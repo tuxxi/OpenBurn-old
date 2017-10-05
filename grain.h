@@ -9,9 +9,16 @@ public:
     ~OpenBurnGrain() {}
 
     virtual double GetSurfaceArea() = 0; //return the burning surface area of the propellant
+    virtual double GetVolume() = 0;
+    //burn faces and regress size params based on burn rate. run this once per time step
+    //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
+    virtual bool Burn(double timestep) = 0;
+
+    virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
     OpenBurnPropellant GetPropellantType() { return m_prop; }
     OpenBurnPropellant SetPropellantType(OpenBurnPropellant prop) {m_prop = prop;}
 protected:
+    double m_rNot, m_rErosive; //burn rates, additive (i.e r = r0 + re)
     OpenBurnPropellant m_prop;
     OpenBurnGrain(OpenBurnPropellant prop)
         : m_prop(prop)
@@ -28,7 +35,8 @@ public:
     {}
     ~BatesGrain() {}
     virtual double GetSurfaceArea() override;
-
+    virtual double GetVolume() override;
+    virtual bool Burn(double timestep) override;
 private:
     double m_grainDia, m_coreDia, m_grainLen;
     int m_numInhibitedFaces;
