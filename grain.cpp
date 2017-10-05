@@ -13,10 +13,18 @@ double BatesGrain::GetSurfaceArea()
 
     return core_area + (2 - m_numInhibitedFaces) * face_area;
 }
+double BatesGrain::GetPortArea()
+{
+    return 2 * M_PI * m_coreDia;
+}
 double BatesGrain::GetVolume()
 {
     double face_area = M_PI * ( m_grainDia * m_grainDia - m_coreDia * m_coreDia );
     return face_area * m_grainLen;
+}
+double BatesGrain::GetHydraulicDiameter()
+{
+    return 4 *( GetPortArea() / (M_PI * m_grainDia) );
 }
 bool BatesGrain::Burn(double timestep)
 {

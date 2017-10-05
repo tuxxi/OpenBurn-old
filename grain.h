@@ -9,7 +9,9 @@ public:
     ~OpenBurnGrain() {}
 
     virtual double GetSurfaceArea() = 0; //return the burning surface area of the propellant
+    virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
+    virtual double GetHydraulicDiameter() = 0; //used for erosive burning calculation
     //burn faces and regress size params based on burn rate. run this once per time step
     //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
     virtual bool Burn(double timestep) = 0;
@@ -35,7 +37,9 @@ public:
     {}
     ~BatesGrain() {}
     virtual double GetSurfaceArea() override;
+    virtual double GetPortArea() override;
     virtual double GetVolume() override;
+    virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
 private:
     double m_grainDia, m_coreDia, m_grainLen;

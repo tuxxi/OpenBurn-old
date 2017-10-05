@@ -13,9 +13,13 @@ public:
     {
         m_avgPropellant = &CalcAvgPropellant();
     }
+    //per unit area:
+    double CalcMassFlowRate(double machNumber);
+
+    //per grain:
     //calculates linear burn rate for a given grain
-    double CalcSteadyStateBurnRate(OpenBurnGrain*); //based on saint robert's law. No erosive burning
-    double CalcErosiveBurnRateFactor(OpenBurnGrain*); //multiplicative law
+    double CalcSteadyStateBurnRate(OpenBurnGrain* grain); //based on saint robert's law. No erosive burning
+    double CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumber); //multiplicative law
 
     //whole chamber:
     double CalcChamberPressure();

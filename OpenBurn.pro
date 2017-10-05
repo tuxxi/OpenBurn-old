@@ -38,7 +38,8 @@ HEADERS += \
     motorsim.h \
     nozzle.h \
     graindialog.h \
-    mainwindow.h
+    mainwindow.h \
+    util.h
 
 FORMS += \
         openburn.ui \
