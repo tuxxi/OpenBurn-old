@@ -11,10 +11,10 @@ public:
     MotorSim(std::list<OpenBurnGrain*>grains, OpenBurnNozzle* nozzle)
         : m_Grains(grains), m_Nozzle(nozzle)
     {
-        m_avgPropellant = &CalcAvgPropellant();
+        m_avgPropellant = CalcAvgPropellant();
     }
     //per unit area:
-    double CalcMassFlowRate(double machNumber);
+    double CalcMassFlowRate(double machNumber, double portArea);
 
     //per grain:
     //calculates linear burn rate for a given grain
@@ -33,6 +33,6 @@ private:
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
 
     //weighted average based on mass of propellant
-    OpenBurnPropellant CalcAvgPropellant();
+    OpenBurnPropellant* CalcAvgPropellant();
     OpenBurnPropellant* m_avgPropellant;
 };

@@ -11,16 +11,16 @@ void MotorSim::RunSim(double timestep)
     }
 }
 //mdot A.K.A Mass flux at given crossflow mach number
-double MotorSim::CalcMassFlowRate(double machNumber)
+double MotorSim::CalcMassFlowRate(double machNumber, double portArea)
 {
-    //mdot = M * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
+    //mdot = M * A * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
     //P_0 = gas pressure, T_0 = gas temperature, k = ratio specific heats (cp/cv), M = mach number, R = gas constant
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
 
     double temp = m_avgPropellant->GetAdiabaticFlameTemp();
     double k = m_avgPropellant->GetSpecificHeatRatio();
-    double A = machNumber * CalcChamberPressure() * qSqrt( (k / (temp * g_kGasConstantR)) );
+    double A = machNumber * portArea * CalcChamberPressure() * qSqrt( (k / (temp * g_kGasConstantR)) );
     double B = 1.0f + (k - 1) / 2 * machNumber * machNumber;
     double C = (k - 1.0f) / 2;
     return A * qPow(B, -1.0f*C);
@@ -62,25 +62,25 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     double exponent = -1.0f*k / (k - 1.0f);
     double P = P_s * qPow(base, exponent);
 
-    //This burn rate value is __lower__ than saint robert's law due to heat transfer considerations.
-    //Normally this value would be used as R_0 but the mach number is not considered in the basic case,
+    //This burn rate value is __lower__ than saint robert's law due to stagnation pressure considerations.
+    //Normally this value would be used as R_0 but the core mach number is not considered in the basic case,
     //So we calculate it here and subtract the difference from R_e at the end.
     double R_0 = prop.GetBurnRateCoef() * qPow(P, prop.GetBurnRateExp());
     double R_diff = CalcSteadyStateBurnRate(grain) - R_0; //this factor will be removed later on
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
-    double G = CalcMassFlowRate(machNumber); // mass flux [or flow rate, depending on who you ask ... :( ]
+    double G = CalcMassFlowRate(machNumber, grain->GetPortArea()); // mass flux [or flow rate, depending on who you ask ... :( ]
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
-    double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant
+    double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
     double rho = prop.GetDensity(); //propellant density
-    double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (at constant pressure)
+    double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
     double T_0 = prop.GetAdiabaticFlameTemp();// adiabatic flame temperature
     double mu = prop.GetGasViscosity(); //viscoisty of combustion products
     double Pr = prop.GetPrandtlNumber(); //prandtl number
 
-    double T_s = 1000;//Average surface temp of burning propellant (degrees K)
-    double T_i = 300; //Base temperature of propellant (degrees K)
+    double T_s = OpenBurnUtil::g_kSurfaceTemperature; //Temperature of burning propellant surface
+    double T_i = OpenBurnUtil::g_kAmbientTemperature; //Base temperature of propellant (degrees K)
     /*
     Now we calculate erosive burning from the given equation:
     R_e = (alpha * G^0.8 ) / [D^0.2 * e^( (beta * R_ttl * rho)/G )]
@@ -102,12 +102,12 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     for (int i = 0; i < OpenBurnUtil::g_kNumInterations; i++) //
     {
         //d/dx ae^(br)-r = abe^(br)-1
-        R_total = R_total - (R_0 + a * qPow(M_E, b * R_total) - R_total) / (R_0 + a * b * qPow(M_E, b * R_total) - 1.0f);
+        R_total = R_total - (R_total + a * qPow(M_E, b * R_total) - R_total) / (R_total + a * b * qPow(M_E, b * R_total) - 1.0f);
     }
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-OpenBurnPropellant MotorSim::CalcAvgPropellant()
+OpenBurnPropellant* MotorSim::CalcAvgPropellant()
 {
     double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_cpcv = 0;
     //sum up all the propellant properties
@@ -124,5 +124,5 @@ OpenBurnPropellant MotorSim::CalcAvgPropellant()
     double n = weighted_n / m_Grains.size();
     double cstar = weighted_cstar / m_Grains.size();
     double cpcv = weighted_cpcv / m_Grains.size();
-    return OpenBurnPropellant(a, n, cstar, cpcv);
+    return new OpenBurnPropellant(a, n, cstar, cpcv);
 }
