@@ -1,12 +1,50 @@
 #include "motorsim.h"
 #include "util.h"
-
+#include <QtDebug>
 using OpenBurnUtil::g_kGasConstantR;
+void MotorSim::SetGrains(std::vector<OpenBurnGrain*> grains)
+{
+    m_Grains = grains;
+}
+void MotorSim::AddGrain(OpenBurnGrain* grain)
+{
+    m_Grains.push_back(grain);
+}
+void MotorSim::RemoveGrain(OpenBurnGrain *grain)
+{
+    for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
+    {
+        if (*i == grain)
+        {
+            m_Grains.erase(i);
+        }
+    }
+}
+void MotorSim::RemoveGrain(int index)
+{
+    int counter = 0;
+    for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
+    {
+        counter++;
+        if (counter == index)
+        {
+            m_Grains.erase(i);
+        }
+    }
+}
+void MotorSim::SetNozzle(OpenBurnNozzle* nozz)
+{
+    m_Nozzle = nozz;
+}
 
 void MotorSim::RunSim(double timestep)
 {
+    CalcAvgPropellant();
     for (auto i : m_Grains)
     {
+        i->SetBurnRate(CalcSteadyStateBurnRate(i));
+        // TODO: if (erosive)
+        //i->SetErosiveBurnRate();
         i->Burn(timestep);
     }
 }
@@ -124,5 +162,12 @@ OpenBurnPropellant* MotorSim::CalcAvgPropellant()
     double n = weighted_n / m_Grains.size();
     double cstar = weighted_cstar / m_Grains.size();
     double cpcv = weighted_cpcv / m_Grains.size();
-    return new OpenBurnPropellant(a, n, cstar, cpcv);
+    return new OpenBurnPropellant(a, n, cstar, cpcv, "OPENBURNDEBUG::AVGPROP");
+}
+void MotorSim::SwapGrains(int one, int two)
+{
+    //TODO: fix me
+    qDebug() << "Grain idx " << one << "swapping with idx " << two << "\n";
+    qDebug() << "m_Grains has size: " << m_Grains.size() << "\n";
+    //std::swap(m_Grains[one-1], m_Grains[two-1]);
 }

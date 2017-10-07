@@ -1,6 +1,6 @@
 #pragma once
 
-#include <list>
+#include <vector>
 
 #include "grain.h"
 #include "nozzle.h"
@@ -8,11 +8,16 @@
 class MotorSim
 {
 public:
-    MotorSim(std::list<OpenBurnGrain*>grains, OpenBurnNozzle* nozzle)
-        : m_Grains(grains), m_Nozzle(nozzle)
-    {
-        m_avgPropellant = CalcAvgPropellant();
-    }
+    MotorSim() :
+        m_avgPropellant(nullptr), m_Nozzle(nullptr), m_Grains(NULL)
+    {}
+
+    void SetGrains(std::vector<OpenBurnGrain*> grains);
+    void AddGrain(OpenBurnGrain* grain);
+    void RemoveGrain(OpenBurnGrain *grain);
+    void RemoveGrain(int index);
+    void SwapGrains(int idx1, int idx2);
+    void SetNozzle(OpenBurnNozzle* nozz);
     //per unit area:
     double CalcMassFlowRate(double machNumber, double portArea);
 
@@ -27,8 +32,9 @@ public:
 
     void RunSim(double timestep = 0.01f);
 
+    size_t GetNumGrains() { return m_Grains.size(); }
 private:
-    std::list<OpenBurnGrain*> m_Grains; //all grains in the motor
+    std::vector<OpenBurnGrain*> m_Grains; //all grains in the motor
     OpenBurnNozzle *m_Nozzle;
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
 

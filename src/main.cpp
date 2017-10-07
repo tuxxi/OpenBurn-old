@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <list>
 
-#include "mainwindow.h"
+#include "src/ui/mainwindow.h"
 
 #include "motorsim.h"
 #include "grain.h"

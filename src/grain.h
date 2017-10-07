@@ -8,6 +8,9 @@ class OpenBurnGrain
 public:
     ~OpenBurnGrain() {}
 
+    virtual double GetLength() = 0;
+    virtual double GetCoreDiameter() = 0;
+    virtual double GetDiameter() = 0;
     virtual double GetSurfaceArea() = 0; //return the burning surface area of the propellant
     virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
@@ -29,13 +32,16 @@ protected:
 };
 
 //a cylindrical bates grain
-class BatesGrain : OpenBurnGrain
+class BatesGrain : public OpenBurnGrain
 {
 public:
     BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop)
         : OpenBurnGrain(prop), m_grainDia(dia), m_coreDia(coredia), m_grainLen(len)
     {}
     ~BatesGrain() {}
+    virtual double GetLength() override { return m_grainLen; }
+    virtual double GetDiameter() override { return m_grainDia; }
+    virtual double GetCoreDiameter() override { return m_coreDia; }
     virtual double GetSurfaceArea() override;
     virtual double GetPortArea() override;
     virtual double GetVolume() override;

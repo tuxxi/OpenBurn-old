@@ -30,7 +30,8 @@ SOURCES += \
     src/motorsim.cpp \
     src/nozzle.cpp \
     src/ui/graindialog.cpp \
-    src/ui/mainwindow.cpp
+    src/ui/mainwindow.cpp \
+    src/ui/graintablewidget.cpp
 
 HEADERS += \
     src/grain.h \
@@ -39,7 +40,8 @@ HEADERS += \
     src/nozzle.h \
     src/ui/graindialog.h \
     src/ui/mainwindow.h \
-    src/util.h
+    src/util.h \
+    src/ui/graintablewidget.h
 
 FORMS += \
     src/ui/graindialog.ui \

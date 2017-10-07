@@ -1,12 +1,14 @@
 #include "graindialog.h"
 #include "ui_graindialog.h"
-#include "grain.h"
+#include "src/grain.h"
+#include "mainwindow.h"
 
 GrainDialog::GrainDialog(QWidget *parent, bool newGrain) :
     QDialog(parent), m_isNewGrainWindow(newGrain),
     ui(new Ui::GrainDialog)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
     if (m_isNewGrainWindow)
     {
         ui->ApplyOrAddNewGrainButton->setText(QApplication::translate("GrainConfirmNew", "Add"));
@@ -35,10 +37,10 @@ GrainDialog::~GrainDialog()
 {
     delete ui;
 }
-
 void GrainDialog::on_cancelButton_clicked()
 {
     close();
+    emit DialogClosed();
 }
 
 void GrainDialog::on_ApplyOrAddNewGrainButton_clicked()
@@ -46,9 +48,14 @@ void GrainDialog::on_ApplyOrAddNewGrainButton_clicked()
     if (m_isNewGrainWindow)
     {
         BatesGrain *grain = new BatesGrain(
-                    ui->grainCoreDiameterComboBox->value(),
+                    ui->grainDiameterComboBox->value(),
                     ui->grainCoreDiameterComboBox->value(),
                     ui->grainLengthComboBox->value(),
-                    OpenBurnPropellant());
+                    *(new OpenBurnPropellant()));
+        emit NewGrain(grain);
+    }
+    else //Editing grain
+    {
+
     }
 }

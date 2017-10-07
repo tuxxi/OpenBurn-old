@@ -1,13 +1,17 @@
 #pragma once
+#include <QString>
 #include "util.h"
 
 class OpenBurnPropellant
 {
 public:
     OpenBurnPropellant() {}
-    OpenBurnPropellant(double a, double n, double cstar, double rho)
-        : m_burnRateCoef(a), m_burnRateExp(n), m_charVel(cstar), m_density(rho)
+    OpenBurnPropellant(double a, double n, double cstar, double rho, QString name)
+        : m_burnRateCoef(a), m_burnRateExp(n), m_charVel(cstar), m_density(rho), m_PropellantName(name)
     {}
+    void SetPropellantName(QString name) { m_PropellantName = name; }
+    QString GetPropellantName() { return m_PropellantName; }
+
     void SetBasicParams(double a, double n, double cstar, double rho);
     void SetAdvancedParams(double Cv, double Cp, double Cs, double Tnot, double molarmass, double mu, double Pr);
 
@@ -27,6 +31,7 @@ public:
     double GetGasViscosity() { return m_gasViscosity; }
     double GetPrandtlNumber() { return m_prandtlNumber; }
 private:
+    QString m_PropellantName;
     //BASIC:
     double m_burnRateCoef, m_burnRateExp; //a, n
     double m_charVel; //c*, m/s
