@@ -42,5 +42,5 @@ HEADERS += \
     util.h
 
 FORMS += \
-        openburn.ui \
-    graindialog.ui
+    graindialog.ui \
+    mainwindow.ui

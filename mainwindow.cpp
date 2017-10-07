@@ -2,10 +2,10 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QCloseEvent>
 
 #include "mainwindow.h"
-#include "ui_openburn.h"
-
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +17,22 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete grainDialog;
+}
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn =
+            QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
+            QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes)
+    {
+        event->ignore();
+    }
+    else
+    {
+        grainDialog->close();
+        event->accept();
+    }
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -74,6 +90,11 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_pushButton_clicked()
 {
-    dialog = new GrainDialog();
-    dialog->show();
+    if (!grainDialog) //only create one!
+    {
+        grainDialog = new GrainDialog();
+    }
+    grainDialog->show();
+    grainDialog->activateWindow();
+    grainDialog->raise();
 }

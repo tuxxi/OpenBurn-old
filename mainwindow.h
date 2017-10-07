@@ -26,6 +26,7 @@ private slots:
     void on_pushButton_clicked();
 
 private:
+    void closeEvent(QCloseEvent*);
     Ui::MainWindow *ui;
-    GrainDialog *dialog;
+    GrainDialog *grainDialog;
 };

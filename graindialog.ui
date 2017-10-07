@@ -78,7 +78,7 @@
        <item>
         <widget class="QComboBox" name="grainDiaUnitsComboBox">
          <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
+          <enum>Qt::LeftToRight</enum>
          </property>
         </widget>
        </item>
@@ -103,7 +103,7 @@
        <item>
         <widget class="QComboBox" name="grainLenUnitsComboBox">
          <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
+          <enum>Qt::LeftToRight</enum>
          </property>
         </widget>
        </item>
@@ -131,7 +131,7 @@
        <item>
         <widget class="QComboBox" name="grainCoreDiaUnitsComboBox">
          <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
+          <enum>Qt::LeftToRight</enum>
          </property>
         </widget>
        </item>
@@ -163,7 +163,7 @@
     <rect>
      <x>180</x>
      <y>200</y>
-     <width>161</width>
+     <width>168</width>
      <height>41</height>
     </rect>
    </property>

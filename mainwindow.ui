@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OpenBurn</class>
- <widget class="QMainWindow" name="OpenBurn">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,16 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>OpenBurn</string>
+   <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>310</y>
-      <width>981</width>
-      <height>251</height>
+      <width>1081</width>
+      <height>241</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -48,7 +48,20 @@
      </item>
     </layout>
    </widget>
-   <widget class="QTableView" name="tableView">
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>10</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add BATES Grain</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -56,19 +69,6 @@
       <width>671</width>
       <height>301</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>40</y>
-      <width>241</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Add BATES Grain</string>
     </property>
    </widget>
   </widget>
@@ -81,7 +81,7 @@
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuOpenBurn">
+   <widget class="QMenu" name="menuMainWindow">
     <property name="title">
      <string>File</string>
     </property>
@@ -91,7 +91,7 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <addaction name="menuOpenBurn"/>
+   <addaction name="menuMainWindow"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">

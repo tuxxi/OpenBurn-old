@@ -17,6 +17,8 @@ public:
 private slots:
     void on_cancelButton_clicked();
 
+    void on_ApplyOrAddNewGrainButton_clicked();
+
 private:
     Ui::GrainDialog *ui;
     bool m_isNewGrainWindow;
