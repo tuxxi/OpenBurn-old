@@ -24,23 +24,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-    grain.cpp \
-    propellant.cpp \
-    motorsim.cpp \
-    nozzle.cpp \
-    graindialog.cpp \
-    mainwindow.cpp
+        src/main.cpp \
+    src/grain.cpp \
+    src/propellant.cpp \
+    src/motorsim.cpp \
+    src/nozzle.cpp \
+    src/ui/graindialog.cpp \
+    src/ui/mainwindow.cpp
 
 HEADERS += \
-    grain.h \
-    propellant.h \
-    motorsim.h \
-    nozzle.h \
-    graindialog.h \
-    mainwindow.h \
-    util.h
+    src/grain.h \
+    src/propellant.h \
+    src/motorsim.h \
+    src/nozzle.h \
+    src/ui/graindialog.h \
+    src/ui/mainwindow.h \
+    src/util.h
 
 FORMS += \
-    graindialog.ui \
-    mainwindow.ui
+    src/ui/graindialog.ui \
+    src/ui/mainwindow.ui
