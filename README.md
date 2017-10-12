@@ -22,10 +22,12 @@ Compiling OpenBurn _should_ be easy on any platform as long as you have the [lat
 
 On Linux/OSX: 
 
-```$ qmake OpenBurn.pro
+```
+$ qmake OpenBurn.pro
 $ make clean
 $ make
-$ ./OpenBurn```
+$ ./OpenBurn
+```
 
 
 
