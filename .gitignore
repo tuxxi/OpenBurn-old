@@ -1,2 +1,7 @@
 *.pro.user
-
+*.o
+moc_*.cpp
+ui_*.h
+*.qmake.stash
+Makefile
+OpenBurn

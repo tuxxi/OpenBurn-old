@@ -1,7 +1,7 @@
 # OpenBurn
 
 OpenBurn is an open-source internal balistics simulation software suite designed from the ground up for the amateur
-rocketry community. OpenBurn is based on C++/Qt5 for cross platform GUI support across all major platforms.
+rocketry community. OpenBurn is based on C++/Qt5, and will have support across all major platforms.
 
 ### Features
 
@@ -18,5 +18,14 @@ calculate necesscary propellant constants such as C*, rho, gamma, Cp, Pr, and mo
 
 ### Compiling
 
-Compiling via Qt Creator is easy, simply open `OpenBurn.pro`, run qmake, and build all files.
+Compiling OpenBurn _should_ be easy on any platform as long as you have the [latest version of the Qt SDK.](https://doc.qt.io/archives/sdk-1.2/sdk-installing.html) 
+
+On Linux/OSX: 
+
+```$ qmake OpenBurn.pro
+$ make clean
+$ make
+$ ./OpenBurn```
+
+
 
