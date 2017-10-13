@@ -4,26 +4,94 @@
 #include <QTextStream>
 #include <QCloseEvent>
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "src/ui/mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    grainDialog = nullptr;
-    ui->setupUi(this);
-    sim = new MotorSim();
+    SetupUI();
+    sim = new MotorSim();    
+}
+void MainWindow::SetupUI()
+{
+    if (objectName().isEmpty())
+        setObjectName(QStringLiteral("MainWindow"));
 
-    connect(ui->tableWidget, SIGNAL(GrainPositionUpdated(int&,int&)),
-            this, SLOT(GrainPositionUpdated(int&,int&)) );
+    setWindowTitle(tr("OpenBurn"));
+    setGeometry(0, 0, 1200, 600);
+    menuBar = new QMenuBar(this);
+    menuBar->setGeometry(QRect(0, 0, 1920, 20));
+    setMenuBar(menuBar);
+    
+    menuFile = new QMenu(menuBar);
+    menuEdit = new QMenu(menuBar);
+    menuTools = new QMenu(menuBar);
+    menuHelp = new QMenu(menuBar);
+    
+    menuFile->setTitle(tr("File"));
+    menuEdit->setTitle(tr("Edit"));
+    menuTools->setTitle(tr("Tools"));    
+    menuHelp->setTitle(tr("Help"));
 
+    actionNew = new QAction(this);
+    actionNew->setText(tr("New"));
+    actionNew->setShortcuts(QKeySequence::New);    
+    //connect(actionNew, &QAction::triggered, this, &MainWindow::menuNew);
+    
+    actionOpen = new QAction(this);
+    actionOpen->setText(tr("Open"));
+    actionOpen->setShortcuts(QKeySequence::Open);    
+    connect(actionOpen, &QAction::triggered, this, &MainWindow::menuOpen);
+
+    actionSave = new QAction(this);
+    actionSave->setText(tr("Save"));
+    actionSave->setShortcuts(QKeySequence::Save);
+    connect(actionSave, &QAction::triggered, this, &MainWindow::menuSave);
+
+    actionSave_As = new QAction(this);
+    actionSave_As->setText(tr("Save As..."));
+    connect(actionSave_As, &QAction::triggered, this, &MainWindow::menuSaveAs);
+    
+    actionExport = new QAction(this);
+    actionExport->setText(tr("Export"));
+    //connect(actionExport, &QAction::triggered, this, &MainWindow::menuSave);
+
+    actionQuit = new QAction(this);
+    actionQuit->setText(tr("Quit"));
+    actionQuit->setShortcuts(QKeySequence::Quit);
+    connect(actionQuit, &QAction::triggered, this, &MainWindow::menuQuit);
+
+    menuBar->addAction(menuFile->menuAction());
+    menuBar->addAction(menuEdit->menuAction());
+    menuBar->addAction(menuTools->menuAction());
+    menuBar->addAction(menuHelp->menuAction());
+    menuFile->addAction(actionNew);
+    menuFile->addAction(actionOpen);
+    menuFile->addAction(actionSave);
+    menuFile->addAction(actionSave_As);
+    menuFile->addAction(actionExport);
+    menuFile->addSeparator();
+    menuFile->addAction(actionQuit);
+
+    statusBar = new QStatusBar(this);
+    setStatusBar(statusBar);
+
+    centralWidget = new QWidget(this);
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    centralWidget->setSizePolicy(sizePolicy);
+    setSizePolicy(sizePolicy);
+    setCentralWidget(centralWidget);
+    
+    tabWidget = new QTabWidget(centralWidget);
+    tabWidget->addTab(new DesignTab, tr("Design"));
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(tabWidget);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-    delete grainDialog;
+    delete sim;
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -38,34 +106,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         event->accept();
     }
-    if (grainDialog) grainDialog->close();
 }
-void MainWindow::DialogClosed()
-{
-    grainDialog = nullptr;
-}
-void MainWindow::NewGrain(OpenBurnGrain *grain)
-{
-    int insertRow = ui->tableWidget->rowCount();
-
-    ui->tableWidget->insertRow(insertRow);
-    ui->tableWidget->setItem(insertRow, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
-    ui->tableWidget->setItem(insertRow, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
-    ui->tableWidget->setItem(insertRow, 2, new QTableWidgetItem(QString::number(grain->GetCoreDiameter())));
-    ui->tableWidget->setItem(insertRow, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
-
-    sim->AddGrain(grain);
-}
-void MainWindow::GrainPositionUpdated(int &oldPos, int &newPos)
-{
-    sim->SwapGrains(oldPos, newPos);
-}
-void MainWindow::on_actionQuit_triggered()
+void MainWindow::menuQuit()
 {
     QCoreApplication::quit();
 }
 
-void MainWindow::on_actionOpen_triggered()
+void MainWindow::menuOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
             tr("OpenBurn File (*.obm);;BurnSim File (*.bsx)"));
@@ -83,7 +130,7 @@ void MainWindow::on_actionOpen_triggered()
 
 }
 
-void MainWindow::on_actionSave_As_triggered()
+void MainWindow::menuSaveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
             tr("OpenBurn File (*.obm);;BurnSim File (*.bsx)"));
@@ -107,38 +154,7 @@ void MainWindow::on_actionSave_As_triggered()
     }
 
 }
-void MainWindow::on_actionSave_triggered()
+void MainWindow::menuSave()
 {
     //save file
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    if (grainDialog == nullptr) //only create one!
-    {
-        grainDialog = new GrainDialog();
-        connect(grainDialog, SIGNAL(DialogClosed()),
-                this, SLOT(DialogClosed()));
-        connect(grainDialog, SIGNAL(NewGrain(OpenBurnGrain*)),
-                this, SLOT(NewGrain(OpenBurnGrain*)));
-    }
-    grainDialog->show();
-    grainDialog->activateWindow();
-    grainDialog->raise();
-}
-
-void MainWindow::on_pushButton_5_clicked()
-{
-    if (grainDialog == nullptr)
-    {
-        grainDialog = new GrainDialog(nullptr, false);
-        connect(grainDialog, SIGNAL(DialogClosed()),
-                    this, SLOT(DialogClosed()));
-        connect(grainDialog, SIGNAL(NewGrain(OpenBurnGrain*)),
-                this, SLOT(NewGrain(OpenBurnGrain*)));
-
-    }
-    grainDialog->show();
-    grainDialog->activateWindow();
-    grainDialog->raise();
 }

@@ -5,3 +5,4 @@ ui_*.h
 *.qmake.stash
 Makefile
 OpenBurn
+.vscode/
