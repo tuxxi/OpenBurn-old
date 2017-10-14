@@ -17,5 +17,5 @@ private:
     void SetupUI();
     QPushButton *newGrainButton;
 
-    GrainDialog *dialog;
+    GrainDialog *grainDialog;
 };

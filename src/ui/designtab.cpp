@@ -1,9 +1,10 @@
 #include "src/ui/designtab.h"
+
 DesignTab::DesignTab(QWidget* parent)
     : QWidget(parent)
 {   
-    connect(newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked));
     SetupUI();
+    connect(newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));    
 }
 DesignTab::~DesignTab() 
 {
@@ -21,5 +22,8 @@ void DesignTab::SetupUI()
 }
 void DesignTab::NewGrainButton_Clicked()
 {
-    dialog = new GrainDialog;
+    grainDialog = new GrainDialog(nullptr, false);
+    grainDialog->show();
+    grainDialog->activateWindow();
+    grainDialog->raise(); 
 }

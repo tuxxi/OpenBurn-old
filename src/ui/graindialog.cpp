@@ -4,6 +4,7 @@
 GrainDialog::GrainDialog(QWidget *parent, bool newGrain) :
     QDialog(parent), m_isNewGrainWindow(newGrain)
 {
+    SetupGraphicsView();    
     SetupUI();
     setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -19,9 +20,9 @@ void GrainDialog::SetupUI()
     sizePolicy.setHeightForWidth(this->sizePolicy().hasHeightForWidth());
     setSizePolicy(sizePolicy);
 
-    frame = new QFrame(this);
-    masterVLayout = new QVBoxLayout;
-
+    QFrame* frame = new QFrame(this);
+    QVBoxLayout* masterVLayout = new QVBoxLayout;
+    
     QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
     sizePolicy1.setHorizontalStretch(0);
     sizePolicy1.setVerticalStretch(0);
@@ -37,16 +38,18 @@ void GrainDialog::SetupUI()
     tr("feet", "Feet (ft)") <<
     tr("meters", "Meters (m)"));
     
-    controlsVLayout = new QVBoxLayout();
-
+    QVBoxLayout* controlsVLayout = new QVBoxLayout();
+    
     //Propellant Selection Box 
     propellantComboBox = new QComboBox(frame);
-    label = new QLabel(frame);
+    QLabel* label = new QLabel(frame);
     modifyPropellantDatabase = new QToolButton(frame);
+    modifyPropellantDatabase->setText(tr("..."));    
 
-    propellantHLayout = new QHBoxLayout();
+    QHBoxLayout* propellantHLayout = new QHBoxLayout();
+
+    propellantHLayout->addWidget(label);    
     propellantHLayout->addWidget(propellantComboBox);
-    propellantHLayout->addWidget(label);
     propellantHLayout->addWidget(modifyPropellantDatabase);
     propellantHLayout->setStretch(0, 5);
     propellantHLayout->setStretch(1, 1);
@@ -55,82 +58,81 @@ void GrainDialog::SetupUI()
     controlsVLayout->addLayout(propellantHLayout);
 
     //Grain Length 
-    grainLengthHLayout = new QHBoxLayout();
+    QHBoxLayout* grainLengthHLayout = new QHBoxLayout();
 
-    grainLengthComboBox = new QDoubleSpinBox(frame);
-    grainLengthComboBox->setDecimals(3);
-    grainLengthComboBox->setMaximum(1e+9);
-    grainLengthComboBox->setSingleStep(0.25);    
-    label_2 = new QLabel(frame);
+    grainLengthSpinBox = new QDoubleSpinBox(frame);
+    grainLengthSpinBox->setDecimals(3);
+    grainLengthSpinBox->setMaximum(1e+9);
+    grainLengthSpinBox->setSingleStep(0.25);    
+    QLabel* label_2 = new QLabel(frame);
     grainLenUnitsComboBox = new QComboBox(frame);
     grainLenUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
     grainLenUnitsComboBox->addItems(units);
-    
-    grainLengthHLayout->addWidget(grainLengthComboBox);    
+
+    grainLengthHLayout->addWidget(label_2);    
+    grainLengthHLayout->addWidget(grainLengthSpinBox);    
     grainLengthHLayout->addWidget(grainLenUnitsComboBox);
-    grainLengthHLayout->addWidget(label_2);
 
     // -------------------------
     controlsVLayout->addLayout(grainLengthHLayout);
 
     //Grain Diameter
-    grainDiaHLayout = new QHBoxLayout();
+    QHBoxLayout* grainDiaHLayout = new QHBoxLayout();
 
-    grainDiameterComboBox = new QDoubleSpinBox(frame);
-    grainDiameterComboBox->setDecimals(3);
-    grainDiameterComboBox->setMaximum(1e+9);
-    grainDiameterComboBox->setSingleStep(0.25);    
-    label_3 = new QLabel(frame);
+    grainDiameterSpinBox = new QDoubleSpinBox(frame);
+    grainDiameterSpinBox->setDecimals(3);
+    grainDiameterSpinBox->setMaximum(1e+9);
+    grainDiameterSpinBox->setSingleStep(0.25);    
+    QLabel* label_3 = new QLabel(frame);
     grainDiaUnitsComboBox = new QComboBox(frame);
     grainDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
     grainDiaUnitsComboBox->addItems(units);
     
-    
-    grainDiaHLayout->addWidget(grainDiameterComboBox);
-    grainDiaHLayout->addWidget(label_3);
+    grainDiaHLayout->addWidget(label_3);    
+    grainDiaHLayout->addWidget(grainDiameterSpinBox);
     grainDiaHLayout->addWidget(grainDiaUnitsComboBox);
 
     // ------------------------
     controlsVLayout->addLayout(grainDiaHLayout);
 
     //Grain Core Diameter
-    grainCoreDiaHLayout = new QHBoxLayout();
+    QHBoxLayout* grainCoreDiaHLayout = new QHBoxLayout();
 
-    grainCoreDiameterComboBox = new QDoubleSpinBox(frame);
-    grainCoreDiameterComboBox->setDecimals(3);
-    grainCoreDiameterComboBox->setMaximum(1e+9);
-    grainCoreDiameterComboBox->setSingleStep(0.25);
-    label_4 = new QLabel(frame);
+    grainCoreDiameterSpinBox = new QDoubleSpinBox(frame);
+    grainCoreDiameterSpinBox->setDecimals(3);
+    grainCoreDiameterSpinBox->setMaximum(1e+9);
+    grainCoreDiameterSpinBox->setSingleStep(0.25);
+    QLabel* label_4 = new QLabel(frame);
     grainCoreDiaUnitsComboBox = new QComboBox(frame);
     grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
     grainCoreDiaUnitsComboBox->addItems(units);
     
     grainCoreDiaHLayout->addWidget(label_4);    
-    grainCoreDiaHLayout->addWidget(grainCoreDiameterComboBox);    
+    grainCoreDiaHLayout->addWidget(grainCoreDiameterSpinBox);    
     grainCoreDiaHLayout->addWidget(grainCoreDiaUnitsComboBox);
 
     // -----------
     controlsVLayout->addLayout(grainCoreDiaHLayout);
 
     //Inhibited Faces
-    grainFacesHLayout = new QHBoxLayout();
+    QHBoxLayout* grainFacesHLayout = new QHBoxLayout();
 
-    grainInhibitedFacesComboBox = new QSpinBox(frame);
-    grainInhibitedFacesComboBox->setMaximum(2);
-    label_5 = new QLabel(frame);
-    horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    grainInhibitedFacesSpinBox = new QSpinBox(frame);
+    grainInhibitedFacesSpinBox->setMaximum(2);
+    QLabel* label_5 = new QLabel(frame);
+    QSpacerItem* horizontalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     grainFacesHLayout->addWidget(label_5);
-    grainFacesHLayout->addWidget(grainInhibitedFacesComboBox);
+    grainFacesHLayout->addWidget(grainInhibitedFacesSpinBox);
     grainFacesHLayout->addItem(horizontalSpacer_2);
 
     // ---------------
     controlsVLayout->addLayout(grainFacesHLayout);
 
     // OK and Cancel buttons
-    commandButtonsHLayout = new QHBoxLayout();
+    QHBoxLayout* commandButtonsHLayout = new QHBoxLayout();
     commandButtonsHLayout->setSpacing(6);
-    horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     ApplyOrAddNewGrainButton = new QPushButton(frame);
     cancelButton = new QPushButton(frame);
 
@@ -141,21 +143,15 @@ void GrainDialog::SetupUI()
     controlsVLayout->addLayout(commandButtonsHLayout);
     
     //2D grain cross section preview
-    graphicsView = new QGraphicsView(this);
-    QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Expanding);
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(graphicsView->sizePolicy().hasHeightForWidth());
-    graphicsView->setSizePolicy(sizePolicy2);
 
-    masterVLayout->addWidget(frame, 0, Qt::AlignTop);    
+    frame->setLayout(controlsVLayout);    
+    masterVLayout->addWidget(frame);    
     masterVLayout->addWidget(graphicsView);
 
     setLayout(masterVLayout);
 
     setWindowTitle(tr("Dialog"));
     label->setText(tr("Propellant Type"));
-    modifyPropellantDatabase->setText(tr("..."));
     label_2->setText(tr("Grain Length"));
     label_3->setText(tr("Grain Diameter"));
     label_4->setText(tr("Grain Core Diameter"));
@@ -166,6 +162,17 @@ void GrainDialog::SetupUI()
     cancelButton->setText(tr("Close"));
 
     setWindowTitle(m_isNewGrainWindow ? tr("Add New Grain") : tr("Modify Grain"));        
+}
+void GrainDialog::SetupGraphicsView()
+{    
+    graphicsView = new QGraphicsView(this);
+    QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(graphicsView->sizePolicy().hasHeightForWidth());
+    graphicsView->setSizePolicy(sizePolicy2);
+
+
 }
 GrainDialog::~GrainDialog()
 {
@@ -182,9 +189,9 @@ void GrainDialog::on_ApplyOrAddNewGrainButton_clicked()
     {
         OpenBurnPropellant prop;
         BatesGrain *grain = new BatesGrain(
-                    grainDiameterComboBox->value(),
-                    grainCoreDiameterComboBox->value(),
-                    grainLengthComboBox->value(),
+                    grainDiameterSpinBox->value(),
+                    grainCoreDiameterSpinBox->value(),
+                    grainLengthSpinBox->value(),
                     prop);
         emit NewGrain(grain);
     }
