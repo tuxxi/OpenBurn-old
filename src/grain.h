@@ -11,7 +11,10 @@ public:
     virtual double GetLength() = 0;
     virtual double GetCoreDiameter() = 0;
     virtual double GetDiameter() = 0;
+    virtual int GetInhibitedFaces() = 0;
+
     virtual double GetSurfaceArea() = 0; //return the burning surface area of the propellant
+
     virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
     virtual double GetHydraulicDiameter() = 0; //used for erosive burning calculation
@@ -21,9 +24,10 @@ public:
 
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
     OpenBurnPropellant GetPropellantType() { return m_prop; }
-    OpenBurnPropellant SetPropellantType(OpenBurnPropellant prop) {m_prop = prop;}
+    void SetPropellantType(OpenBurnPropellant prop) {m_prop = prop;}
 protected:
     double m_rNot, m_rErosive; //burn rates, additive (i.e r = r0 + re)
+
     OpenBurnPropellant m_prop;
     OpenBurnGrain(OpenBurnPropellant prop)
         : m_prop(prop)
@@ -42,6 +46,7 @@ public:
     virtual double GetLength() override { return m_grainLen; }
     virtual double GetDiameter() override { return m_grainDia; }
     virtual double GetCoreDiameter() override { return m_coreDia; }
+    virtual int GetInhibitedFaces() override { return m_numInhibitedFaces; }
     virtual double GetSurfaceArea() override;
     virtual double GetPortArea() override;
     virtual double GetVolume() override;

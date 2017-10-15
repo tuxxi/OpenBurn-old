@@ -132,7 +132,7 @@ void GrainDialog::SetupGraphicsView()
 void GrainDialog::on_cancelButton_clicked()
 {
     close();
-    emit DialogClosed();
+    emit SIG_DialogClosed();
 }
 
 void GrainDialog::on_applyButton_clicked()
@@ -147,7 +147,7 @@ void GrainDialog::on_applyButton_clicked()
             m_grainLengthSpinBox->value(),
             prop,                    
             m_grainInhibitedFacesSpinBox->value());
-        emit NewGrain(grain);
+        emit SIG_DIALOG_NewGrain(grain);
     }
     else //Editing grain
     {

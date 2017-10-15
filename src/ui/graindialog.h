@@ -14,6 +14,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QGridLayout>
+#include <QDebug>
 
 #include "src/grain.h"
 
@@ -26,8 +27,8 @@ public:
     ~GrainDialog();
 
 signals:
-    void DialogClosed();
-    void NewGrain(OpenBurnGrain *grain);
+    void SIG_DialogClosed();
+    void SIG_DIALOG_NewGrain(OpenBurnGrain*);
 
 private slots:
     void on_cancelButton_clicked();

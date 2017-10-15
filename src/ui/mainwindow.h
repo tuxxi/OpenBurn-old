@@ -27,6 +27,7 @@ public:
     ~MainWindow();
 
 public slots:
+    void SLOT_NewGrain(OpenBurnGrain *grain);
 
 private slots:
     void menuQuit();
@@ -41,22 +42,11 @@ private:
 
     QMenuBar *menuBar;
     QStatusBar *statusBar;
-    QMenu *menuFile;
-    QMenu *menuEdit;
-    QMenu *menuTools;
-    QMenu *menuHelp;
+    QMenu *menuFile, *menuEdit, *menuTools, *menuHelp;
 
-    QAction *actionOpen;
-    QAction *actionSave;
-    QAction *actionSave_As;
-    QAction *actionQuit;
-    QAction *actionNew;
-    QAction *actionExport;
+    QAction *actionOpen, *actionSave, *actionSave_As, *actionQuit, *actionNew, *actionExport;
 
     QTabWidget *tabWidget;
-    DesignTab *tab;
-    QWidget *tab_2;
-    QWidget *tab_3;
-    
+    DesignTab *m_designTab;    
     MotorSim *sim;
 };

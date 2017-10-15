@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     SetupUI();
+    connect(m_designTab, SIGNAL(SIG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
     sim = new MotorSim();    
 }
 void MainWindow::SetupUI()
@@ -18,7 +19,7 @@ void MainWindow::SetupUI()
         setObjectName(QStringLiteral("MainWindow"));
 
     setWindowTitle(tr("OpenBurn"));
-    setGeometry(0, 0, 1200, 600);
+    setGeometry(0, 0, 1400, 900);
     menuBar = new QMenuBar(this);
     menuBar->setGeometry(QRect(0, 0, 1920, 20));
     setMenuBar(menuBar);
@@ -80,7 +81,8 @@ void MainWindow::SetupUI()
     setSizePolicy(sizePolicy);
     
     tabWidget = new QTabWidget(this);
-    tabWidget->addTab(new DesignTab, tr("Design"));
+    m_designTab = new DesignTab;
+    tabWidget->addTab(m_designTab, tr("Design"));
 
     setCentralWidget(tabWidget);
 }
@@ -88,6 +90,11 @@ void MainWindow::SetupUI()
 MainWindow::~MainWindow()
 {
     delete sim;
+}
+void MainWindow::SLOT_NewGrain(OpenBurnGrain *grain)
+{
+    qDebug() << "new grain!";
+    sim->AddGrain(grain);
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {

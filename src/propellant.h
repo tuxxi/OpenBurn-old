@@ -25,7 +25,7 @@ public:
     double GetPropellantSpecificHeat() { return m_PropellantSpecificHeat; }
     double GetSpecificHeatConstantPressure() { return m_specificHeatConstantPressure; }
     double GetSpecificHeatConstantVolume() { return m_specificHeatConstantVolume; }
-    double GetSpecificHeatRatio();
+    double GetSpecificHeatRatio(); //defined in propellant.cpp
     double GetAdiabaticFlameTemp() { return m_adiabaticFlameTemp; }
     double GetMolarMass() { return m_molarMass; }
     double GetGasViscosity() { return m_gasViscosity; }

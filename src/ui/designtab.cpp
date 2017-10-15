@@ -4,7 +4,7 @@ DesignTab::DesignTab(QWidget* parent)
     : QWidget(parent)
 {   
     SetupUI();
-    connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));    
+    connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
 }
 DesignTab::~DesignTab() 
 {
@@ -22,6 +22,7 @@ void DesignTab::SetupUI()
     setSizePolicy(sizePolicy);    
 
     m_grainsDisplay = new GrainTableWidget(this);
+    m_grainsDisplay->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_grainsDisplay->setColumnCount(5); //propellant, len, core dia, dia, inhibited face
 
     QStringList tableHeader = (QStringList() << 
@@ -46,18 +47,27 @@ void DesignTab::SetupUI()
     layout->addWidget(m_grainCrossSection, 1, 0, 1, 2);
     setLayout(layout);
 }
-void DesignTab::DialogClosed()
+void DesignTab::SLOT_DialogClosed()
 {
     delete m_grainDialog;
 }
-void DesignTab::NewGrain(OpenBurnGrain *grain)
+void DesignTab::SLOT_NewGrain(OpenBurnGrain *grain)
 {
-
+    int numItems = m_grainsDisplay->rowCount();
+    m_grainsDisplay->setRowCount(numItems+1);
+    m_grainsDisplay->setItem(numItems, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
+    m_grainsDisplay->setItem(numItems, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
+    m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(QString::number(grain->GetCoreDiameter())));    
+    m_grainsDisplay->setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
+    m_grainsDisplay->setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
+    
+    emit SIG_NewGrain(grain);    
 }
 void DesignTab::NewGrainButton_Clicked()
 {
-    m_grainDialog = new GrainDialog(nullptr, false);
-    connect(m_grainDialog, SIGNAL(DialogClosed()), this, SLOT(DialogClosed()));
+    m_grainDialog = new GrainDialog(nullptr, true);
+    connect(m_grainDialog, SIGNAL(SIG_DialogClosed()), this, SLOT(SLOT_DialogClosed()));
+    connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));        
     m_grainDialog->show();
     m_grainDialog->activateWindow();
     m_grainDialog->raise(); 
