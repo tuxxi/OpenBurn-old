@@ -13,6 +13,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
+#include <QGridLayout>
 
 #include "src/grain.h"
 
@@ -30,21 +31,21 @@ signals:
 
 private slots:
     void on_cancelButton_clicked();
-    void on_ApplyOrAddNewGrainButton_clicked();
+    void on_applyButton_clicked();
 
 private:
     void SetupUI();
     void SetupGraphicsView();
 
-    QGraphicsView *graphicsView;
-    QDoubleSpinBox *grainDiameterSpinBox, *grainCoreDiameterSpinBox, *grainLengthSpinBox;
-    QSpinBox *grainInhibitedFacesSpinBox;
+    QGraphicsView *m_graphicsView;
+    QDoubleSpinBox *m_grainDiameterSpinBox, *m_grainCoreDiameterSpinBox, *m_grainLengthSpinBox;
+    QSpinBox *m_grainInhibitedFacesSpinBox;
 
-    QComboBox *propellantComboBox;
-    QComboBox *grainLenUnitsComboBox, *grainDiaUnitsComboBox, *grainCoreDiaUnitsComboBox;
+    QComboBox *m_propellantComboBox;
+    QComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox, *m_grainCoreDiaUnitsComboBox;
 
-    QToolButton *modifyPropellantDatabase;
+    QToolButton *m_modifyPropellantDatabase;
 
-    QPushButton *ApplyOrAddNewGrainButton, *cancelButton;
+    QPushButton *m_applyButton, *m_cancelButton;
     bool m_isNewGrainWindow;
 };

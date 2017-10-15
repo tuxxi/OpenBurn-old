@@ -2,8 +2,12 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSizePolicy>
+#include <QFrame>
+#include <QVBoxLayout>
+#include <QGroupBox>
 
 #include "src/ui/graindialog.h"
+#include "src/ui/graintablewidget.h"
 
 class DesignTab : public QWidget
 {
@@ -11,11 +15,16 @@ class DesignTab : public QWidget
 public:
     explicit DesignTab(QWidget *parent = nullptr);
     ~DesignTab();
+
+public slots:
+    void DialogClosed();
+    void NewGrain(OpenBurnGrain *grain);
 private slots:
     void NewGrainButton_Clicked();
 private:
     void SetupUI();
-    QPushButton *newGrainButton;
+    QPushButton *m_newGrainButton;
 
-    GrainDialog *grainDialog;
+    GrainDialog *m_grainDialog;
+    GrainTableWidget *m_grainsDisplay;
 };
