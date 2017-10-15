@@ -1,22 +1,15 @@
 #pragma once
 
 #include <QDialog>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QDoubleSpinBox>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QVBoxLayout>
-#include <QGridLayout>
-#include <QDebug>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QGraphicsView>
+#include <QPushButton>
+#include <QComboBox>
+#include <QToolButton>
 
 #include "src/grain.h"
+#include "../util.h"
 
 class GrainDialog : public QDialog
 {
@@ -27,13 +20,11 @@ public:
     ~GrainDialog();
 
 signals:
-    void SIG_DialogClosed();
     void SIG_DIALOG_NewGrain(OpenBurnGrain*);
 
 private slots:
     void on_cancelButton_clicked();
     void on_applyButton_clicked();
-
 private:
     void SetupUI();
     void SetupGraphicsView();

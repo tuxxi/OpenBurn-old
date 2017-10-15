@@ -51,11 +51,12 @@ void MainWindow::SetupUI()
 
     actionSave_As = new QAction(this);
     actionSave_As->setText(tr("Save As..."));
+    actionSave_As->setShortcuts(QKeySequence::SaveAs);
     connect(actionSave_As, &QAction::triggered, this, &MainWindow::menuSaveAs);
     
     actionExport = new QAction(this);
-    actionExport->setText(tr("Export"));
-    //connect(actionExport, &QAction::triggered, this, &MainWindow::menuSave);
+    actionExport->setText(tr("Export"));    
+    //connect(actionExport, &QAction::triggered, this, &MainWindow::menuExport);
 
     actionQuit = new QAction(this);
     actionQuit->setText(tr("Quit"));
@@ -93,14 +94,14 @@ MainWindow::~MainWindow()
 }
 void MainWindow::SLOT_NewGrain(OpenBurnGrain *grain)
 {
-    qDebug() << "new grain!";
+    //qDebug() << "new grain!";
     sim->AddGrain(grain);
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QMessageBox::StandardButton resBtn =
             QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
-            QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+            QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     if (resBtn != QMessageBox::Yes)
     {
         event->ignore();
@@ -112,9 +113,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 void MainWindow::menuQuit()
 {
-    QCoreApplication::quit();
+    QMessageBox::StandardButton resBtn =
+    QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes)
+    {
+        QCoreApplication::quit();
+    }
+    else
+    {
+        return;
+    }
 }
-
 void MainWindow::menuOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),

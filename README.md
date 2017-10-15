@@ -24,10 +24,13 @@ On Linux/OSX:
 
 ```
 $ qmake OpenBurn.pro
-$ make clean
 $ make
 $ ./OpenBurn
-```
-
-
-
+```  
+Notes:  
+1) If you run `make` and see: `make: Nothing to be done for 'first'.`, you will need to clean the moc_* object files that qmake generates:  
+`$ make clean`  
+2) If you wish to add new source files to OpenBurn, run the following to generate a new OpenBurn.pro file:  
+`$ qmake -project "QT+= core gui" "greaterThan(QT_MAJOR_VERSION, 4): QT += widgets"`   
+3) You can turn off the automatic -Wall that qmake adds to the makefile with  
+`qmake OpenBurn.pro "CONFIG += warn_off"`  

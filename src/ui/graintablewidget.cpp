@@ -41,6 +41,6 @@ void GrainTableWidget::dropEvent(QDropEvent *event)
         }
         int oldRow = (currentOldRow);
         newRow++;
-        emit GrainPositionUpdated(oldRow, newRow);
+        emit SIG_GrainPositionUpdated(oldRow, newRow);
     }
 }

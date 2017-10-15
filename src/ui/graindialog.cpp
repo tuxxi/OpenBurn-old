@@ -1,3 +1,13 @@
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QSpacerItem>
+#include <QFrame>
+#include <QLabel>
+#include <QMessageBox>
+
+#include <QDebug>
+
 #include "graindialog.h"
 #include "src/grain.h"
 
@@ -6,8 +16,6 @@ GrainDialog::GrainDialog(QWidget *parent, bool newGrain) :
 {
     SetupGraphicsView();    
     SetupUI();
-    setAttribute(Qt::WA_DeleteOnClose);
-
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(on_cancelButton_clicked()));
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(on_applyButton_clicked()));
 }
@@ -33,18 +41,12 @@ void GrainDialog::SetupUI()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
     setSizePolicy(sizePolicy);    
-
-    QStringList units = (QStringList() <<
-    tr("Inches (in)") <<
-    tr("Millimeters (mm)") <<
-    tr("Centimeters (cm)") <<
-    tr("Feet (ft)") <<
-    tr("Meters (m)"));
     
     //Propellant Selection Box 
     m_propellantComboBox = new QComboBox(frame);
     QLabel* label = new QLabel(frame);
-    label->setText(tr("Propellant Type"));    
+    label->setBuddy(m_propellantComboBox);        
+    label->setText(tr("Propellant Type"));
     m_modifyPropellantDatabase = new QToolButton(frame);
     m_modifyPropellantDatabase->setText("...");    
     controlsLayout->addWidget(label, 0, 0);
@@ -57,10 +59,11 @@ void GrainDialog::SetupUI()
     m_grainLengthSpinBox->setDecimals(3);
     m_grainLengthSpinBox->setSingleStep(0.25);    
     QLabel* label_2 = new QLabel(frame);
+    label_2->setBuddy(m_grainLengthSpinBox);
     label_2->setText(tr("Grain Length"));    
     m_grainLenUnitsComboBox = new QComboBox(frame);
     m_grainLenUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainLenUnitsComboBox->addItems(units);
+    m_grainLenUnitsComboBox->addItems(OpenBurnUtil::g_kLengthUnits);
 
     controlsLayout->addWidget(label_2, 1, 0);
     controlsLayout->addWidget(m_grainLengthSpinBox, 1, 1);
@@ -71,10 +74,11 @@ void GrainDialog::SetupUI()
     m_grainDiameterSpinBox->setDecimals(3);
     m_grainDiameterSpinBox->setSingleStep(0.25);    
     QLabel* label_3 = new QLabel(frame);
+    label_3->setBuddy(m_grainDiameterSpinBox);
     label_3->setText(tr("Grain Diameter"));    
     m_grainDiaUnitsComboBox = new QComboBox(frame);
     m_grainDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainDiaUnitsComboBox->addItems(units);
+    m_grainDiaUnitsComboBox->addItems(OpenBurnUtil::g_kLengthUnits);
     
     controlsLayout->addWidget(label_3, 2, 0);
     controlsLayout->addWidget(m_grainDiameterSpinBox, 2, 1);
@@ -85,10 +89,11 @@ void GrainDialog::SetupUI()
     m_grainCoreDiameterSpinBox->setDecimals(3);
     m_grainCoreDiameterSpinBox->setSingleStep(0.25);
     QLabel* label_4 = new QLabel(frame);
+    label_4->setBuddy(m_grainCoreDiameterSpinBox);
     label_4->setText(tr("Grain Core Diameter"));    
     m_grainCoreDiaUnitsComboBox = new QComboBox(frame);
     m_grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainCoreDiaUnitsComboBox->addItems(units);
+    m_grainCoreDiaUnitsComboBox->addItems(OpenBurnUtil::g_kLengthUnits);
     
     controlsLayout->addWidget(label_4, 3, 0);
     controlsLayout->addWidget(m_grainCoreDiameterSpinBox, 3, 1);
@@ -98,6 +103,7 @@ void GrainDialog::SetupUI()
     m_grainInhibitedFacesSpinBox = new QSpinBox(frame);
     m_grainInhibitedFacesSpinBox->setMaximum(2);
     QLabel* label_5 = new QLabel(frame);
+    label_5->setBuddy(m_grainInhibitedFacesSpinBox);
     label_5->setText(tr("Number Inhibited Faces"));    
 
     controlsLayout->addWidget(label_5, 4, 0);
@@ -132,14 +138,28 @@ void GrainDialog::SetupGraphicsView()
 void GrainDialog::on_cancelButton_clicked()
 {
     close();
-    emit SIG_DialogClosed();
 }
 
 void GrainDialog::on_applyButton_clicked()
 {
+    //OPENBURN_TODO: make this a small warning below the buttons or something rather than a msg box
+    if (qFuzzyIsNull(m_grainLengthSpinBox->value())) 
+    {
+        QMessageBox::warning(this, tr("OpenBurn: Warning!"),
+        tr("Grain Length cannot be 0!\n"),
+        QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+    if (qFuzzyIsNull(m_grainDiameterSpinBox->value())) 
+    {
+        QMessageBox::warning(this, tr("OpenBurn: Warning!"),
+        tr("Grain Diameter cannot be 0!\n"),
+        QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
     if (m_isNewGrainWindow)
     {
-        //temp - DONT STACK ALLOCATE THIS !!
+        //OPENBURN_TODO: temp - DONT STACK ALLOCATE THIS !!
         OpenBurnPropellant prop;
         BatesGrain *grain = new BatesGrain(
             m_grainDiameterSpinBox->value(),            

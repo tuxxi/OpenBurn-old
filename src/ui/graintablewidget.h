@@ -9,6 +9,6 @@ public:
     GrainTableWidget(QWidget *parent);
     virtual void dropEvent(QDropEvent *event) override;
 signals:
-    void GrainPositionUpdated(int &oldPosition, int &newPosition);
+    void SIG_GrainPositionUpdated(int, int);
 };
 

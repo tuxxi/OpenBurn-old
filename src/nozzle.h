@@ -4,7 +4,6 @@
 class OpenBurnNozzle
 {
 public:
-    OpenBurnNozzle() {}
     OpenBurnNozzle(double throat, double exit)
         : m_NozzleThroat(throat), m_NozzleExit(exit)
     {}
@@ -19,7 +18,15 @@ private:
 
 class ConicalNozzle : public OpenBurnNozzle
 {
-    //TODO: add calculation to fix
+public:
+    ConicalNozzle(double throat, double exit, double halfAngle = 15.0f)
+        : OpenBurnNozzle(throat, exit), m_HalfAngle(halfAngle)
+    {}
+
+    ~ConicalNozzle();
+    //TODO: add calculations to account for departures from ideal performance
+    //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf
 private:
     double m_HalfAngle;
+    double m_throatLength;
 };
