@@ -76,17 +76,13 @@ void MainWindow::SetupUI()
     statusBar = new QStatusBar(this);
     setStatusBar(statusBar);
 
-    centralWidget = new QWidget(this);
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    centralWidget->setSizePolicy(sizePolicy);
     setSizePolicy(sizePolicy);
-    setCentralWidget(centralWidget);
     
-    tabWidget = new QTabWidget(centralWidget);
+    tabWidget = new QTabWidget(this);
     tabWidget->addTab(new DesignTab, tr("Design"));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(tabWidget);
+    setCentralWidget(tabWidget);
 }
 
 MainWindow::~MainWindow()

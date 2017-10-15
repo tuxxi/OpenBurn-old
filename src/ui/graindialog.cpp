@@ -106,8 +106,7 @@ void GrainDialog::SetupUI()
     // OK and Cancel buttons
     m_applyButton = new QPushButton(frame);
     m_cancelButton = new QPushButton(frame);
-    QString GrainConfirm = m_isNewGrainWindow ? tr("Add") : tr("Apply");
-    m_applyButton->setText(GrainConfirm);
+    m_applyButton->setText(m_isNewGrainWindow ? tr("Add") : tr("Apply"));
     m_cancelButton->setText(tr("Close"));
 
     controlsLayout->addWidget(m_applyButton, 5, 0);

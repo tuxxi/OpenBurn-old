@@ -3,8 +3,9 @@
 #include <QVBoxLayout>
 #include <QSizePolicy>
 #include <QFrame>
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <QGroupBox>
+#include <QGraphicsView>
 
 #include "src/ui/graindialog.h"
 #include "src/ui/graintablewidget.h"
@@ -27,4 +28,5 @@ private:
 
     GrainDialog *m_grainDialog;
     GrainTableWidget *m_grainsDisplay;
+    QGraphicsView *m_grainCrossSection;
 };

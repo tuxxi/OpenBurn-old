@@ -32,15 +32,18 @@ void DesignTab::SetupUI()
         tr("Inhibited Faces"));
     m_grainsDisplay->setHorizontalHeaderLabels(tableHeader);
     
-    m_newGrainButton = new QPushButton("New Grain", this);
+    m_newGrainButton = new QPushButton(tr("New Grain"));
     QVBoxLayout *vLayout = new QVBoxLayout;    
     vLayout->addWidget(m_newGrainButton);
     frame->setLayout(vLayout);
 
     //master layout
-    QHBoxLayout* layout = new QHBoxLayout;    
-    layout->addWidget(m_grainsDisplay);
-    layout->addWidget(frame);
+    QGridLayout* layout = new QGridLayout;    
+    layout->addWidget(m_grainsDisplay, 0, 0);
+    layout->addWidget(frame, 0, 1);
+    
+    m_grainCrossSection = new QGraphicsView;
+    layout->addWidget(m_grainCrossSection, 1, 0, 1, 2);
     setLayout(layout);
 }
 void DesignTab::DialogClosed()
