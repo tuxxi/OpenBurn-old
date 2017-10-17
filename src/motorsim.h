@@ -11,15 +11,22 @@ public:
     MotorSim() :
         m_avgPropellant(nullptr), m_Nozzle(nullptr), m_Grains(NULL)
     {}
+    std::vector<OpenBurnGrain*> m_Grains; //all grains in the motor
+    OpenBurnNozzle *m_Nozzle;
+    
+    bool HasGrains();
+    bool HasNozzle();
 
     void SetGrains(std::vector<OpenBurnGrain*> grains);
+    void SetNozzle(OpenBurnNozzle* nozz);
+    
     void AddGrain(OpenBurnGrain* grain);
     void RemoveGrain(OpenBurnGrain *grain);
     void RemoveGrain(int index);
     void SwapGrains(int idx1, int idx2);
-    void SetNozzle(OpenBurnNozzle* nozz);
+
     //per unit area:
-    double CalcMassFlowRate(double machNumber, double portArea);
+    double CalcMassFlux(double machNumber, double portArea);
 
     //per grain:
     //calculates linear burn rate for a given grain
@@ -34,8 +41,6 @@ public:
 
     size_t GetNumGrains() { return m_Grains.size(); }
 private:
-    std::vector<OpenBurnGrain*> m_Grains; //all grains in the motor
-    OpenBurnNozzle *m_Nozzle;
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
 
     //weighted average based on mass of propellant

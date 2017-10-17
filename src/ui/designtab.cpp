@@ -9,17 +9,19 @@
 #include "src/ui/designtab.h"
 
 DesignTab::DesignTab(QWidget* parent)
-    : QWidget(parent), m_grainDialog(nullptr), m_nozzleDialog(nullptr)
+    : QWidget(parent), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr)
 {   
     SetupUI();
     connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
     connect(m_nozzleSettingsButton, SIGNAL(clicked()), this, SLOT(NozzleButton_Clicked()));
     connect(m_grainsDisplay, SIGNAL(SIG_GrainPositionUpdated(int, int)),
         this, SLOT(SLOT_GrainPositionUpdated(int, int)));
+    m_sim = new MotorSim;
+    UpdateGraphicsScene();
 }
 DesignTab::~DesignTab() 
 {
-
+    delete m_sim;
 }
 void DesignTab::SetupUI()
 {
@@ -66,13 +68,39 @@ void DesignTab::SetupUI()
     layout->addWidget(m_grainsDisplay, 0, 0);
     layout->addWidget(frame_GrainDesign, 0, 1);
     layout->addWidget(frame_Params, 0, 2);
-    m_grainCrossSection = new QGraphicsView;
-    
+
+    m_motorDisplayView = new QGraphicsView;
+    m_motorDisplayScene = new QGraphicsScene;
+    m_motorDisplayView->setScene(m_motorDisplayScene);
+    m_motorDisplayView->show();
+
     //takes up 1 row, and two columns
-    layout->addWidget(m_grainCrossSection, 1, 0, 1, 3);
+    layout->addWidget(m_motorDisplayView, 1, 0, 1, 3);
     setLayout(layout);
 }
 
+//this MUST be called AFTER we setup the basic UI layout.
+void DesignTab::UpdateGraphicsScene()
+{
+    if (!m_motorObject)
+    {
+        m_motorObject = new MotorGraphicsItem(100);
+        m_motorDisplayScene->addItem(m_motorObject);
+    }
+    if (m_sim->HasGrains()) m_motorObject->SetGrains(m_sim->m_Grains);   
+    if (m_sim->HasNozzle()) m_motorObject->SetNozzle(m_sim->m_Nozzle);
+
+    m_motorObject->update();
+    m_motorDisplayScene->update();
+    m_motorDisplayScene->setSceneRect(m_motorObject->boundingRect());
+    QRectF bounds = QRectF(m_motorObject->boundingRect().left(), m_motorObject->boundingRect().top(), 
+    m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
+    m_motorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+}
+void DesignTab::resizeEvent(QResizeEvent* event)
+{
+    UpdateGraphicsScene();
+}
 //this allows us to mark the objects as null when they are destroyed, allowing new ones to be made later on
 //NOTE: they are only deleted if delete is called directly since they do NOT have attribute WA_DeleteOnClose.
 //this is because I want to be able to re-open the same dialog with the same settings easily.
@@ -99,16 +127,25 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain *grain)
     m_grainsDisplay->setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
     m_grainsDisplay->setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
     
-    emit SIG_NewGrain(grain);
+    m_sim->AddGrain(grain);
+    emit SIG_NewGrain(grain);    
+    UpdateGraphicsScene();
 }
 //Recieved from the grain table widget. Update the sim!
 void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 {
     //todo: update sim?
+    UpdateGraphicsScene();
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
     qDebug() << "Nozzle throat diameter: " << nozz->GetNozzleThroat();
+    if (m_sim->m_Nozzle)
+    {
+        delete m_sim->m_Nozzle; //deallocate if we already had one because the dialog creates a new object every time
+    }
+    m_sim->SetNozzle(nozz);
+    UpdateGraphicsScene();
 }
 void DesignTab::NewGrainButton_Clicked()
 {

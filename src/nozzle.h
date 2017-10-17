@@ -10,7 +10,6 @@ public:
     ~OpenBurnNozzle() {}
     virtual double GetNozzleThroat() { return m_NozzleThroat; }
     virtual double GetNozzleExit() { return m_NozzleExit; }
-
 private:
     double m_NozzleThroat; //nozzle throat diameter
     double m_NozzleExit; //nozzle exit diameter
@@ -28,5 +27,5 @@ public:
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf
 private:
     double m_HalfAngle;
-    double m_throatLength;
+    double m_throatLength; //straight cut throat
 };

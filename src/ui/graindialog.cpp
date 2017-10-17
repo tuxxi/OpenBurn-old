@@ -117,9 +117,15 @@ void GrainDialog::SetupUI()
 
     controlsLayout->addWidget(m_applyButton, 5, 0);
     controlsLayout->addWidget(m_cancelButton, 5, 1);
-        
-    //2D grain cross section preview
     
+    setTabOrder(m_propellantComboBox, m_grainLengthSpinBox);
+    setTabOrder(m_grainLengthSpinBox, m_grainDiameterSpinBox);
+    setTabOrder(m_grainDiameterSpinBox, m_grainCoreDiameterSpinBox);
+    setTabOrder(m_grainCoreDiameterSpinBox, m_grainInhibitedFacesSpinBox);
+    setTabOrder(m_grainInhibitedFacesSpinBox, m_applyButton);
+    setTabOrder(m_applyButton, m_cancelButton);
+    setTabOrder(m_cancelButton, m_propellantComboBox); //loop back to top
+
     QVBoxLayout* masterVLayout = new QVBoxLayout;    
     masterVLayout->addWidget(frame);    
     masterVLayout->addWidget(m_graphicsView);
@@ -129,7 +135,7 @@ void GrainDialog::SetupUI()
 void GrainDialog::SetupGraphicsView()
 {    
     m_graphicsView = new QGraphicsView(this);
-    QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     sizePolicy2.setHorizontalStretch(0);
     sizePolicy2.setVerticalStretch(0);
     sizePolicy2.setHeightForWidth(m_graphicsView->sizePolicy().hasHeightForWidth());

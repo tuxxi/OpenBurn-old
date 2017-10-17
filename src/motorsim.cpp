@@ -48,8 +48,8 @@ void MotorSim::RunSim(double timestep)
         i->Burn(timestep);
     }
 }
-//mdot A.K.A Mass flux at given crossflow mach number
-double MotorSim::CalcMassFlowRate(double machNumber, double portArea)
+//mdot A.K.A Mass flux at given crossflow mach number and port area
+double MotorSim::CalcMassFlux(double machNumber, double portArea)
 {
     //mdot = M * A * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
     //P_0 = gas pressure, T_0 = gas temperature, k = ratio specific heats (cp/cv), M = mach number, R = gas constant
@@ -108,7 +108,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
-    double G = CalcMassFlowRate(machNumber, grain->GetPortArea()); // mass flux [or flow rate, depending on who you ask ... :( ]
+    double G = CalcMassFlux(machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
     double rho = prop.GetDensity(); //propellant density
@@ -170,4 +170,12 @@ void MotorSim::SwapGrains(int one, int two)
     qDebug() << "Grain idx " << one << "swapping with idx " << two << "\n";
     qDebug() << "m_Grains has size: " << m_Grains.size() << "\n";
     //std::swap(m_Grains[one-1], m_Grains[two-1]);
+}
+bool MotorSim::HasNozzle()
+{
+    return m_Nozzle;
+}
+bool MotorSim::HasGrains()
+{
+    return m_Grains.size() != 0;
 }

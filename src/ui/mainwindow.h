@@ -2,14 +2,14 @@
 
 #include <QMainWindow>
 #include <QSizePolicy>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QWidget>
+#include <QAction>
+#include <QApplication>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QTabWidget>
+#include <QWidget>
 #include <QVBoxLayout>
 
 #include "src/ui/graintablewidget.h"

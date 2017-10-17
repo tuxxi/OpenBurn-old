@@ -5,7 +5,9 @@
 #include "src/ui/graindialog.h"
 #include "src/ui/nozzledialog.h"
 #include "src/ui/graintablewidget.h"
-#include "../util.h"
+#include "src/util.h"
+#include "src/motorsim.h"
+#include "src/ui/graphics/motorgraphicsitem.h"
 
 class DesignTab : public QWidget
 {
@@ -13,7 +15,7 @@ class DesignTab : public QWidget
 public:
     explicit DesignTab(QWidget *parent = nullptr);
     ~DesignTab();
-
+    void resizeEvent(QResizeEvent* event) override;
 signals:
     void SIG_NewGrain(OpenBurnGrain *grain); //passes along to the main window which holds the sim object
 public slots:
@@ -28,10 +30,16 @@ private slots:
     
 private:
     void SetupUI();
+    void UpdateGraphicsScene();
     QPushButton *m_newGrainButton, *m_nozzleSettingsButton;
 
     GrainDialog *m_grainDialog;
     NozzleDialog *m_nozzleDialog;
     GrainTableWidget *m_grainsDisplay;
-    QGraphicsView *m_grainCrossSection;
+
+    MotorGraphicsItem *m_motorObject;
+    QGraphicsView *m_motorDisplayView;
+    QGraphicsScene* m_motorDisplayScene;
+
+    MotorSim* m_sim;
 };

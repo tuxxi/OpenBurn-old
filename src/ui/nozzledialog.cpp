@@ -49,6 +49,11 @@ void NozzleDialog::SetupUI()
     layout->addWidget(label_2, 1, 0);
     layout->addWidget(m_exitDiaSpinBox, 1, 1);
     layout->addWidget(m_exitDiaUnits, 1, 2);
+    
+    setTabOrder(m_throatDiaSpinBox, m_exitDiaSpinBox);
+    setTabOrder(m_exitDiaSpinBox, m_applyButton);
+    setTabOrder(m_applyButton, m_cancelButton);
+    setTabOrder(m_cancelButton, m_throatDiaSpinBox);
 
     //buttons
     layout->addWidget(m_OKButton, 2, 0);
