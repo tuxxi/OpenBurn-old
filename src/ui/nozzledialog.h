@@ -18,7 +18,7 @@ public:
 signals:
     void SIG_NozzleChanged(OpenBurnNozzle*);
 private slots:
-    void apply();
+    bool apply();
     void accept();
     void closeDialog();
 private:

@@ -62,7 +62,7 @@ void NozzleDialog::SetupUI()
     
     setLayout(layout);
 }
-void NozzleDialog::apply()
+bool NozzleDialog::apply()
 {
     //OPENBURN_TODO: make this a small warning below the buttons or something rather than a msg box
     if (qFuzzyIsNull(m_throatDiaSpinBox->value())) 
@@ -70,22 +70,25 @@ void NozzleDialog::apply()
         QMessageBox::warning(this, tr("OpenBurn: Warning!"),
         tr("Nozzle Throat Diameter cannot be 0!\n"),
         QMessageBox::Ok, QMessageBox::Ok);
-        return;
+        return false;
     }
     if (qFuzzyIsNull(m_exitDiaSpinBox->value())) 
     {
         QMessageBox::warning(this, tr("OpenBurn: Warning!"),
         tr("Nozzle Exit Diameter cannot be 0!\n"),
         QMessageBox::Ok, QMessageBox::Ok);
-        return;
+        return false;
     }
     ConicalNozzle* nozz = new ConicalNozzle(m_throatDiaSpinBox->value(), m_exitDiaSpinBox->value());
     emit SIG_NozzleChanged(nozz);
+    return true;
 }
 void NozzleDialog::accept()
 {
-    apply();
-    closeDialog();
+    if (apply())
+    {
+        closeDialog();        
+    }
 }
 void NozzleDialog::closeDialog()
 {

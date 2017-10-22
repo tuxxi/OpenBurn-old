@@ -16,12 +16,17 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     Q_UNUSED(widget);
 
     //draw the outline of the motor
-    painter->setPen(QPen(Qt::black, 5, Qt::DashDotDotLine, Qt::RoundCap, Qt::RoundJoin));
-    painter->drawLine(0, 0, 0, m_MotorHeight); //forward end of motor
-    painter->drawLine(0, 0, m_MotorLen, 0); //bottom line
-    painter->drawLine(0, m_MotorHeight, m_MotorLen, m_MotorHeight); //top line
+    if (m_MotorLen > 0)
+    {
+        painter->setPen(QPen(Qt::black, 5, Qt::DashDotDotLine, Qt::RoundCap, Qt::RoundJoin));
+        painter->drawLine(0, 0, 0, m_MotorHeight); //forward end of motor
+        painter->drawLine(0, 0, m_MotorLen, 0); //bottom line
+        painter->drawLine(0, m_MotorHeight, m_MotorLen, m_MotorHeight); //top line    
+    }
     
-    //draw nozzle
+    /*
+    //draw nozzle:
+    TODO: move to new class for nozzle
     if (m_Nozzle)
     {
         int newMotorLen = m_MotorLen + (qCos(qDegreesToRadians(70.0f)) * m_scaleFactor);
@@ -42,6 +47,7 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->drawLine(newMotorLen, throatHeight, 
             finalLen, m_MotorHeight - exitHeight);
     }
+    */
 }
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*> &grains)
 {  
@@ -56,6 +62,20 @@ void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*> &grains)
         newGrain->setPos(m_MotorLen, 0);
         m_gfxGrains.push_back(newGrain);
         m_MotorLen += len;
+    }
+}
+void MotorGraphicsItem::RemoveGrain(int index)
+{
+    int grainLen = m_gfxGrains[index]->boundingRect().width();  
+    m_MotorLen -= grainLen;
+    delete m_gfxGrains[index];
+    m_gfxGrains.erase(m_gfxGrains.begin() + index);
+
+    //shift grains after this one back in line
+    for (int i = index; i < m_gfxGrains.size(); i++)
+    {
+        QPointF currentPos = m_gfxGrains[i]->pos();
+        m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());
     }
 }
 void MotorGraphicsItem::SetNozzle(OpenBurnNozzle* nozzle)

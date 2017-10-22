@@ -16,6 +16,8 @@ DesignTab::DesignTab(QWidget* parent)
     connect(m_nozzleSettingsButton, SIGNAL(clicked()), this, SLOT(NozzleButton_Clicked()));
     connect(m_grainsDisplay, SIGNAL(SIG_GrainPositionUpdated(int, int)),
         this, SLOT(SLOT_GrainPositionUpdated(int, int)));
+    connect(m_deleteGrainButton, SIGNAL(clicked()), this, SLOT(DeleteGrainButton_Clicked()));
+    connect(m_grainsDisplay, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
     m_sim = new MotorSim;
     UpdateGraphicsScene();
 }
@@ -36,12 +38,14 @@ void DesignTab::SetupUI()
 
     m_grainsDisplay = new GrainTableWidget(this);
     m_grainsDisplay->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_grainsDisplay->setDragEnabled(true);
-    m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
+    m_grainsDisplay->setColumnCount(5); //propellant, len, core dia, dia, inhibited face
     m_grainsDisplay->setAlternatingRowColors(true);
     m_grainsDisplay->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_grainsDisplay->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_grainsDisplay->setColumnCount(5); //propellant, len, core dia, dia, inhibited face
+
+    //disable drag drop for now until i can fox it
+    //m_grainsDisplay->setDragEnabled(true);
+    //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
 
     QStringList tableHeader = (QStringList() << 
         tr("Length") << 
@@ -53,8 +57,11 @@ void DesignTab::SetupUI()
     
     //grain buttons
     m_newGrainButton = new QPushButton(tr("New Grain"));
+    m_deleteGrainButton = new QPushButton(tr("Delete"));
+    m_deleteGrainButton->setEnabled(false);
     QGridLayout* gLayout = new QGridLayout;    
-    gLayout->addWidget(m_newGrainButton);
+    gLayout->addWidget(m_newGrainButton, 0, 1, 2, 2);
+    gLayout->addWidget(m_deleteGrainButton, 0, 0);
     frame_GrainDesign->setLayout(gLayout);
 
     //nozzle and sim settings
@@ -135,16 +142,15 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain *grain)
 void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 {
     //todo: update sim?
+    m_sim->SwapGrains(oldPos, newPos);
     UpdateGraphicsScene();
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
-    qDebug() << "Nozzle throat diameter: " << nozz->GetNozzleThroat();
-    if (m_sim->m_Nozzle)
+    if (!m_sim->HasNozzle()) //set nozzle ptr only once..
     {
-        delete m_sim->m_Nozzle; //deallocate if we already had one because the dialog creates a new object every time
+        m_sim->SetNozzle(nozz);
     }
-    m_sim->SetNozzle(nozz);
     UpdateGraphicsScene();
 }
 void DesignTab::NewGrainButton_Clicked()
@@ -160,15 +166,36 @@ void DesignTab::NewGrainButton_Clicked()
     m_grainDialog->activateWindow();
     m_grainDialog->raise();
 }
+void DesignTab::DeleteGrainButton_Clicked()
+{
+    for (int i = 0; i <= m_grainsDisplay->rowCount(); i++)
+    {
+        if (m_grainsDisplay->isItemSelected(m_grainsDisplay->item(i, 0)))
+        {
+            //qDebug() << "grain # " << i << "deleted.";
+            m_grainsDisplay->removeRow(i);
+            m_sim->RemoveGrain(i);
+            m_motorObject->RemoveGrain(i);
+        }
+    }
+    //disable the button again since we no longer have anything selected
+    m_deleteGrainButton->setEnabled(false);
+    UpdateGraphicsScene();
+}
 void DesignTab::NozzleButton_Clicked()
 {
     if (!m_nozzleDialog) //only make one!!
     {
-        m_nozzleDialog = new NozzleDialog(nullptr);
+        m_nozzleDialog = new NozzleDialog;
         connect(m_nozzleDialog, SIGNAL(SIG_NozzleChanged(OpenBurnNozzle*)), this, SLOT(SLOT_NozzleUpdated(OpenBurnNozzle*)));
         connect(m_nozzleDialog, SIGNAL(destroyed()), this, SLOT(SLOT_NozzDialogClosed()));
     }
     m_nozzleDialog->show();
     m_nozzleDialog->activateWindow();
     m_nozzleDialog->raise();
+}
+void DesignTab::SLOT_grainTable_cellClicked(int row, int column)
+{
+    m_seed_grain = m_sim->m_Grains[row];
+    m_deleteGrainButton->setEnabled(true);
 }

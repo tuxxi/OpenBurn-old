@@ -25,13 +25,21 @@ public slots:
 private slots:
     void NewGrainButton_Clicked();
     void NozzleButton_Clicked();
+    void DeleteGrainButton_Clicked();
     void SLOT_GrainDialogClosed();
     void SLOT_NozzDialogClosed();
+    void SLOT_grainTable_cellClicked(int row, int column);
     
 private:
     void SetupUI();
     void UpdateGraphicsScene();
-    QPushButton *m_newGrainButton, *m_nozzleSettingsButton;
+    
+    OpenBurnNozzle* m_seed_nozzle;    
+    QPushButton *m_nozzleSettingsButton;
+
+    //grain settings
+    OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
+    QPushButton *m_newGrainButton, *m_deleteGrainButton;
 
     GrainDialog *m_grainDialog;
     NozzleDialog *m_nozzleDialog;

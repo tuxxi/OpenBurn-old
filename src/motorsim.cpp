@@ -22,15 +22,7 @@ void MotorSim::RemoveGrain(OpenBurnGrain *grain)
 }
 void MotorSim::RemoveGrain(int index)
 {
-    int counter = 0;
-    for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
-    {
-        counter++;
-        if (counter == index)
-        {
-            m_Grains.erase(i);
-        }
-    }
+    m_Grains.erase(m_Grains.begin() + index);
 }
 void MotorSim::SetNozzle(OpenBurnNozzle* nozz)
 {
@@ -164,12 +156,13 @@ OpenBurnPropellant* MotorSim::CalcAvgPropellant()
     double cpcv = weighted_cpcv / m_Grains.size();
     return new OpenBurnPropellant(a, n, cstar, cpcv, "OPENBURNDEBUG::AVGPROP");
 }
-void MotorSim::SwapGrains(int one, int two)
+void MotorSim::SwapGrains(int oldPos, int newPos)
 {
     //TODO: fix me
-    qDebug() << "Grain idx " << one << "swapping with idx " << two << "\n";
+    qDebug() << "Grain idx " << oldPos << "swapping with idx " << newPos << "\n";
     qDebug() << "m_Grains has size: " << m_Grains.size() << "\n";
-    //std::swap(m_Grains[one-1], m_Grains[two-1]);
+
+    std::swap(m_Grains[oldPos], m_Grains[newPos]); //std::swap uses move semantics afaik
 }
 bool MotorSim::HasNozzle()
 {
