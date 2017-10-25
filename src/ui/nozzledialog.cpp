@@ -22,38 +22,37 @@ void NozzleDialog::SetupUI()
     QGridLayout *layout = new QGridLayout;
     setWindowTitle(tr("Modify Nozzle"));
 
-    m_OKButton = new QPushButton(tr("OK"));
-    m_cancelButton = new QPushButton(tr("Cancel"));
-    m_applyButton = new QPushButton(tr("Apply"));
+    m_OKButton = new QPushButton(tr("OK"), this);
+    m_cancelButton = new QPushButton(tr("Cancel"), this);
+    m_applyButton = new QPushButton(tr("Apply"), this);
 
     //throat diameter
-    m_throatDiaSpinBox = new QDoubleSpinBox;
+    m_throatDiaSpinBox = new QDoubleSpinBox(this);
     m_throatDiaSpinBox->setDecimals(3);
     m_throatDiaSpinBox->setSingleStep(0.25f);
-    QLabel* label = new QLabel(tr("Throat Diameter"));
+    QLabel* label = new QLabel(tr("Throat Diameter"), this);
     label->setBuddy(m_throatDiaSpinBox);
-    m_throatDiaUnits = new QComboBox;
+    m_throatDiaUnits = new QComboBox(this);
     m_throatDiaUnits->addItems(OpenBurnUtil::g_kLengthUnits);
     layout->addWidget(label, 0, 0);
     layout->addWidget(m_throatDiaSpinBox, 0, 1);
     layout->addWidget(m_throatDiaUnits, 0, 2);
 
     //exit (expansion, divergence) diameter
-    m_exitDiaSpinBox = new QDoubleSpinBox;
+    m_exitDiaSpinBox = new QDoubleSpinBox(this);
     m_exitDiaSpinBox->setDecimals(3);
     m_exitDiaSpinBox->setSingleStep(0.25f);
-    QLabel* label_2 = new QLabel(tr("Exit Diameter"));
+    QLabel* label_2 = new QLabel(tr("Exit Diameter"), this);
     label_2->setBuddy(m_exitDiaSpinBox);
-    m_exitDiaUnits = new QComboBox;
+    m_exitDiaUnits = new QComboBox(this);
     m_exitDiaUnits->addItems(OpenBurnUtil::g_kLengthUnits);
     layout->addWidget(label_2, 1, 0);
     layout->addWidget(m_exitDiaSpinBox, 1, 1);
     layout->addWidget(m_exitDiaUnits, 1, 2);
     
     setTabOrder(m_throatDiaSpinBox, m_exitDiaSpinBox);
-    setTabOrder(m_exitDiaSpinBox, m_applyButton);
-    setTabOrder(m_applyButton, m_cancelButton);
-    setTabOrder(m_cancelButton, m_throatDiaSpinBox);
+    setTabOrder(m_exitDiaSpinBox, m_OKButton);
+    setTabOrder(m_OKButton, m_cancelButton);
 
     //buttons
     layout->addWidget(m_OKButton, 2, 0);

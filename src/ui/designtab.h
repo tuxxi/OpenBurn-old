@@ -49,5 +49,7 @@ private:
     QGraphicsView *m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
 
+    QGraphicsTextItem* knDisplay;
+
     MotorSim* m_sim;
 };

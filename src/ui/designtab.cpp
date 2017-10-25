@@ -37,24 +37,6 @@ void DesignTab::SetupUI()
     setSizePolicy(sizePolicy);    
 
     m_grainsDisplay = new GrainTableWidget(this);
-    m_grainsDisplay->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_grainsDisplay->setColumnCount(5); //propellant, len, core dia, dia, inhibited face
-    m_grainsDisplay->setAlternatingRowColors(true);
-    m_grainsDisplay->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_grainsDisplay->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    //disable drag drop for now until i can fox it
-    //m_grainsDisplay->setDragEnabled(true);
-    //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
-
-    QStringList tableHeader = (QStringList() << 
-        tr("Length") << 
-        tr("Diameter") << 
-        tr("Core Diameter") << 
-        tr("Propellant") << 
-        tr("Inhibited Faces"));
-    m_grainsDisplay->setHorizontalHeaderLabels(tableHeader);
-    
     //grain buttons
     m_newGrainButton = new QPushButton(tr("New Grain"));
     m_deleteGrainButton = new QPushButton(tr("Delete"));
@@ -92,10 +74,25 @@ void DesignTab::UpdateGraphicsScene()
     if (!m_motorObject)
     {
         m_motorObject = new MotorGraphicsItem(100);
+        knDisplay = new QGraphicsTextItem;
         m_motorDisplayScene->addItem(m_motorObject);
     }
+    if (!knDisplay)
+    {
+        knDisplay = new QGraphicsTextItem;        
+    }
     if (m_sim->HasGrains()) m_motorObject->SetGrains(m_sim->m_Grains);   
-    if (m_sim->HasNozzle()) m_motorObject->SetNozzle(m_sim->m_Nozzle);
+    if (m_sim->HasNozzle())
+    {
+        m_motorObject->SetNozzle(m_sim->m_Nozzle);
+        double kn = m_sim->CalcKn();
+        qDebug() << "Kn is : " << kn;
+        knDisplay->setPlainText(QString::number(kn));
+        knDisplay->setPos(0, 0);
+        knDisplay->show();
+    } 
+    
+    
 
     m_motorObject->update();
     m_motorDisplayScene->update();
@@ -103,6 +100,7 @@ void DesignTab::UpdateGraphicsScene()
     QRectF bounds = QRectF(m_motorObject->boundingRect().left(), m_motorObject->boundingRect().top(), 
     m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
     m_motorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+
 }
 void DesignTab::resizeEvent(QResizeEvent* event)
 {
@@ -147,10 +145,12 @@ void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
-    if (!m_sim->HasNozzle()) //set nozzle ptr only once..
+    if (m_sim->HasNozzle())
     {
-        m_sim->SetNozzle(nozz);
+        delete m_sim->m_Nozzle;
     }
+    m_sim->SetNozzle(nozz);
+    
     UpdateGraphicsScene();
 }
 void DesignTab::NewGrainButton_Clicked()

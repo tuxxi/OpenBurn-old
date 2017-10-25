@@ -2,6 +2,13 @@
 #include "util.h"
 #include <QtDebug>
 using OpenBurnUtil::g_kGasConstantR;
+
+MotorSim::MotorSim() :
+    m_avgPropellant(nullptr), m_Nozzle(nullptr), m_Grains(NULL)
+{
+
+
+}
 void MotorSim::SetGrains(std::vector<OpenBurnGrain*> grains)
 {
     m_Grains = grains;
@@ -57,9 +64,8 @@ double MotorSim::CalcMassFlux(double machNumber, double portArea)
 }
 double MotorSim::CalcKn()
 {
-    double nozzleRadius = (m_Nozzle->GetNozzleThroat() / 2.0f);
     double surfaceArea = 0;
-    double nozzleSurfaceArea =  nozzleRadius * nozzleRadius * M_PI;
+    double nozzleSurfaceArea = 0.25f * M_PI * m_Nozzle->GetNozzleThroat() *  m_Nozzle->GetNozzleThroat();
     for (auto i : m_Grains)
     {
         surfaceArea += i->GetSurfaceArea();
@@ -139,7 +145,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
 }
 OpenBurnPropellant* MotorSim::CalcAvgPropellant()
 {
-    double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_cpcv = 0;
+    double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_rho = 0;
     //sum up all the propellant properties
     for (auto i : m_Grains)
     {
@@ -148,13 +154,17 @@ OpenBurnPropellant* MotorSim::CalcAvgPropellant()
         weighted_a += mass * i->GetPropellantType().GetBurnRateCoef();
         weighted_n += mass * i->GetPropellantType().GetBurnRateExp();
         weighted_cstar += mass * i->GetPropellantType().GetCharVelocity();
-        weighted_cpcv += mass * i->GetPropellantType().GetSpecificHeatRatio();
+        weighted_rho += mass * i->GetPropellantType().GetDensity();
+        //weighted_cpcv += mass * i->GetPropellantType().GetSpecificHeatRatio();
     }
     double a = weighted_a / m_Grains.size();
     double n = weighted_n / m_Grains.size();
     double cstar = weighted_cstar / m_Grains.size();
-    double cpcv = weighted_cpcv / m_Grains.size();
-    return new OpenBurnPropellant(a, n, cstar, cpcv, "OPENBURNDEBUG::AVGPROP");
+    double rho = weighted_rho / m_Grains.size();
+    //double cpcv = weighted_cpcv / m_Grains.size();
+    
+    delete m_avgPropellant; //clear old memory 
+    m_avgPropellant = new OpenBurnPropellant(a, n, cstar, rho, "OPENBURNDEBUG::AVGPROP");
 }
 void MotorSim::SwapGrains(int oldPos, int newPos)
 {
@@ -166,7 +176,7 @@ void MotorSim::SwapGrains(int oldPos, int newPos)
 }
 bool MotorSim::HasNozzle()
 {
-    return m_Nozzle;
+    return m_Nozzle != nullptr;
 }
 bool MotorSim::HasGrains()
 {

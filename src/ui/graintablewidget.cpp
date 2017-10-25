@@ -2,11 +2,42 @@
 
 GrainTableWidget::GrainTableWidget(QWidget *parent) : QTableWidget(parent)
 {
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+    setColumnCount(5); //propellant, len, core dia, dia, inhibited face
+    setAlternatingRowColors(true);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    //setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    QStringList tableHeader = (QStringList() << 
+        tr("Length") << 
+        tr("Diameter") << 
+        tr("Core Diameter") << 
+        tr("Propellant") << 
+        tr("Inhibited Faces"));
+
+    setHorizontalHeaderLabels(tableHeader);
+    resizeColumnsToContents();
+    setFixedSize(horizontalHeader()->length() + verticalHeader()->width(), 500);
+
+    //disable drag drop for now until i can fox it
+    //m_grainsDisplay->setDragEnabled(true);
+    //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
+}
+void GrainTableWidget::resizeEvent(QResizeEvent* event)
+{
+    //resizeColumnsToContents();
+    /*
+    setFixedSize(horizontalHeader()->length() + verticalHeader()->width(), 
+        verticalHeader()->length()+horizontalHeader()->height());
+        */
 }
 //thank you to honiahaka10 on stack overflow
 //https://stackoverflow.com/a/41203632/8508673
-void GrainTableWidget::dropEvent(QDropEvent *event)
+void GrainTableWidget::dropEvent(QDropEvent* event)
 {
     if(event->source() == this)
     {

@@ -8,9 +8,7 @@
 class MotorSim
 {
 public:
-    MotorSim() :
-        m_avgPropellant(nullptr), m_Nozzle(nullptr), m_Grains(NULL)
-    {}
+    MotorSim();
     std::vector<OpenBurnGrain*> m_Grains; //all grains in the motor
     OpenBurnNozzle *m_Nozzle;
     
