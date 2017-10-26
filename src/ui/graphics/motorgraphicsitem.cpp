@@ -52,7 +52,7 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*> &grains)
 {  
     m_Grains = grains;
-    for (int i = m_gfxGrains.size(); i < m_Grains.size(); i++)
+    for (size_t i = m_gfxGrains.size(); i < m_Grains.size(); ++i)
     {
         GrainGraphicsItem *newGrain = new GrainGraphicsItem(m_Grains[i], m_scaleFactor, true, this);
         double len = newGrain->boundingRect().width();

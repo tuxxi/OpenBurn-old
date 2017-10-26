@@ -6,7 +6,7 @@
 class OpenBurnGrain
 {
 public:
-    ~OpenBurnGrain() {}
+    virtual ~OpenBurnGrain() {}
 
     virtual double GetLength() = 0;
     virtual double GetCoreDiameter() = 0;
@@ -39,10 +39,8 @@ protected:
 class BatesGrain : public OpenBurnGrain
 {
 public:
-    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces = 0)
-        : OpenBurnGrain(prop), m_grainDia(dia), m_coreDia(coredia), m_grainLen(len), m_numInhibitedFaces(inhibitedfaces)
-    {}
-    ~BatesGrain() {}
+    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces = 0);
+    virtual ~BatesGrain() override;
     virtual double GetLength() override { return m_grainLen; }
     virtual double GetDiameter() override { return m_grainDia; }
     virtual double GetCoreDiameter() override { return m_coreDia; }

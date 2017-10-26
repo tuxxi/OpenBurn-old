@@ -19,7 +19,7 @@ void MainWindow::SetupUI()
         setObjectName(QStringLiteral("MainWindow"));
 
     setWindowTitle(tr("OpenBurn"));
-    setGeometry(0, 0, 1400, 900);
+    setGeometry(100, 100, 1400, 900);
     menuBar = new QMenuBar(this);
     menuBar->setGeometry(QRect(0, 0, 1920, 20));
     setMenuBar(menuBar);

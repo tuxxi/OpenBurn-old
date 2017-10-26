@@ -1,6 +1,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QGraphicsView>
+#include <QLabel>
 
 #include "src/ui/graindialog.h"
 #include "src/ui/nozzledialog.h"
@@ -32,13 +33,22 @@ private slots:
     
 private:
     void SetupUI();
-    void UpdateGraphicsScene();
+    void UpdateDesign();
     
+    //design overview - static
+    QLabel* m_motorMajorDiaLabel, *m_motorLenLabel, *m_nozzleDiaLabel, *m_nozzleExitLabel, *m_knLabel,
+        *m_numGrainsLabel;
+    //*m_propellantMassLabel,
+
+    //simulated results - requires a sim to be run
+    //for quick reference only- more detailed results are available on results tab
+    QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
+
     OpenBurnNozzle* m_seed_nozzle;    
     QPushButton *m_nozzleSettingsButton;
 
     //grain settings
-    OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
+    //OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
     QPushButton *m_newGrainButton, *m_deleteGrainButton;
 
     GrainDialog *m_grainDialog;

@@ -1,7 +1,11 @@
 #pragma once
 
 #include <QStringList>
+#include <QString>
 #include <QObject>
+
+#define num QString::number
+
 namespace OpenBurnUtil
 {
 

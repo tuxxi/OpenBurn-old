@@ -1,5 +1,13 @@
 #include "grain.h"
+BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces)
+    : OpenBurnGrain(prop), m_grainDia(dia), m_coreDia(coredia), m_grainLen(len), m_numInhibitedFaces(inhibitedfaces)
+{
 
+}
+BatesGrain::~BatesGrain()
+{
+
+}
 void OpenBurnGrain::SetBurnRate(double steadyState, double erosiveFactor)
 {
     m_rNot = steadyState;

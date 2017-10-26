@@ -5,10 +5,19 @@
 #include "grain.h"
 #include "nozzle.h"
 
+enum KN_STATIC_CALC_TYPE
+{
+    KN_CALC_INITIAL,
+    KN_CALC_MAX,
+    KN_CALC_FINAL
+};
 class MotorSim
 {
 public:
     MotorSim();
+
+    static double CalcStaticKn(const std::vector<OpenBurnGrain*>& initial_grains, OpenBurnNozzle* nozzle, KN_STATIC_CALC_TYPE type);
+
     std::vector<OpenBurnGrain*> m_Grains; //all grains in the motor
     OpenBurnNozzle *m_Nozzle;
     
@@ -29,11 +38,15 @@ public:
     //per grain:
     //calculates linear burn rate for a given grain
     double CalcSteadyStateBurnRate(OpenBurnGrain* grain); //based on saint robert's law. No erosive burning
-    double CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumber); //multiplicative law
+    double CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumber);
 
     //whole chamber:
     double CalcChamberPressure();
-    double CalcKn();
+    double CalcKn(); //instantaneous kn calc, for grains in motor that have regressed a given ammount
+
+    double GetMotorLength();
+    double GetMotorMajorDiameter();
+    double GetMotorPropellantMass();
 
     void RunSim(double timestep = 0.01f);
 
@@ -42,6 +55,6 @@ private:
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
 
     //weighted average based on mass of propellant
-    OpenBurnPropellant* CalcAvgPropellant();
+    void CalcAvgPropellant();
     OpenBurnPropellant* m_avgPropellant;
 };

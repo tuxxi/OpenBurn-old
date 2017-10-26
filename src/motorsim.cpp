@@ -65,12 +65,11 @@ double MotorSim::CalcMassFlux(double machNumber, double portArea)
 double MotorSim::CalcKn()
 {
     double surfaceArea = 0;
-    double nozzleSurfaceArea = 0.25f * M_PI * m_Nozzle->GetNozzleThroat() *  m_Nozzle->GetNozzleThroat();
     for (auto i : m_Grains)
     {
         surfaceArea += i->GetSurfaceArea();
     }
-    return surfaceArea / nozzleSurfaceArea;
+    return surfaceArea / m_Nozzle->GetNozzleThroatArea();
 }
 double MotorSim::CalcChamberPressure()
 {
@@ -143,7 +142,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-OpenBurnPropellant* MotorSim::CalcAvgPropellant()
+void MotorSim::CalcAvgPropellant()
 {
     double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_rho = 0;
     //sum up all the propellant properties
@@ -182,3 +181,72 @@ bool MotorSim::HasGrains()
 {
     return m_Grains.size() != 0;
 }
+double MotorSim::GetMotorLength()
+{
+    double len = 0;
+    for (auto i : m_Grains)
+    {
+        len += i->GetLength();
+    }
+    return len;
+}
+double MotorSim::GetMotorMajorDiameter()
+{
+    double dia = 0;
+    for (auto i : m_Grains)
+    {
+        //if the new grain's dia is larger than previously recorded dia, its the motor's major dia.
+        dia < i->GetDiameter() ? dia = i->GetDiameter() : NULL;
+    }
+    return dia;
+}
+double MotorSim::GetMotorPropellantMass()
+{
+    double mass = 0;
+    for (auto i : m_Grains)
+    {
+        mass += i->GetVolume() * i->GetPropellantType().GetDensity();
+    }
+    return mass;
+}
+double MotorSim::CalcStaticKn(const std::vector<OpenBurnGrain*>& initial_grains, OpenBurnNozzle* nozzle, KN_STATIC_CALC_TYPE type)
+{
+    double surfaceArea = 0;
+
+    //http://www.nakka-rocketry.net/design1.html
+    switch (type)
+    {
+    default:
+    case KN_CALC_INITIAL:
+        for (auto i : initial_grains)
+        {
+            surfaceArea += i->GetSurfaceArea();
+        }
+        break;
+    case KN_CALC_MAX:
+        for (auto i : initial_grains)
+        {
+            int inhibited = (2 - i->GetInhibitedFaces());
+            double webRegression = float(1.0f/6.0f) * (i->GetLength() - inhibited * i->GetCoreDiameter());
+            double Ab_max_core_dia = i->GetCoreDiameter() + (inhibited * webRegression);
+            double Ab_max_len = i->GetLength() - (inhibited * webRegression);
+
+            double face_area = 0.25f * M_PI * ((i->GetDiameter() * i->GetDiameter()) - (Ab_max_core_dia * Ab_max_core_dia));
+            double core_area = M_PI * Ab_max_core_dia * Ab_max_len;
+
+            surfaceArea += core_area + inhibited * face_area;
+        }
+        break;
+    case KN_CALC_FINAL:
+        for (auto i : initial_grains)
+        {
+            double web_thickness = 0.5f * (i->GetDiameter() - i->GetCoreDiameter());
+            double core_area = M_PI * i->GetDiameter() * (i->GetLength() - 2 * web_thickness);
+            surfaceArea += core_area;
+        }
+        break;
+    }
+    return surfaceArea / nozzle->GetNozzleThroatArea();
+}
+
+

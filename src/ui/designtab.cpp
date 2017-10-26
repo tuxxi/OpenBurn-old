@@ -19,7 +19,7 @@ DesignTab::DesignTab(QWidget* parent)
     connect(m_deleteGrainButton, SIGNAL(clicked()), this, SLOT(DeleteGrainButton_Clicked()));
     connect(m_grainsDisplay, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
     m_sim = new MotorSim;
-    UpdateGraphicsScene();
+    UpdateDesign();
 }
 DesignTab::~DesignTab() 
 {
@@ -28,8 +28,9 @@ DesignTab::~DesignTab()
 void DesignTab::SetupUI()
 {
     //controls 
-    QGroupBox* frame_GrainDesign = new QGroupBox(tr("Grain Design"));
-    QGroupBox* frame_Params = new QGroupBox(tr("Simulation Settings"));
+    QGroupBox* gb_GrainDesign = new QGroupBox(tr("Grain Design"));
+    QGroupBox* gb_frame_Params = new QGroupBox(tr("Simulation Settings"));
+    QGroupBox* gb_design_overview = new QGroupBox(tr("Design Overview"));
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
@@ -44,32 +45,63 @@ void DesignTab::SetupUI()
     QGridLayout* gLayout = new QGridLayout;    
     gLayout->addWidget(m_newGrainButton, 0, 1, 2, 2);
     gLayout->addWidget(m_deleteGrainButton, 0, 0);
-    frame_GrainDesign->setLayout(gLayout);
+    gb_GrainDesign->setLayout(gLayout);
 
     //nozzle and sim settings
     m_nozzleSettingsButton = new QPushButton(tr("Edit Nozzle"));
     QVBoxLayout* vLayout_2 = new QVBoxLayout;
     vLayout_2->addWidget(m_nozzleSettingsButton);
-    frame_Params->setLayout(vLayout_2);
+    gb_frame_Params->setLayout(vLayout_2);
 
-    //master layout
-    QGridLayout* layout = new QGridLayout;
-    layout->addWidget(m_grainsDisplay, 0, 0);
-    layout->addWidget(frame_GrainDesign, 0, 1);
-    layout->addWidget(frame_Params, 0, 2);
-
+    //design overview
     m_motorDisplayView = new QGraphicsView;
     m_motorDisplayScene = new QGraphicsScene;
     m_motorDisplayView->setScene(m_motorDisplayScene);
     m_motorDisplayView->show();
 
+    QGroupBox* gb_design_params = new QGroupBox(tr("Design Parameters"));
+    QGridLayout* gridLayoutDesignParams = new QGridLayout;
+    m_knLabel = new QLabel;
+    m_nozzleDiaLabel = new QLabel;
+    m_nozzleExitLabel = new QLabel;
+    m_motorMajorDiaLabel = new QLabel;
+    m_motorLenLabel = new QLabel;
+    m_numGrainsLabel = new QLabel;
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Kn:")), 0, 0);
+    gridLayoutDesignParams->addWidget(m_knLabel, 0, 1);
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Throat Diameter:")), 1, 0);
+    gridLayoutDesignParams->addWidget(m_nozzleDiaLabel, 1, 1);
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 2, 0);
+    gridLayoutDesignParams->addWidget(m_nozzleExitLabel, 2, 1);
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Grains:")), 3, 0);
+    gridLayoutDesignParams->addWidget(m_numGrainsLabel, 3, 1);
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Diameter:")), 4, 0);
+    gridLayoutDesignParams->addWidget(m_motorMajorDiaLabel, 4, 1);
+    gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Length:")), 5, 0);
+    gridLayoutDesignParams->addWidget(m_motorLenLabel, 5, 1);
+
+    gb_design_params->setLayout(gridLayoutDesignParams);
+
+    //QGroupBox* gb_sim_quick_results = new QGroupBox(tr("Sim Results"));
+    //QGridLayout* gridLayoutSimResults = new QGridLayout;
+
+    QHBoxLayout* hBoxLayout = new QHBoxLayout;
+    hBoxLayout->addWidget(m_motorDisplayView);
+    hBoxLayout->addWidget(gb_design_params);
+    gb_design_overview->setLayout(hBoxLayout);
+
+    //master layout
+    QGridLayout* layout = new QGridLayout;
+    layout->addWidget(m_grainsDisplay, 0, 0);
+    layout->addWidget(gb_GrainDesign, 0, 1);
+    layout->addWidget(gb_frame_Params, 0, 2);
+    layout->addWidget(gb_design_overview, 1, 0, 1, 3);
     //takes up 1 row, and two columns
-    layout->addWidget(m_motorDisplayView, 1, 0, 1, 3);
     setLayout(layout);
 }
 
 //this MUST be called AFTER we setup the basic UI layout.
-void DesignTab::UpdateGraphicsScene()
+void DesignTab::UpdateDesign()
 {
     if (!m_motorObject)
     {
@@ -81,18 +113,25 @@ void DesignTab::UpdateGraphicsScene()
     {
         knDisplay = new QGraphicsTextItem;        
     }
-    if (m_sim->HasGrains()) m_motorObject->SetGrains(m_sim->m_Grains);   
+    if (m_sim->HasGrains())
+    {
+        m_motorObject->SetGrains(m_sim->m_Grains);
+        m_motorLenLabel->setText(num(m_sim->GetMotorLength()));
+        m_motorMajorDiaLabel->setText(num(m_sim->GetMotorMajorDiameter()));
+        m_numGrainsLabel->setText(num(m_sim->GetNumGrains()));
+    }
     if (m_sim->HasNozzle())
     {
         m_motorObject->SetNozzle(m_sim->m_Nozzle);
-        double kn = m_sim->CalcKn();
-        qDebug() << "Kn is : " << kn;
-        knDisplay->setPlainText(QString::number(kn));
-        knDisplay->setPos(0, 0);
-        knDisplay->show();
+        QString initialKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_INITIAL));
+        QString maxKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_MAX));
+        QString finalKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_FINAL));
+
+        m_knLabel->setText(tr("Initial: ") + initialKn + tr(", Max: ") + maxKn + tr(", Final: ") + finalKn);
+        m_nozzleDiaLabel->setText(num(m_sim->m_Nozzle->GetNozzleThroat()));
+        m_nozzleExitLabel->setText(num(m_sim->m_Nozzle->GetNozzleExit()));
+
     } 
-    
-    
 
     m_motorObject->update();
     m_motorDisplayScene->update();
@@ -104,7 +143,8 @@ void DesignTab::UpdateGraphicsScene()
 }
 void DesignTab::resizeEvent(QResizeEvent* event)
 {
-    UpdateGraphicsScene();
+    Q_UNUSED(event);
+    UpdateDesign();
 }
 //this allows us to mark the objects as null when they are destroyed, allowing new ones to be made later on
 //NOTE: they are only deleted if delete is called directly since they do NOT have attribute WA_DeleteOnClose.
@@ -126,22 +166,22 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain *grain)
 {
     int numItems = m_grainsDisplay->rowCount();
     m_grainsDisplay->setRowCount(numItems+1);
-    m_grainsDisplay->setItem(numItems, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
-    m_grainsDisplay->setItem(numItems, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
-    m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(QString::number(grain->GetCoreDiameter())));    
+    m_grainsDisplay->setItem(numItems, 0, new QTableWidgetItem(num(grain->GetLength())));
+    m_grainsDisplay->setItem(numItems, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(num(grain->GetCoreDiameter())));
     m_grainsDisplay->setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
-    m_grainsDisplay->setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
+    m_grainsDisplay->setItem(numItems, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
     
     m_sim->AddGrain(grain);
     emit SIG_NewGrain(grain);    
-    UpdateGraphicsScene();
+    UpdateDesign();
 }
 //Recieved from the grain table widget. Update the sim!
 void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 {
     //todo: update sim?
     m_sim->SwapGrains(oldPos, newPos);
-    UpdateGraphicsScene();
+    UpdateDesign();
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
@@ -151,7 +191,7 @@ void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
     }
     m_sim->SetNozzle(nozz);
     
-    UpdateGraphicsScene();
+    UpdateDesign();
 }
 void DesignTab::NewGrainButton_Clicked()
 {
@@ -180,7 +220,7 @@ void DesignTab::DeleteGrainButton_Clicked()
     }
     //disable the button again since we no longer have anything selected
     m_deleteGrainButton->setEnabled(false);
-    UpdateGraphicsScene();
+    UpdateDesign();
 }
 void DesignTab::NozzleButton_Clicked()
 {
@@ -196,6 +236,8 @@ void DesignTab::NozzleButton_Clicked()
 }
 void DesignTab::SLOT_grainTable_cellClicked(int row, int column)
 {
-    m_seed_grain = m_sim->m_Grains[row];
+    Q_UNUSED(column);
+    Q_UNUSED(row);
+    //m_seed_grain = m_sim->m_Grains[row];
     m_deleteGrainButton->setEnabled(true);
 }
