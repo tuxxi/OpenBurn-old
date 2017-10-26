@@ -2,7 +2,7 @@
 
 GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
     : m_grain(grain), m_scaleFactor(scale_factor), QGraphicsObject(parent), 
-    m_color(Qt::lightGray), m_isCrossSectionView(crossSection)
+    m_color(Qt::gray), m_isCrossSectionView(crossSection)
 {
     setAcceptDrops(true);
 }
@@ -18,7 +18,7 @@ void GrainGraphicsItem::paint(QPainter *painter,
     if (m_isCrossSectionView)
     {
         //draw grain
-        QBrush brush = QBrush(Qt::gray, Qt::FDiagPattern);
+        QBrush brush = QBrush(m_color, Qt::FDiagPattern);
         QPen pen = QPen(Qt::black, 0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
         painter->setPen(pen);
         painter->setBrush(brush);

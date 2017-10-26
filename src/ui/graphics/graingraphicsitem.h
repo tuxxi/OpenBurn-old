@@ -14,6 +14,8 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
+    OpenBurnGrain* m_grain;
+
 protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
@@ -23,6 +25,5 @@ protected:
     bool m_isCrossSectionView; //
     double grainX, grainY;
     int m_scaleFactor;
-    OpenBurnGrain* m_grain;
 };
 

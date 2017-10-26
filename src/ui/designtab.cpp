@@ -185,10 +185,13 @@ void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
+   /*
     if (m_sim->HasNozzle())
     {
         delete m_sim->m_Nozzle;
     }
+    */
+    //todo: refactor me! this creates a dANgLinG pOINteR!!
     m_sim->SetNozzle(nozz);
     
     UpdateDesign();

@@ -7,6 +7,8 @@
 
 #include <vector>
 #include "src/ui/graphics/graingraphicsitem.h"
+#include "src/ui/graphics/nozzlegraphicsitem.h"
+
 #include "src/grain.h"
 #include "src/nozzle.h"
 
@@ -19,19 +21,16 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
-    void SetGrains(const std::vector<OpenBurnGrain*> &grains);
-    void RemoveGrain(int index);
+    void SetGrains(const std::vector<OpenBurnGrain*>& grains);
     void SetNozzle(OpenBurnNozzle* nozzle);
+    void RemoveGrain(int index);
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_scaleFactor; }
     double m_MotorLen, m_MotorHeight; //in pixnels
     
 private:
     int m_scaleFactor;
-    
-    std::vector<OpenBurnGrain*> m_Grains;
     std::vector<GrainGraphicsItem*> m_gfxGrains;
-    
-    OpenBurnNozzle *m_Nozzle;
+    NozzleGraphicsItem* m_gfxNozzle;
 };
 

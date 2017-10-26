@@ -20,7 +20,8 @@ HEADERS += src/grain.h \
            src/ui/mainwindow.h \
            src/ui/nozzledialog.h \
            src/ui/graphics/graingraphicsitem.h \
-           src/ui/graphics/motorgraphicsitem.h
+           src/ui/graphics/motorgraphicsitem.h \
+    src/ui/graphics/nozzlegraphicsitem.h
 SOURCES += src/grain.cpp \
            src/main.cpp \
            src/motorsim.cpp \
@@ -32,4 +33,5 @@ SOURCES += src/grain.cpp \
            src/ui/mainwindow.cpp \
            src/ui/nozzledialog.cpp \
            src/ui/graphics/graingraphicsitem.cpp \
-           src/ui/graphics/motorgraphicsitem.cpp
+           src/ui/graphics/motorgraphicsitem.cpp \
+    src/ui/graphics/nozzlegraphicsitem.cpp

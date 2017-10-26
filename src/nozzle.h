@@ -23,8 +23,12 @@ public:
     ConicalNozzle(double throat, double exit, double halfAngle = 15.0f)
         : OpenBurnNozzle(throat, exit), m_HalfAngle(halfAngle)
     {}
-    virtual double GetNozzleThroatArea() override;
     ~ConicalNozzle();
+    virtual double GetNozzleThroatArea() override;
+
+    double GetHalfAngle() { return m_HalfAngle; }
+    double GetThroatLength() { return m_throatLength; }
+
     //TODO: add calculations to account for departures from ideal performance
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf
 private:
