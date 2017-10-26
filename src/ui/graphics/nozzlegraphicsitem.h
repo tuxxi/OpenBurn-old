@@ -17,12 +17,12 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) override;
-
+    void UpdateNozzle(OpenBurnNozzle* nozz);
 private:
     QColor m_color;
     bool m_isCrossSectionView;
     int m_scaleFactor;
-    double m_nozzleHeight;
+    double m_nozzleHeight, m_nozzleLength;
     OpenBurnNozzle* m_Nozzle;
 };
 

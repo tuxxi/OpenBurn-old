@@ -103,35 +103,38 @@ void DesignTab::SetupUI()
 //this MUST be called AFTER we setup the basic UI layout.
 void DesignTab::UpdateDesign()
 {
-    if (!m_motorObject)
-    {
-        m_motorObject = new MotorGraphicsItem(100);
-        knDisplay = new QGraphicsTextItem;
-        m_motorDisplayScene->addItem(m_motorObject);
-    }
-    if (!knDisplay)
-    {
-        knDisplay = new QGraphicsTextItem;        
-    }
     if (m_sim->HasGrains())
     {
         m_motorObject->SetGrains(m_sim->m_Grains);
         m_motorLenLabel->setText(num(m_sim->GetMotorLength()));
         m_motorMajorDiaLabel->setText(num(m_sim->GetMotorMajorDiameter()));
         m_numGrainsLabel->setText(num(m_sim->GetNumGrains()));
+
+        if (m_sim->HasNozzle())
+        {
+            m_motorObject->SetNozzle(m_sim->m_Nozzle);
+            QString initialKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_INITIAL));
+            QString maxKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_MAX));
+            QString finalKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_FINAL));
+    
+            m_knLabel->setText(initialKn + "-" + maxKn);    
+        }
     }
     if (m_sim->HasNozzle())
     {
-        m_motorObject->SetNozzle(m_sim->m_Nozzle);
-        QString initialKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_INITIAL));
-        QString maxKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_MAX));
-        QString finalKn = num(m_sim->CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_FINAL));
-
-        m_knLabel->setText(tr("Initial: ") + initialKn + tr(", Max: ") + maxKn + tr(", Final: ") + finalKn);
         m_nozzleDiaLabel->setText(num(m_sim->m_Nozzle->GetNozzleThroat()));
         m_nozzleExitLabel->setText(num(m_sim->m_Nozzle->GetNozzleExit()));
 
-    } 
+    }
+    UpdateGraphics(); 
+}
+void DesignTab::UpdateGraphics()
+{
+    if (!m_motorObject)
+    {
+        m_motorObject = new MotorGraphicsItem(100);
+        m_motorDisplayScene->addItem(m_motorObject);
+    }
 
     m_motorObject->update();
     m_motorDisplayScene->update();
@@ -162,7 +165,7 @@ void DesignTab::SLOT_GrainDialogClosed()
 
 //Recieved from the grain dialog. Updates the grain table widget,
 //and send sout a signal to main window that there was a new grain added
-void DesignTab::SLOT_NewGrain(OpenBurnGrain *grain)
+void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 {
     int numItems = m_grainsDisplay->rowCount();
     m_grainsDisplay->setRowCount(numItems+1);

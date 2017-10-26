@@ -19,9 +19,10 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (m_MotorLen > 0)
     {
         painter->setPen(QPen(Qt::black, 5, Qt::DashDotDotLine, Qt::RoundCap, Qt::RoundJoin));
+        double len = m_MotorLen + (m_gfxNozzle ? m_gfxNozzle->boundingRect().width() : 0);
         painter->drawLine(0, 0, 0, m_MotorHeight); //forward end of motor
-        painter->drawLine(0, 0, m_MotorLen, 0); //bottom line
-        painter->drawLine(0, m_MotorHeight, m_MotorLen, m_MotorHeight); //top line    
+        painter->drawLine(0, 0, len, 0); //bottom line
+        painter->drawLine(0, m_MotorHeight, len, m_MotorHeight); //top line    
     }
 }
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
@@ -37,6 +38,7 @@ void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
         m_gfxGrains.push_back(newGrain);
         m_MotorLen += len;
     }
+    update();    
 }
 void MotorGraphicsItem::RemoveGrain(int index)
 {
@@ -51,6 +53,7 @@ void MotorGraphicsItem::RemoveGrain(int index)
         QPointF currentPos = m_gfxGrains[i]->pos();
         m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());
     }
+    update();    
 }
 void MotorGraphicsItem::SetScaleFactor(int scale)
 {
@@ -61,6 +64,8 @@ void MotorGraphicsItem::SetNozzle(OpenBurnNozzle* nozzle)
     if (!m_gfxNozzle)
     {
         m_gfxNozzle = new NozzleGraphicsItem(nozzle, m_scaleFactor, m_MotorHeight, true, this);
-        m_gfxNozzle->setPos(m_MotorLen, 0);
     }
+    m_gfxNozzle->UpdateNozzle(nozzle);    
+    m_gfxNozzle->setPos(m_MotorLen, 0);
+    update();
 }

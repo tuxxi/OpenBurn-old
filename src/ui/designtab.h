@@ -14,14 +14,14 @@ class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(QWidget *parent = nullptr);
+    explicit DesignTab(QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;
 signals:
-    void SIG_NewGrain(OpenBurnGrain *grain); //passes along to the main window which holds the sim object
+    void SIG_NewGrain(OpenBurnGrain* grain); //passes along to the main window which holds the sim object
 public slots:
     void SLOT_GrainPositionUpdated(int oldPos, int newPos); 
-    void SLOT_NewGrain(OpenBurnGrain *grain); //recieved from the grain dialog
+    void SLOT_NewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
     void SLOT_NozzleUpdated(OpenBurnNozzle* nozz);
 private slots:
     void NewGrainButton_Clicked();
@@ -34,6 +34,7 @@ private slots:
 private:
     void SetupUI();
     void UpdateDesign();
+    void UpdateGraphics();
     
     //design overview - static
     QLabel* m_motorMajorDiaLabel, *m_motorLenLabel, *m_nozzleDiaLabel, *m_nozzleExitLabel, *m_knLabel,
@@ -44,22 +45,20 @@ private:
     //for quick reference only- more detailed results are available on results tab
     QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
 
-    OpenBurnNozzle* m_seed_nozzle;    
-    QPushButton *m_nozzleSettingsButton;
+    //OpenBurnNozzle* m_seed_nozzle;    
+    QPushButton* m_nozzleSettingsButton;
 
     //grain settings
     //OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
     QPushButton *m_newGrainButton, *m_deleteGrainButton;
 
-    GrainDialog *m_grainDialog;
-    NozzleDialog *m_nozzleDialog;
-    GrainTableWidget *m_grainsDisplay;
+    GrainDialog* m_grainDialog;
+    NozzleDialog* m_nozzleDialog;
+    GrainTableWidget* m_grainsDisplay;
 
-    MotorGraphicsItem *m_motorObject;
-    QGraphicsView *m_motorDisplayView;
+    MotorGraphicsItem* m_motorObject;
+    QGraphicsView* m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
-
-    QGraphicsTextItem* knDisplay;
 
     MotorSim* m_sim;
 };
