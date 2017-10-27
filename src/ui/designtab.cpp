@@ -169,14 +169,19 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 {
     int numItems = m_grainsDisplay->rowCount();
     m_grainsDisplay->setRowCount(numItems+1);
+
     m_grainsDisplay->setItem(numItems, 0, new QTableWidgetItem(num(grain->GetLength())));
     m_grainsDisplay->setItem(numItems, 1, new QTableWidgetItem(num(grain->GetDiameter())));
-    m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(num(grain->GetCoreDiameter())));
-    m_grainsDisplay->setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
+    m_grainsDisplay->setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
     m_grainsDisplay->setItem(numItems, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
-    
+
+    if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
+    {
+        m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+    }
+
     m_sim->AddGrain(grain);
-    emit SIG_NewGrain(grain);    
+    emit SIG_NewGrain(grain);
     UpdateDesign();
 }
 //Recieved from the grain table widget. Update the sim!
@@ -188,22 +193,14 @@ void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
-   /*
-    if (m_sim->HasNozzle())
-    {
-        delete m_sim->m_Nozzle;
-    }
-    */
-    //todo: refactor me! this creates a dANgLinG pOINteR!!
-    m_sim->SetNozzle(nozz);
-    
+    m_sim->SetNozzle(nozz);    
     UpdateDesign();
 }
 void DesignTab::NewGrainButton_Clicked()
 {
     if (!m_grainDialog) //only make one!!
     {
-        m_grainDialog = new GrainDialog(nullptr, true);
+        m_grainDialog = new GrainDialog;
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
         

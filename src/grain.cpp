@@ -1,13 +1,22 @@
 #include "grain.h"
-BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces)
-    : OpenBurnGrain(prop), m_grainDia(dia), m_coreDia(coredia), m_grainLen(len), m_numInhibitedFaces(inhibitedfaces)
+
+OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant* prop, int inhibited)
+    : m_grainDia(diameter), m_grainLen(length),m_prop(prop), m_numInhibitedFaces(inhibited)
 {
 
 }
-BatesGrain::~BatesGrain()
+OpenBurnGrain::~OpenBurnGrain()
 {
 
 }
+double OpenBurnGrain::GetLength() { return m_grainLen; }
+double OpenBurnGrain::GetDiameter() { return m_grainDia; }
+int OpenBurnGrain::GetInhibitedFaces() { return m_numInhibitedFaces; }
+OpenBurnPropellant* OpenBurnGrain::GetPropellantType() { return m_prop; }
+void OpenBurnGrain::SetLength(double length) { m_grainLen = length; }
+void OpenBurnGrain::SetDiameter(double dia) { m_grainDia = dia; }
+void OpenBurnGrain::SetInhibitedFaces(int faces) { m_numInhibitedFaces = faces; }
+void OpenBurnGrain::SetPropellantType(OpenBurnPropellant* prop) { m_prop = prop; }
 void OpenBurnGrain::SetBurnRate(double steadyState, double erosiveFactor)
 {
     m_rNot = steadyState;
@@ -15,7 +24,19 @@ void OpenBurnGrain::SetBurnRate(double steadyState, double erosiveFactor)
 }
 
 // Bates Grains
-double BatesGrain::GetSurfaceArea()
+BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant* prop, int inhibitedfaces)
+    : OpenBurnGrain(dia, len, prop, inhibitedfaces), m_coreDia(coredia)
+{
+
+}
+BatesGrain::~BatesGrain()
+{
+
+}
+
+double BatesGrain::GetCoreDiameter() { return m_coreDia; }
+void BatesGrain::SetCoreDiameter(double dia) { m_coreDia = dia; }
+double BatesGrain::GetBurningSurfaceArea()
 {
     double face_area = 0.25f * M_PI * ((m_grainDia * m_grainDia) - (m_coreDia * m_coreDia));
     double core_area = M_PI * m_coreDia * m_grainLen;

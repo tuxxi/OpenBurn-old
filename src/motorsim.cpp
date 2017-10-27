@@ -67,7 +67,7 @@ double MotorSim::CalcKn()
     double surfaceArea = 0;
     for (auto i : m_Grains)
     {
-        surfaceArea += i->GetSurfaceArea();
+        surfaceArea += i->GetBurningSurfaceArea();
     }
     return surfaceArea / m_Nozzle->GetNozzleThroatArea();
 }
@@ -82,13 +82,13 @@ double MotorSim::CalcChamberPressure()
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnGrain* grain)
 {
     // r = a * p^n
-    OpenBurnPropellant prop = grain->GetPropellantType();
-    return prop.GetBurnRateCoef() * qPow(CalcChamberPressure(), prop.GetBurnRateExp());
+    OpenBurnPropellant* prop = grain->GetPropellantType();
+    return prop->GetBurnRateCoef() * qPow(CalcChamberPressure(), prop->GetBurnRateExp());
 }
 double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumber)
 {
-    OpenBurnPropellant prop = grain->GetPropellantType();
-    double k = prop.GetSpecificHeatRatio();
+    OpenBurnPropellant* prop = grain->GetPropellantType();
+    double k = prop->GetSpecificHeatRatio();
     double P_s = CalcChamberPressure(); //steady-state chamber pressure
 
     //First we have to calculate saint roberts law again, using static pressure at grain surface obtained by:
@@ -100,19 +100,19 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     //This burn rate value is __lower__ than saint robert's law due to stagnation pressure considerations.
     //Normally this value would be used as R_0 but the core mach number is not considered in the basic case,
     //So we calculate it here and subtract the difference from R_e at the end.
-    double R_0 = prop.GetBurnRateCoef() * qPow(P, prop.GetBurnRateExp());
+    double R_0 = prop->GetBurnRateCoef() * qPow(P, prop->GetBurnRateExp());
     double R_diff = CalcSteadyStateBurnRate(grain) - R_0; //this factor will be removed later on
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
     double G = CalcMassFlux(machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
-    double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
-    double rho = prop.GetDensity(); //propellant density
-    double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
-    double T_0 = prop.GetAdiabaticFlameTemp();// adiabatic flame temperature
-    double mu = prop.GetGasViscosity(); //viscoisty of combustion products
-    double Pr = prop.GetPrandtlNumber(); //prandtl number
+    double C_s = prop->GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
+    double rho = prop->GetDensity(); //propellant density
+    double C_p = prop->GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
+    double T_0 = prop->GetAdiabaticFlameTemp();// adiabatic flame temperature
+    double mu = prop->GetGasViscosity(); //viscoisty of combustion products
+    double Pr = prop->GetPrandtlNumber(); //prandtl number
 
     double T_s = OpenBurnUtil::g_kSurfaceTemperature; //Temperature of burning propellant surface
     double T_i = OpenBurnUtil::g_kAmbientTemperature; //Base temperature of propellant (degrees K)
@@ -149,12 +149,12 @@ void MotorSim::CalcAvgPropellant()
     for (auto i : m_Grains)
     {
         //"weight" each property based on the propellant mass in the motor
-        double mass = i->GetVolume() * i->GetPropellantType().GetDensity();
-        weighted_a += mass * i->GetPropellantType().GetBurnRateCoef();
-        weighted_n += mass * i->GetPropellantType().GetBurnRateExp();
-        weighted_cstar += mass * i->GetPropellantType().GetCharVelocity();
-        weighted_rho += mass * i->GetPropellantType().GetDensity();
-        //weighted_cpcv += mass * i->GetPropellantType().GetSpecificHeatRatio();
+        double mass = i->GetVolume() * i->GetPropellantType()->GetDensity();
+        weighted_a += mass * i->GetPropellantType()->GetBurnRateCoef();
+        weighted_n += mass * i->GetPropellantType()->GetBurnRateExp();
+        weighted_cstar += mass * i->GetPropellantType()->GetCharVelocity();
+        weighted_rho += mass * i->GetPropellantType()->GetDensity();
+        //weighted_cpcv += mass * i->GetPropellantType()->GetSpecificHeatRatio();
     }
     double a = weighted_a / m_Grains.size();
     double n = weighted_n / m_Grains.size();
@@ -205,7 +205,7 @@ double MotorSim::GetMotorPropellantMass()
     double mass = 0;
     for (auto i : m_Grains)
     {
-        mass += i->GetVolume() * i->GetPropellantType().GetDensity();
+        mass += i->GetVolume() * i->GetPropellantType()->GetDensity();
     }
     return mass;
 }
@@ -220,29 +220,36 @@ double MotorSim::CalcStaticKn(const std::vector<OpenBurnGrain*>& initial_grains,
     case KN_CALC_INITIAL:
         for (auto i : initial_grains)
         {
-            surfaceArea += i->GetSurfaceArea();
+            surfaceArea += i->GetBurningSurfaceArea();
         }
         break;
     case KN_CALC_MAX:
         for (auto i : initial_grains)
         {
-            int inhibited = (2 - i->GetInhibitedFaces());
-            double webRegression = float(1.0f/6.0f) * (i->GetLength() - inhibited * i->GetCoreDiameter());
-            double Ab_max_core_dia = i->GetCoreDiameter() + (inhibited * webRegression);
-            double Ab_max_len = i->GetLength() - (inhibited * webRegression);
-
-            double face_area = 0.25f * M_PI * ((i->GetDiameter() * i->GetDiameter()) - (Ab_max_core_dia * Ab_max_core_dia));
-            double core_area = M_PI * Ab_max_core_dia * Ab_max_len;
-
-            surfaceArea += core_area + inhibited * face_area;
+            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
+            {
+                int inhibited = (2 - bates->GetInhibitedFaces());
+                double webRegression = float(1.0f/6.0f) * (bates->GetLength() - inhibited * bates->GetCoreDiameter());
+                double Ab_max_core_dia = bates->GetCoreDiameter() + (inhibited * webRegression);
+                double Ab_max_len = bates->GetLength() - (inhibited * webRegression);
+    
+                double face_area = 0.25f * M_PI * ((bates->GetDiameter() * bates->GetDiameter()) - (Ab_max_core_dia * Ab_max_core_dia));
+                double core_area = M_PI * Ab_max_core_dia * Ab_max_len;
+    
+                surfaceArea += core_area + inhibited * face_area;    
+            }
+            //other grain types
         }
         break;
     case KN_CALC_FINAL:
         for (auto i : initial_grains)
         {
-            double web_thickness = 0.5f * (i->GetDiameter() - i->GetCoreDiameter());
-            double core_area = M_PI * i->GetDiameter() * (i->GetLength() - 2 * web_thickness);
-            surfaceArea += core_area;
+            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
+            {
+                double web_thickness = 0.5f * (bates->GetDiameter() - bates->GetCoreDiameter());
+                double core_area = M_PI * bates->GetDiameter() * (bates->GetLength() - 2 * web_thickness);
+                surfaceArea += core_area;    
+            }            
         }
         break;
     }

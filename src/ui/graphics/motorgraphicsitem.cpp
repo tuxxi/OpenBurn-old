@@ -31,13 +31,11 @@ void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
     {
         GrainGraphicsItem *newGrain = new GrainGraphicsItem(grains[i], m_scaleFactor, true, this);
         double len = newGrain->boundingRect().width();
-        double height = newGrain->boundingRect().height();
-        m_MotorHeight = qMax(height, m_MotorHeight); //if one grain is larger, that's our new motor diameter.
-
         newGrain->setPos(m_MotorLen, 0);
         m_gfxGrains.push_back(newGrain);
         m_MotorLen += len;
     }
+    CalculateMotorHeight();
     update();    
 }
 void MotorGraphicsItem::RemoveGrain(int index)
@@ -53,6 +51,7 @@ void MotorGraphicsItem::RemoveGrain(int index)
         QPointF currentPos = m_gfxGrains[i]->pos();
         m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());
     }
+    CalculateMotorHeight();
     update();    
 }
 void MotorGraphicsItem::SetScaleFactor(int scale)
@@ -68,4 +67,14 @@ void MotorGraphicsItem::SetNozzle(OpenBurnNozzle* nozzle)
     m_gfxNozzle->UpdateNozzle(nozzle);    
     m_gfxNozzle->setPos(m_MotorLen, 0);
     update();
+}
+//loops through all the grains in the motor and finds the _maximum_ diameter. this is the motor height.
+void MotorGraphicsItem::CalculateMotorHeight()
+{
+    m_MotorHeight = 0.0f;
+    for (auto* i : m_gfxGrains)
+    {
+        m_MotorHeight = qMax(i->boundingRect().height(), m_MotorHeight); //if one grain is larger, that's our new motor diameter.
+    }
+    if (m_gfxNozzle) m_gfxNozzle->UpdateHeight(m_MotorHeight);
 }

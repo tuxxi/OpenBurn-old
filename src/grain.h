@@ -1,19 +1,30 @@
 #pragma once
-#include "propellant.h"
+#include "src/propellant.h"
 #include <QtMath>
 
+enum GRAINTYPE
+{
+    GRAINTYPE_BATES = 0,
+};
 //represents a single propellant grain in a motor
 class OpenBurnGrain
 {
 public:
-    virtual ~OpenBurnGrain() {}
+    OpenBurnGrain(double length, double diameter, OpenBurnPropellant* prop, int inhibited = 0 );
+    virtual ~OpenBurnGrain();
 
-    virtual double GetLength() = 0;
-    virtual double GetCoreDiameter() = 0;
-    virtual double GetDiameter() = 0;
-    virtual int GetInhibitedFaces() = 0;
+    virtual double GetLength();
+    virtual double GetDiameter();
+    virtual int GetInhibitedFaces();
+    virtual OpenBurnPropellant* GetPropellantType();
+    
+    virtual void SetLength(double length);
+    virtual void SetDiameter(double dia);
+    virtual void SetInhibitedFaces(int faces);
+    virtual void SetPropellantType(OpenBurnPropellant* prop);
 
-    virtual double GetSurfaceArea() = 0; //return the burning surface area of the propellant
+
+    virtual double GetBurningSurfaceArea() = 0; //return the burning surface area of the propellant
 
     virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
@@ -23,35 +34,31 @@ public:
     virtual bool Burn(double timestep) = 0;
 
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
-    OpenBurnPropellant GetPropellantType() { return m_prop; }
-    void SetPropellantType(OpenBurnPropellant prop) {m_prop = prop;}
-protected:
+//protected:
+    int m_numInhibitedFaces;    
+    double m_grainDia, m_grainLen;     
     double m_rNot, m_rErosive; //burn rates, additive (i.e r = r0 + re)
 
-    OpenBurnPropellant m_prop;
-    OpenBurnGrain(OpenBurnPropellant prop)
-        : m_prop(prop)
-    {}
-
+    OpenBurnPropellant* m_prop;
 };
 
 //a cylindrical bates grain
 class BatesGrain : public OpenBurnGrain
 {
 public:
-    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces = 0);
+    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant* prop, int inhibitedfaces = 0);
+
     virtual ~BatesGrain() override;
-    virtual double GetLength() override { return m_grainLen; }
-    virtual double GetDiameter() override { return m_grainDia; }
-    virtual double GetCoreDiameter() override { return m_coreDia; }
-    virtual int GetInhibitedFaces() override { return m_numInhibitedFaces; }
-    virtual double GetSurfaceArea() override;
+    
+    virtual double GetBurningSurfaceArea() override;
     virtual double GetPortArea() override;
     virtual double GetVolume() override;
     virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
+
+    virtual double GetCoreDiameter();
+    virtual void SetCoreDiameter(double dia);
 private:
-    double m_grainDia, m_coreDia, m_grainLen;
-    int m_numInhibitedFaces;
+    double m_coreDia;
 };
 

@@ -70,3 +70,7 @@ void NozzleGraphicsItem::UpdateNozzle(OpenBurnNozzle* nozz)
 {
     m_Nozzle = nozz;
 }
+void NozzleGraphicsItem::UpdateHeight(double height)
+{
+    m_nozzleHeight = height;
+}

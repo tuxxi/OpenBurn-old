@@ -18,6 +18,7 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0) override;
     void UpdateNozzle(OpenBurnNozzle* nozz);
+    void UpdateHeight(double height);
 private:
     QColor m_color;
     bool m_isCrossSectionView;
