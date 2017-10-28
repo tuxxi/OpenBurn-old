@@ -11,6 +11,7 @@
 
 #include "src/grain.h"
 #include "../util.h"
+#include "graindesigntypes.h"
 
 class GrainDialog : public QDialog
 {
@@ -18,7 +19,7 @@ class GrainDialog : public QDialog
 
 public:
     explicit GrainDialog(QWidget* parent = nullptr, OpenBurnGrain* grain = nullptr);
-    ~GrainDialog();
+    virtual ~GrainDialog();
 
 signals:
     void SIG_DIALOG_NewGrain(OpenBurnGrain*);
@@ -26,28 +27,17 @@ signals:
 private slots:
     void on_cancelButton_clicked();
     void on_applyButton_clicked();
-    void on_grainType_changed(const QString& text);
+    void SLOT_GrainType_Changed(GRAINTYPE type);
 private:
     void SetupUI();
     void RefreshUI();
-    void SetupGraphicsView();
-    void SeedValues();
-    QGridLayout* controlsLayout;
-    QFrame* frame;
-
+    QGridLayout* m_controlsLayout;
+    QFrame* m_frame;
 
     QGraphicsView *m_graphicsView;
-    QDoubleSpinBox *m_grainDiameterSpinBox, *m_grainCoreDiameterSpinBox, *m_grainLengthSpinBox;
-    QSpinBox *m_grainInhibitedFacesSpinBox;
-
-    QComboBox *m_grainTypeComboBox;
-    QComboBox *m_propellantComboBox;
-    QComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox, *m_grainCoreDiaUnitsComboBox;
-
-    QToolButton *m_modifyPropellantDatabase;
-
     QPushButton *m_applyButton, *m_cancelButton;
 
+    OpenBurnGrainDesign* m_GrainDesign;
     OpenBurnGrain* m_Grain;
     GRAINTYPE m_GrainType;
     bool m_isNewGrainWindow;

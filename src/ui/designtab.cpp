@@ -150,8 +150,6 @@ void DesignTab::resizeEvent(QResizeEvent* event)
     UpdateDesign();
 }
 //this allows us to mark the objects as null when they are destroyed, allowing new ones to be made later on
-//NOTE: they are only deleted if delete is called directly since they do NOT have attribute WA_DeleteOnClose.
-//this is because I want to be able to re-open the same dialog with the same settings easily.
 void DesignTab::SLOT_NozzDialogClosed()
 {
     m_nozzleDialog = nullptr;
