@@ -124,7 +124,6 @@ void DesignTab::UpdateDesign()
     {
         m_nozzleDiaLabel->setText(num(m_sim->m_Nozzle->GetNozzleThroat()));
         m_nozzleExitLabel->setText(num(m_sim->m_Nozzle->GetNozzleExit()));
-
     }
     UpdateGraphics(); 
 }
@@ -136,24 +135,28 @@ void DesignTab::UpdateGraphics()
         m_motorDisplayScene->addItem(m_motorObject);
     }
 
-    m_motorObject->update();
-    m_motorDisplayScene->update();
+    //we have to repaint the veiwport otherwise the graphics objects don't update properly
+    m_motorObject->update(m_motorObject->boundingRect());
+    m_motorDisplayView->viewport()->repaint();
+
+    //set the motor display scene to the middle of the view plus a bit of padding on the sides
     m_motorDisplayScene->setSceneRect(m_motorObject->boundingRect());
     QRectF bounds = QRectF(m_motorObject->boundingRect().left(), m_motorObject->boundingRect().top(), 
-    m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
+        m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
     m_motorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
+    //update again just in case 
+    m_motorDisplayView->viewport()->repaint();    
 }
 void DesignTab::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    UpdateDesign();
+    UpdateGraphics();
 }
 //this allows us to mark the objects as null when they are destroyed, allowing new ones to be made later on
 void DesignTab::SLOT_NozzDialogClosed()
 {
     m_nozzleDialog = nullptr;
-    qDebug() << "deleted nozzle dialog!";
 }
 void DesignTab::SLOT_GrainDialogClosed()
 {
@@ -185,14 +188,13 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 //Recieved from the grain table widget. Update the sim!
 void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
 {
-    //todo: update sim?
     m_sim->SwapGrains(oldPos, newPos);
     UpdateDesign();
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
     m_sim->SetNozzle(nozz);    
-    UpdateDesign();
+    UpdateDesign();    
 }
 void DesignTab::NewGrainButton_Clicked()
 {

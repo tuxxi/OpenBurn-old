@@ -30,7 +30,7 @@ void NozzleGraphicsItem::paint(QPainter *painter,
             double exitHeightUpper = m_nozzleHeight * 0.5f + exitRadius;
             double exitHeightLower = m_nozzleHeight * 0.5f - exitRadius;
 
-            double divergentAngle = 15; //nozz->GetHalfAngle();
+            double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
             double convergentAngle = 25; // ?? allow user to change? maybe?
             double throatLen = 20.0f; //nozz->GetThroatLen();
         

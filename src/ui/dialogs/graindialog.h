@@ -10,7 +10,7 @@
 #include <QToolButton>
 
 #include "src/grain.h"
-#include "../util.h"
+#include "src/util.h"
 #include "graindesigntypes.h"
 
 class GrainDialog : public QDialog
@@ -37,7 +37,7 @@ private:
     QGraphicsView *m_graphicsView;
     QPushButton *m_applyButton, *m_cancelButton;
 
-    OpenBurnGrainDesign* m_GrainDesign;
+    OpenBurnDesignGrain* m_GrainDesign;
     OpenBurnGrain* m_Grain;
     GRAINTYPE m_GrainType;
     bool m_isNewGrainWindow;

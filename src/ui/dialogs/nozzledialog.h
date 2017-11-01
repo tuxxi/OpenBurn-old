@@ -7,8 +7,10 @@
 #include <QPushButton>
 #include <QComboBox>
 
-#include "../util.h"
-#include "../nozzle.h"
+#include "src/util.h"
+#include "src/nozzle.h"
+#include "nozzledesigntypes.h"
+
 class NozzleDialog : public QDialog
 {
     Q_OBJECT
@@ -23,7 +25,9 @@ private slots:
     void closeDialog();
 private:
     void SetupUI();
+    QFrame* m_frame;
+    QGraphicsView *m_graphicsView;
+    
+    OpenBurnDesignNozzle* m_NozzleDesign;
     QPushButton *m_applyButton, *m_OKButton, *m_cancelButton;   
-    QDoubleSpinBox *m_throatDiaSpinBox, *m_exitDiaSpinBox, *m_halfAngleSpinBox, *m_throatLenSpinBox;
-    QComboBox *m_throatDiaUnits, *m_exitDiaUnits, *m_halfAngleUnits, *m_throadLenUnits;
 };

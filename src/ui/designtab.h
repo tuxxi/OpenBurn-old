@@ -3,9 +3,9 @@
 #include <QGraphicsView>
 #include <QLabel>
 
-#include "src/ui/graindialog.h"
-#include "src/ui/nozzledialog.h"
-#include "src/ui/graintablewidget.h"
+#include "src/ui/dialogs/graindialog.h"
+#include "src/ui/dialogs/nozzledialog.h"
+#include "src/ui/widgets/graintablewidget.h"
 #include "src/util.h"
 #include "src/motorsim.h"
 #include "src/ui/graphics/motorgraphicsitem.h"

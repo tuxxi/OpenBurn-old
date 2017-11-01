@@ -12,8 +12,8 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
-#include "src/ui/graintablewidget.h"
-#include "src/ui/graindialog.h"
+#include "src/ui/widgets/graintablewidget.h"
+#include "src/ui/dialogs/graindialog.h"
 #include "src/ui/designtab.h"
 
 #include "src/motorsim.h"

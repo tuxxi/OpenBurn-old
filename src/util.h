@@ -10,11 +10,15 @@ namespace OpenBurnUtil
 {
 
     static const QStringList g_kLengthUnits = (QStringList() <<
-    QObject::tr("Inches (in)") <<
-    QObject::tr("Millimeters (mm)") <<
-    QObject::tr("Centimeters (cm)") <<
-    QObject::tr("Feet (ft)") <<
-    QObject::tr("Meters (m)"));
+        QObject::tr("Inches (in)") <<
+        QObject::tr("Millimeters (mm)") <<
+        QObject::tr("Centimeters (cm)") <<
+        QObject::tr("Feet (ft)") <<
+        QObject::tr("Meters (m)"));
+
+    static const QStringList g_kAngleUnits = (QStringList() <<
+        QObject::tr("Degrees") << 
+        QObject::tr("Radians"));
 
     static const double g_kGasConstantR = 8.3144621; //J / mol * k
     static const int g_kNumInterations = 200;

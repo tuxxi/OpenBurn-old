@@ -1,10 +1,10 @@
 #include <QLabel>
 #include <QDebug>
 
-#include "src/ui/graindesigntypes.h"
+#include "src/ui/dialogs/graindesigntypes.h"
 #include "src/util.h"
 
-OpenBurnGrainDesign::OpenBurnGrainDesign(QWidget* parent, OpenBurnGrain* seed)
+OpenBurnDesignGrain::OpenBurnDesignGrain(QWidget* parent, OpenBurnGrain* seed)
     : QWidget(parent), m_seedGrain(seed)
 {
     SetupUI();
@@ -12,7 +12,7 @@ OpenBurnGrainDesign::OpenBurnGrainDesign(QWidget* parent, OpenBurnGrain* seed)
         this, SLOT(on_grainType_changed(int)));
     SeedValues();
 }
-void OpenBurnGrainDesign::SetupUI()
+void OpenBurnDesignGrain::SetupUI()
 {
     controlsLayout = new QGridLayout;
     //Grain type combo box
@@ -73,11 +73,11 @@ void OpenBurnGrainDesign::SetupUI()
     
     setLayout(controlsLayout);
 }
-OpenBurnGrainDesign::~OpenBurnGrainDesign()
+OpenBurnDesignGrain::~OpenBurnDesignGrain()
 {
 
 }
-void OpenBurnGrainDesign::SeedValues()
+void OpenBurnDesignGrain::SeedValues()
 {
     if (m_seedGrain)
     {
@@ -88,37 +88,37 @@ void OpenBurnGrainDesign::SeedValues()
         //propellant ..     
     }
 }
-double OpenBurnGrainDesign::GetLength()
+double OpenBurnDesignGrain::GetLength()
 {
     return m_grainLengthSpinBox->value();
 }
-double OpenBurnGrainDesign::GetDiameter()
+double OpenBurnDesignGrain::GetDiameter()
 {
     return m_grainDiameterSpinBox->value();
 }
-int OpenBurnGrainDesign::GetInhibitedFaces()
+int OpenBurnDesignGrain::GetInhibitedFaces()
 {
     return m_grainInhibitedFacesSpinBox->value();
 }
-GRAINTYPE OpenBurnGrainDesign::GetGrainType()
+GRAINTYPE OpenBurnDesignGrain::GetGrainType()
 {
     return static_cast<GRAINTYPE>(m_grainTypeComboBox->currentIndex());
 }
-//OpenBurnPropellant* OpenBurnGrainDesign::GetPropellant()
+//OpenBurnPropellant* OpenBurnDesignGrain::GetPropellant()
 
-void OpenBurnGrainDesign::on_grainType_changed(int idx)
+void OpenBurnDesignGrain::on_grainType_changed(int idx)
 {
     //TODO: for some reason, the value in the grain design's type spin box doesn't update even though it says the index updated...
     emit SIG_GrainType_Changed(static_cast<GRAINTYPE>(idx));
 }
-void OpenBurnGrainDesign::AddNewControls(QWidget* widet, int row, int col)
+void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 {
     controlsLayout->addWidget(widet, row+4, col);
 }
 
 //BATES
-GrainDesignBates::GrainDesignBates(QWidget* parent, OpenBurnGrain* seed)
-    : OpenBurnGrainDesign(parent, seed)
+BatesGrainDesign::BatesGrainDesign(QWidget* parent, BatesGrain* seed)
+    : OpenBurnDesignGrain(parent, seed)
 {
     //Grain Core Diameter
     m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);
@@ -138,17 +138,17 @@ GrainDesignBates::GrainDesignBates(QWidget* parent, OpenBurnGrain* seed)
 
     SeedValues();    
 }
-GrainDesignBates::~GrainDesignBates()
+BatesGrainDesign::~BatesGrainDesign()
 {
 
 }
-double GrainDesignBates::GetCoreDiameter()
+double BatesGrainDesign::GetCoreDiameter()
 {
     return m_grainCoreDiameterSpinBox->value();
 }
-void GrainDesignBates::SeedValues()
+void BatesGrainDesign::SeedValues()
 {
-    OpenBurnGrainDesign::SeedValues();
+    OpenBurnDesignGrain::SeedValues();
     if (BatesGrain* seed = dynamic_cast<BatesGrain*>(m_seedGrain))
     {
         m_grainCoreDiameterSpinBox->setValue(seed->GetCoreDiameter());

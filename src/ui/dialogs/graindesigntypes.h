@@ -18,12 +18,12 @@
 //idx 0: type, 1: propellant, 2: length, 3: diameter, 255: inhibited faces
 //any __custom__ grain properties, e.g core diameter, should inherit this class and
 //call AddNewControls() in the constructor.
-class OpenBurnGrainDesign : public QWidget
+class OpenBurnDesignGrain : public QWidget
 {
     Q_OBJECT
 public:
-    explicit OpenBurnGrainDesign(QWidget* parent = nullptr, OpenBurnGrain* seed = nullptr);
-    virtual ~OpenBurnGrainDesign();
+    explicit OpenBurnDesignGrain(QWidget* parent = nullptr, OpenBurnGrain* seed = nullptr);
+    virtual ~OpenBurnDesignGrain();
 
     double GetLength();
     double GetDiameter();
@@ -57,12 +57,12 @@ private:
 };
 
 //a BATES grain
-class GrainDesignBates : public OpenBurnGrainDesign
+class BatesGrainDesign : public OpenBurnDesignGrain
 {
     Q_OBJECT
 public:
-    explicit GrainDesignBates(QWidget* parent = nullptr, OpenBurnGrain* seed = nullptr);
-    virtual ~GrainDesignBates();
+    explicit BatesGrainDesign(QWidget* parent = nullptr, BatesGrain* seed = nullptr);
+    virtual ~BatesGrainDesign();
 
     double GetCoreDiameter();
     

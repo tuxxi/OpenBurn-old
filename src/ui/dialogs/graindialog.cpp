@@ -7,7 +7,7 @@
 
 #include <QDebug>
 
-#include "graindialog.h"
+#include "src/ui/dialogs/graindialog.h"
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* grain) :
@@ -43,7 +43,7 @@ void GrainDialog::SetupUI()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(m_frame->sizePolicy().hasHeightForWidth());
     setSizePolicy(sizePolicy);    
-    m_GrainDesign = new GrainDesignBates(m_frame, m_Grain);
+    m_GrainDesign = new BatesGrainDesign(m_frame, static_cast<BatesGrain*>(m_Grain));
 
     // OK and Cancel buttons
     m_applyButton = new QPushButton(m_frame);
@@ -75,8 +75,7 @@ void GrainDialog::RefreshUI()
     m_GrainDesign->deleteLater();
     if (m_GrainType == GRAINTYPE_BATES)
     {
-        qDebug() << "Type is now BATES grain!";
-        m_GrainDesign = new GrainDesignBates(m_frame, m_Grain);
+        m_GrainDesign = new BatesGrainDesign(m_frame, static_cast<BatesGrain*>(m_Grain));
         m_controlsLayout->addWidget(m_GrainDesign, 1, 0, 3, 3);
         connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(SLOT_GrainType_Changed(GRAINTYPE)));   
     }
@@ -113,7 +112,7 @@ void GrainDialog::on_applyButton_clicked()
     }
     if (m_GrainType == GRAINTYPE_BATES)
     {
-        GrainDesignBates* design = static_cast<GrainDesignBates*>(m_GrainDesign);
+        BatesGrainDesign* design = static_cast<BatesGrainDesign*>(m_GrainDesign);
         if (m_isNewGrainWindow)
         {
             OpenBurnPropellant* prop = new OpenBurnPropellant;            

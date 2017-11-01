@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QCloseEvent>
 
-#include "src/ui/mainwindow.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
