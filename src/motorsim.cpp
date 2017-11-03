@@ -3,8 +3,8 @@
 #include <QtDebug>
 using OpenBurnUtil::g_kGasConstantR;
 
-MotorSim::MotorSim() :
-    m_avgPropellant(nullptr), m_Nozzle(nullptr), m_Grains(NULL)
+MotorSim::MotorSim() 
+    : m_Nozzle(nullptr), m_avgPropellant(nullptr)
 {
 
 
@@ -196,7 +196,7 @@ double MotorSim::GetMotorMajorDiameter()
     for (auto i : m_Grains)
     {
         //if the new grain's dia is larger than previously recorded dia, its the motor's major dia.
-        dia < i->GetDiameter() ? dia = i->GetDiameter() : NULL;
+        dia < i->GetDiameter() ? dia = i->GetDiameter() : 0.0f;
     }
     return dia;
 }

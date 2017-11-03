@@ -1,8 +1,8 @@
 #include "src/ui/graphics/graingraphicsitem.h"
 
 GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
-    : m_grain(grain), m_scaleFactor(scale_factor), QGraphicsObject(parent), 
-    m_color(Qt::gray), m_isCrossSectionView(crossSection)
+    : QGraphicsObject(parent), m_grain(grain), m_color(Qt::gray), 
+    m_scaleFactor(scale_factor), m_isCrossSectionView(crossSection)
 {
     setAcceptDrops(true);
 }

@@ -79,6 +79,7 @@ bool NozzleDialog::apply()
         emit SIG_NozzleChanged(nozz);
         return true;    
     }
+    return false;
 }
 void NozzleDialog::accept()
 {

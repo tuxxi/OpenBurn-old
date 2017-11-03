@@ -18,7 +18,7 @@ class GrainDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GrainDialog(QWidget* parent = nullptr, OpenBurnGrain* grain = nullptr);
+    explicit GrainDialog(QWidget* parent = nullptr, OpenBurnGrain* grain = nullptr, bool newGrain = true);
     virtual ~GrainDialog();
 
 signals:

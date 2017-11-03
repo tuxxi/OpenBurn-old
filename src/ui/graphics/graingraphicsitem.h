@@ -14,16 +14,17 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
-    OpenBurnGrain* m_grain;
-
+    const OpenBurnGrain* GetGrain() { return m_grain; }
 protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     void dropEvent(QGraphicsSceneDragDropEvent *event) override;
 
+    OpenBurnGrain* m_grain;
     QColor m_color;
-    bool m_isCrossSectionView; //
-    double grainX, grainY;
     int m_scaleFactor;
+    bool m_isCrossSectionView;
+
+    double grainX, grainY;    
 };
 

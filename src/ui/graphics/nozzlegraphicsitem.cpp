@@ -2,15 +2,17 @@
 
 NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle,
     int scale_factor, double nozzle_height, bool crossSection, QGraphicsItem *parent)
-    : m_Nozzle(nozzle), m_scaleFactor(scale_factor),
-      m_nozzleHeight(nozzle_height), m_color(Qt::lightGray), m_isCrossSectionView(crossSection),
-      QGraphicsObject(parent)
+    : QGraphicsObject(parent), m_color(Qt::lightGray), m_Nozzle(nozzle), m_nozzleHeight(nozzle_height), 
+    m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
 {
 
 }
 void NozzleGraphicsItem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     if (m_isCrossSectionView)
     {
         ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);

@@ -1,8 +1,9 @@
 #include "src/ui/graphics/motorgraphicsitem.h"
 
+
 MotorGraphicsItem::MotorGraphicsItem(int scale_factor, QGraphicsItem *parent)
-    : m_scaleFactor(scale_factor), m_MotorLen(0.0f), m_MotorHeight(0.0f), QGraphicsObject(parent),
-      m_gfxGrains(NULL), m_gfxNozzle(nullptr)
+    : QGraphicsObject(parent), m_scaleFactor(scale_factor), m_gfxNozzle(nullptr),
+    m_MotorLen(0.0f), m_MotorHeight(0.0f)
 {
     
 }
@@ -46,7 +47,7 @@ void MotorGraphicsItem::RemoveGrain(int index)
     m_gfxGrains.erase(m_gfxGrains.begin() + index);
 
     //shift grains after this one back in line
-    for (int i = index; i < m_gfxGrains.size(); i++)
+    for (size_t i = index; i < m_gfxGrains.size(); i++)
     {
         QPointF currentPos = m_gfxGrains[i]->pos();
         m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());

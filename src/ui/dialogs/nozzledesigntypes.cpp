@@ -86,6 +86,7 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     AddNewControls(label_3, 0, 0);
     AddNewControls(m_halfAngleSpinBox, 0, 1);
     AddNewControls(m_halfAngleUnits, 0, 2);
+    setTabOrder(m_exitDiaSpinBox, m_halfAngleSpinBox);
     SeedValues();
 }
 ConicalNozzleDesign::~ConicalNozzleDesign()

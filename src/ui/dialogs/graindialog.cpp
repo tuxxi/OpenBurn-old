@@ -10,8 +10,8 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/grain.h"
 
-GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* grain) :
-    QDialog(parent), m_isNewGrainWindow(grain == nullptr), m_Grain(grain)
+GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* seedGrain, bool newGrain) :
+    QDialog(parent), m_Grain(seedGrain), m_isNewGrainWindow(newGrain)
 {
     SetupUI();
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(on_cancelButton_clicked()));

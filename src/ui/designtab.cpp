@@ -29,7 +29,7 @@ void DesignTab::SetupUI()
 {
     //controls 
     QGroupBox* gb_GrainDesign = new QGroupBox(tr("Grain Design"));
-    QGroupBox* gb_frame_Params = new QGroupBox(tr("Simulation Settings"));
+    QGroupBox* gb_frame_Params = new QGroupBox(tr("Chamber Design"));
     QGroupBox* gb_design_overview = new QGroupBox(tr("Design Overview"));
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -61,34 +61,29 @@ void DesignTab::SetupUI()
 
     QGroupBox* gb_design_params = new QGroupBox(tr("Design Parameters"));
     QGridLayout* gridLayoutDesignParams = new QGridLayout;
-    m_knLabel = new QLabel;
-    m_nozzleDiaLabel = new QLabel;
-    m_nozzleExitLabel = new QLabel;
-    m_motorMajorDiaLabel = new QLabel;
-    m_motorLenLabel = new QLabel;
-    m_numGrainsLabel = new QLabel;
+
     gridLayoutDesignParams->addWidget(new QLabel(tr("Kn:")), 0, 0);
-    gridLayoutDesignParams->addWidget(m_knLabel, 0, 1);
+    gridLayoutDesignParams->addWidget(m_knLabel = new QLabel, 0, 1);
     gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Throat Diameter:")), 1, 0);
-    gridLayoutDesignParams->addWidget(m_nozzleDiaLabel, 1, 1);
+    gridLayoutDesignParams->addWidget(m_nozzleDiaLabel = new QLabel, 1, 1);
     gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 2, 0);
-    gridLayoutDesignParams->addWidget(m_nozzleExitLabel, 2, 1);
+    gridLayoutDesignParams->addWidget(m_nozzleExitLabel = new QLabel, 2, 1);
     gridLayoutDesignParams->addWidget(new QLabel(tr("Grains:")), 3, 0);
-    gridLayoutDesignParams->addWidget(m_numGrainsLabel, 3, 1);
+    gridLayoutDesignParams->addWidget(m_numGrainsLabel = new QLabel, 3, 1);
     gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Diameter:")), 4, 0);
-    gridLayoutDesignParams->addWidget(m_motorMajorDiaLabel, 4, 1);
+    gridLayoutDesignParams->addWidget(m_motorMajorDiaLabel = new QLabel, 4, 1);
     gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Length:")), 5, 0);
-    gridLayoutDesignParams->addWidget(m_motorLenLabel, 5, 1);
+    gridLayoutDesignParams->addWidget(m_motorLenLabel = new QLabel, 5, 1);
 
     gb_design_params->setLayout(gridLayoutDesignParams);
 
     //QGroupBox* gb_sim_quick_results = new QGroupBox(tr("Sim Results"));
     //QGridLayout* gridLayoutSimResults = new QGridLayout;
 
-    QHBoxLayout* hBoxLayout = new QHBoxLayout;
-    hBoxLayout->addWidget(m_motorDisplayView);
-    hBoxLayout->addWidget(gb_design_params);
-    gb_design_overview->setLayout(hBoxLayout);
+    QGridLayout* designLayout = new QGridLayout;
+    designLayout->addWidget(gb_design_params, 0, 2, 1, 1);    
+    designLayout->addWidget(m_motorDisplayView, 1, 0, 1, 3);
+    gb_design_overview->setLayout(designLayout);
 
     //master layout
     QGridLayout* layout = new QGridLayout;

@@ -26,12 +26,12 @@ public:
     void RemoveGrain(int index);
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_scaleFactor; }
-    double m_MotorLen, m_MotorHeight; //in pixnels
     
 private:
     void CalculateMotorHeight();
     int m_scaleFactor;
     std::vector<GrainGraphicsItem*> m_gfxGrains;
     NozzleGraphicsItem* m_gfxNozzle;
+    double m_MotorLen, m_MotorHeight; //in pixnels    
 };
 

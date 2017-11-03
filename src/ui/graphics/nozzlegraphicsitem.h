@@ -21,9 +21,9 @@ public:
     void UpdateHeight(double height);
 private:
     QColor m_color;
+    OpenBurnNozzle* m_Nozzle;   
+    double m_nozzleHeight, m_nozzleLength;    
     bool m_isCrossSectionView;
     int m_scaleFactor;
-    double m_nozzleHeight, m_nozzleLength;
-    OpenBurnNozzle* m_Nozzle;
 };
 

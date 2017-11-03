@@ -22,16 +22,19 @@ GrainTableWidget::GrainTableWidget(QWidget *parent) : QTableWidget(parent)
     setHorizontalHeaderLabels(tableHeader);
     resizeColumnsToContents();
     resizeRowsToContents();
-    //setFixedSize(horizontalHeader()->length() + verticalHeader()->width(), 500);
-
+    horizontalHeader()->setStretchLastSection(true);
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     //disable drag drop for now until i can fox it
     //m_grainsDisplay->setDragEnabled(true);
     //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
 }
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
 {
-    resizeRowsToContents();
-    resizeColumnsToContents();
+    Q_UNUSED(event);
+    for (int i = 0; i < columnCount(); i++)
+    {
+        setColumnWidth(i, this->width()/columnCount());
+    }    
 }
 //thank you to honiahaka10 on stack overflow
 //https://stackoverflow.com/a/41203632/8508673

@@ -5,31 +5,29 @@
 class OpenBurnPropellant
 {
 public:
-    OpenBurnPropellant() {}
-    OpenBurnPropellant(double a, double n, double cstar, double rho, QString name)
-        : m_burnRateCoef(a), m_burnRateExp(n), m_charVel(cstar), m_density(rho), m_PropellantName(name)
-    {}
-    void SetPropellantName(QString name) { m_PropellantName = name; }
-    QString GetPropellantName() { return m_PropellantName; }
-
+    OpenBurnPropellant();
+    OpenBurnPropellant(double a, double n, double cstar, double rho, QString name);
+        
+    void SetPropellantName(const QString& name);
+    QString GetPropellantName();
     void SetBasicParams(double a, double n, double cstar, double rho);
     void SetAdvancedParams(double Cv, double Cp, double Cs, double Tnot, double molarmass, double mu, double Pr);
 
     //BASIC:
-    double GetBurnRateCoef() { return m_burnRateCoef; }
-    double GetBurnRateExp() { return m_burnRateExp; }
-    double GetCharVelocity() { return m_charVel; }
-    double GetDensity() { return m_density; }
+    double GetBurnRateCoef();
+    double GetBurnRateExp();
+    double GetCharVelocity();
+    double GetDensity();
 
     //ADVANCED:
-    double GetPropellantSpecificHeat() { return m_PropellantSpecificHeat; }
-    double GetSpecificHeatConstantPressure() { return m_specificHeatConstantPressure; }
-    double GetSpecificHeatConstantVolume() { return m_specificHeatConstantVolume; }
+    double GetPropellantSpecificHeat();
+    double GetSpecificHeatConstantPressure();
+    double GetSpecificHeatConstantVolume();
     double GetSpecificHeatRatio(); //defined in propellant.cpp
-    double GetAdiabaticFlameTemp() { return m_adiabaticFlameTemp; }
-    double GetMolarMass() { return m_molarMass; }
-    double GetGasViscosity() { return m_gasViscosity; }
-    double GetPrandtlNumber() { return m_prandtlNumber; }
+    double GetAdiabaticFlameTemp() ;
+    double GetMolarMass();
+    double GetGasViscosity();
+    double GetPrandtlNumber();
 private:
     QString m_PropellantName;
     //BASIC:

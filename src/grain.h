@@ -35,11 +35,11 @@ public:
 
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
 //protected:
-    int m_numInhibitedFaces;    
-    double m_grainDia, m_grainLen;     
-    double m_rNot, m_rErosive; //burn rates, additive (i.e r = r0 + re)
-
+    double m_grainDia, m_grainLen;
     OpenBurnPropellant* m_prop;
+    int m_numInhibitedFaces;
+
+    double m_rNot, m_rErosive; //burn rates, additive (i.e r = r_0 + r_e)
 };
 
 //a cylindrical bates grain
