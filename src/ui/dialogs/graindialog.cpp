@@ -11,12 +11,13 @@
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* seedGrain, bool newGrain) :
-    QDialog(parent), m_Grain(seedGrain), m_isNewGrainWindow(newGrain)
+    QDialog(parent), m_gfxGrain(nullptr), m_Grain(seedGrain), m_isNewGrainWindow(newGrain)
 {
     SetupUI();
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(on_cancelButton_clicked()));
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(on_applyButton_clicked()));
-    connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(SLOT_GrainType_Changed(GRAINTYPE)));
+    connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(RefreshUI(GRAINTYPE)));
+    connect(m_GrainDesign, SIGNAL(SIG_GrainDesign_Changed()), this, SLOT(UpdateDesign()));
     setAttribute(Qt::WA_DeleteOnClose);
 }
 GrainDialog::~GrainDialog()
@@ -56,7 +57,10 @@ void GrainDialog::SetupUI()
     m_controlsLayout->addWidget(m_applyButton, 256, 0);
     m_controlsLayout->addWidget(m_cancelButton, 256, 1);
 
-    m_graphicsView = new QGraphicsView(this);
+    m_graphicsView = new QGraphicsView;
+    m_graphicsScene = new QGraphicsScene;
+    m_graphicsView->setScene(m_graphicsScene);
+    m_graphicsView->show();
     QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     sizePolicy2.setHorizontalStretch(0);
     sizePolicy2.setVerticalStretch(0);
@@ -69,25 +73,71 @@ void GrainDialog::SetupUI()
 
     setLayout(masterVLayout);
 }
-void GrainDialog::RefreshUI()
+void GrainDialog::RefreshUI(GRAINTYPE type)
 {
+    m_GrainType = type;    
     m_controlsLayout->removeWidget(m_GrainDesign);
     m_GrainDesign->deleteLater();
     if (m_GrainType == GRAINTYPE_BATES)
     {
         m_GrainDesign = new BatesGrainDesign(m_frame, static_cast<BatesGrain*>(m_Grain));
         m_controlsLayout->addWidget(m_GrainDesign, 1, 0, 3, 3);
-        connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(SLOT_GrainType_Changed(GRAINTYPE)));   
+        connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(RefreshUI(GRAINTYPE))); 
+        connect(m_GrainDesign, SIGNAL(SIG_GrainDesign_Changed()), this, SLOT(UpdateDesign()));        
     }
     else
     {
         //other grain types
     }
+    UpdateDesign();    
 }
-void GrainDialog::SLOT_GrainType_Changed(GRAINTYPE type)
+void GrainDialog::UpdateDesign()
 {
-    m_GrainType = type;
-    RefreshUI();
+    BatesGrainDesign* design = dynamic_cast<BatesGrainDesign*>(m_GrainDesign);
+    if (design)
+    {
+        if (!m_Grain)
+        {
+            OpenBurnPropellant* prop = new OpenBurnPropellant();
+            m_Grain = new BatesGrain(
+                design->GetDiameter(),        
+                design->GetCoreDiameter(),
+                design->GetLength(),
+                prop,                    
+                design->GetInhibitedFaces());
+        }
+        else //edit
+        {
+            BatesGrain* grain = static_cast<BatesGrain*>(m_Grain);
+            grain->SetDiameter(design->GetDiameter());
+            grain->SetCoreDiameter(design->GetCoreDiameter());
+            grain->SetLength(design->GetLength());
+            grain->SetInhibitedFaces(design->GetInhibitedFaces());
+            m_Grain = grain;
+        }
+    }
+    UpdateGraphics();
+}
+void GrainDialog::UpdateGraphics()
+{
+    if (!m_gfxGrain)
+    {
+        m_gfxGrain = new GrainGraphicsItem(m_Grain, 100, false);
+        m_graphicsScene->addItem(m_gfxGrain);    
+    }
+    m_gfxGrain->setPos(0, 0);    
+    m_gfxGrain->update(m_gfxGrain->boundingRect());
+    m_graphicsView->viewport()->repaint();
+
+    //set the display scene to the middle of the view plus a bit of padding on the sides
+    m_graphicsView->setSceneRect(m_gfxGrain->boundingRect());
+    QRectF bounds = QRectF(m_gfxGrain->boundingRect().left(), m_gfxGrain->boundingRect().top(), 
+        m_gfxGrain->boundingRect().width() + 50, m_gfxGrain->boundingRect().height() + 50);
+    m_graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
+
+    //update again just in case 
+    m_graphicsView->viewport()->repaint();    
+
 }
 void GrainDialog::on_cancelButton_clicked()
 {
@@ -110,32 +160,7 @@ void GrainDialog::on_applyButton_clicked()
         QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
-    if (m_GrainType == GRAINTYPE_BATES)
-    {
-        BatesGrainDesign* design = static_cast<BatesGrainDesign*>(m_GrainDesign);
-        if (m_isNewGrainWindow)
-        {
-            OpenBurnPropellant* prop = new OpenBurnPropellant;            
-            BatesGrain *grain = new BatesGrain(
-                design->GetDiameter(),        
-                design->GetCoreDiameter(),
-                design->GetLength(),
-                prop,                    
-                design->GetInhibitedFaces());
-            emit SIG_DIALOG_NewGrain(grain);
-    
-        }
-        else //Editing grain
-        {
-            //edit grain
-            BatesGrain* grain = static_cast<BatesGrain*>(m_Grain);
-            grain->SetDiameter(design->GetDiameter());
-            grain->SetCoreDiameter(design->GetCoreDiameter());
-            grain->SetLength(design->GetLength());
-            grain->SetInhibitedFaces(design->GetInhibitedFaces());
-            //m_Grain->SetPropellantType();
-            emit SIG_DIALOG_EditGrain(m_Grain);
-        }        
-
-    }
+    UpdateDesign();
+    emit SIG_DIALOG_NewGrain(m_Grain);
+    m_Grain = nullptr;
 }

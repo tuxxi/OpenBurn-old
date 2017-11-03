@@ -12,7 +12,7 @@ public:
     virtual double GetNozzleThroatArea() = 0;
     virtual double GetNozzleThroat() { return m_NozzleThroat; }
     virtual double GetNozzleExit() { return m_NozzleExit; }
-private:
+protected:
     double m_NozzleThroat; //nozzle throat diameter
     double m_NozzleExit; //nozzle exit diameter
 };
@@ -26,6 +26,10 @@ public:
     ~ConicalNozzle();
     virtual double GetNozzleThroatArea() override;
 
+    void SetNozzleThroat(double);
+    void SetNozzleExit(double);
+    void SetHalfAngle(double);
+    void SetNozzleThroatLen(double);
     double GetHalfAngle() { return m_HalfAngle; }
     double GetThroatLength() { return m_throatLength; }
 

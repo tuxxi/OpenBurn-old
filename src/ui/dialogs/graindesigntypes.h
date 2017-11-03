@@ -36,6 +36,7 @@ private slots:
     
 signals:
     void SIG_GrainType_Changed(GRAINTYPE type);
+    void SIG_GrainDesign_Changed();
 protected:
     virtual void SeedValues();
     void AddNewControls(QWidget* widet, int row, int col);

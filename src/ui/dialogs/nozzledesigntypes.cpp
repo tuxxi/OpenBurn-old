@@ -7,6 +7,9 @@ OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz
     : QWidget(parent), m_seedNozzle(nozz)
 {
     SetupUI();
+    connect(m_throatDiaSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
+    connect(m_exitDiaSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
+    SeedValues();
 }
 void OpenBurnDesignNozzle::SetupUI()
 {
@@ -76,8 +79,8 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     : OpenBurnDesignNozzle(parent, nozz)
 {
     m_halfAngleSpinBox = new QDoubleSpinBox(this);
-    m_halfAngleSpinBox->setDecimals(3);
-    m_halfAngleSpinBox->setSingleStep(0.25);
+    m_halfAngleSpinBox->setDecimals(1);
+    m_halfAngleSpinBox->setSingleStep(1);
     QLabel* label_3 = new QLabel(tr("Divergent Half Angle"), this);
     m_halfAngleUnits = new QComboBox(this);
     m_halfAngleUnits->setLayoutDirection(Qt::LeftToRight);
@@ -88,6 +91,8 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     AddNewControls(m_halfAngleUnits, 0, 2);
     setTabOrder(m_exitDiaSpinBox, m_halfAngleSpinBox);
     SeedValues();
+    connect(m_halfAngleSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
+    
 }
 ConicalNozzleDesign::~ConicalNozzleDesign()
 {

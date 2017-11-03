@@ -15,28 +15,30 @@ void NozzleGraphicsItem::paint(QPainter *painter,
 
     if (m_isCrossSectionView)
     {
+        //draw entrance cone
+        QBrush brush = QBrush(m_color, Qt::DiagCrossPattern);
+        QPen pen = QPen(Qt::black, 0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+        painter->setPen(pen);
+        painter->setBrush(brush);
+        double exitRadius = 0.5f * (m_Nozzle->GetNozzleExit() * m_scaleFactor);
+        double throatRadius = 0.5f * (m_Nozzle->GetNozzleThroat() * m_scaleFactor);
+
+        double throatHeightUpper = m_nozzleHeight * 0.5f + throatRadius;
+        double throatHeightLower = m_nozzleHeight * 0.5f - throatRadius;
+
+        double exitHeightUpper = m_nozzleHeight * 0.5f + exitRadius;
+        double exitHeightLower = m_nozzleHeight * 0.5f - exitRadius;
+
+        double convergentAngle = 25; // ?? allow user to change? maybe?
+        double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));            
+        
+        //draw exit cone
         ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);
         if (nozz)
-        {
-            //draw entrance cone
-            QBrush brush = QBrush(m_color, Qt::DiagCrossPattern);
-            QPen pen = QPen(Qt::black, 0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-            painter->setPen(pen);
-            painter->setBrush(brush);
-            double exitRadius = 0.5f * (nozz->GetNozzleExit() * m_scaleFactor);
-            double throatRadius = 0.5f * (nozz->GetNozzleThroat() * m_scaleFactor);
-
-            double throatHeightUpper = m_nozzleHeight * 0.5f + throatRadius;
-            double throatHeightLower = m_nozzleHeight * 0.5f - throatRadius;
-
-            double exitHeightUpper = m_nozzleHeight * 0.5f + exitRadius;
-            double exitHeightLower = m_nozzleHeight * 0.5f - exitRadius;
-
+        {        
             double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
-            double convergentAngle = 25; // ?? allow user to change? maybe?
             double throatLen = 20.0f; //nozz->GetThroatLen();
         
-            double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));            
             double divergentLen = exitRadius * (1.0f / qTan(qDegreesToRadians(divergentAngle))); //cot
             m_nozzleLength = convergentLen + throatLen + divergentLen;
             bool exitConeRestrained = exitRadius * 2.0f < m_nozzleHeight;

@@ -6,13 +6,16 @@
 
 #include "src/ui/dialogs/nozzledialog.h"
 
-NozzleDialog::NozzleDialog(QWidget* parent)
-    : QDialog(parent)
+NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed)
+    : QDialog(parent), m_Nozzle(seed), m_gfxNozzle(nullptr)
 {
     SetupUI();
     connect(m_OKButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(closeDialog()));        
-    connect(m_applyButton, SIGNAL(clicked()), this, SLOT(apply()));    
+    connect(m_applyButton, SIGNAL(clicked()), this, SLOT(apply()));  
+    
+    connect(m_NozzleDesign, SIGNAL(SIG_DesignUpdated()), this, SLOT(UpdateDesign()));
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 NozzleDialog::~NozzleDialog()
 {
@@ -28,7 +31,8 @@ void NozzleDialog::SetupUI()
     m_frame->setFrameShape(QFrame::StyledPanel);
     m_frame->setFrameShadow(QFrame::Raised);
 
-    m_NozzleDesign = new ConicalNozzleDesign(this);
+    ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);
+    m_NozzleDesign = new ConicalNozzleDesign(this, nozz);        
     m_OKButton = new QPushButton(tr("OK"), this);
     m_cancelButton = new QPushButton(tr("Cancel"), this);
     m_applyButton = new QPushButton(tr("Apply"), this);
@@ -39,10 +43,13 @@ void NozzleDialog::SetupUI()
     layout->addWidget(m_applyButton, 255, 1);        
     layout->addWidget(m_cancelButton, 255, 2);
     
-    m_graphicsView = new QGraphicsView(this);
+    m_graphicsView = new QGraphicsView;
+    m_graphicsScene = new QGraphicsScene;
+    m_graphicsView->setScene(m_graphicsScene);
+    m_graphicsView->show();
     QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setVerticalStretch(10);
     sizePolicy2.setHeightForWidth(m_graphicsView->sizePolicy().hasHeightForWidth());
     m_graphicsView->setSizePolicy(sizePolicy2);
 
@@ -51,6 +58,49 @@ void NozzleDialog::SetupUI()
     masterLayout->addWidget(m_frame);
     masterLayout->addWidget(m_graphicsView);
     setLayout(masterLayout);
+}
+void NozzleDialog::UpdateDesign()
+{
+    ConicalNozzleDesign* design = dynamic_cast<ConicalNozzleDesign*>(m_NozzleDesign);
+    if (design)
+    {
+        if (!m_Nozzle)
+        {
+            m_Nozzle = new ConicalNozzle(
+                design->GetThroatDiameter(), 
+                design->GetExitDiameter(), 
+                design->GetDivergentHalfAngle());    
+        }
+        else
+        {
+            ConicalNozzle* nozz = static_cast<ConicalNozzle*>(m_Nozzle);
+            nozz->SetNozzleThroat(design->GetThroatDiameter());
+            nozz->SetNozzleExit(design->GetExitDiameter());
+            nozz->SetHalfAngle(design->GetDivergentHalfAngle());
+        }
+    }
+    UpdateGraphics();
+}
+void NozzleDialog::UpdateGraphics()
+{
+    if (!m_gfxNozzle)
+    {
+        m_gfxNozzle = new NozzleGraphicsItem(m_Nozzle, 100, 100, false);
+        m_graphicsScene->addItem(m_gfxNozzle);    
+    }
+    QRectF bounding = m_gfxNozzle->boundingRect();
+    m_gfxNozzle->setPos(0, 0);    
+    m_gfxNozzle->update(bounding);
+    m_graphicsView->viewport()->repaint();
+
+    //set the display scene to the middle of the view plus a bit of padding on the sides
+    m_graphicsView->setSceneRect(bounding);
+    QRectF bounds = QRectF(bounding.left(), bounding.top(), 
+        bounding.width() + 50, bounding.height() + 50);
+    m_graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
+
+    //update again just in case 
+    m_graphicsView->viewport()->repaint();    
 }
 bool NozzleDialog::apply()
 {
@@ -69,17 +119,9 @@ bool NozzleDialog::apply()
         QMessageBox::Ok, QMessageBox::Ok);
         return false;
     }
-    ConicalNozzleDesign* design = dynamic_cast<ConicalNozzleDesign*>(m_NozzleDesign);
-    if (design)
-    {
-        ConicalNozzle* nozz = new ConicalNozzle(
-            design->GetThroatDiameter(), 
-            design->GetExitDiameter(), 
-            design->GetDivergentHalfAngle());
-        emit SIG_NozzleChanged(nozz);
-        return true;    
-    }
-    return false;
+    UpdateDesign();    
+    emit SIG_NozzleChanged(m_Nozzle);
+    return true;    
 }
 void NozzleDialog::accept()
 {

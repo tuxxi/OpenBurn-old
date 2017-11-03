@@ -10,6 +10,10 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(QWidget* parent, OpenBurnGrain* seed)
     SetupUI();
     connect(m_grainTypeComboBox, SIGNAL(currentIndexChanged(int)), 
         this, SLOT(on_grainType_changed(int)));
+    connect(m_grainDiameterSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
+    connect(m_grainLengthSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
+    connect(m_grainInhibitedFacesSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(SIG_GrainDesign_Changed()));
+    
     SeedValues();
 }
 void OpenBurnDesignGrain::SetupUI()
@@ -136,7 +140,8 @@ BatesGrainDesign::BatesGrainDesign(QWidget* parent, BatesGrain* seed)
     setTabOrder(m_grainDiameterSpinBox, m_grainCoreDiameterSpinBox);        
     setTabOrder(m_grainCoreDiameterSpinBox, m_grainInhibitedFacesSpinBox);
 
-    SeedValues();    
+    SeedValues();
+    connect(m_grainCoreDiameterSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
 }
 BatesGrainDesign::~BatesGrainDesign()
 {

@@ -32,15 +32,38 @@ void GrainGraphicsItem::paint(QPainter *painter,
             painter->setPen(pen);    
             painter->drawRect(0, (wid/2) - (corewid/2), len, corewid);
         }
+        else
+        {
+        //other grain types
+        }
     }
     else
     {
-        //face
+        painter->drawEllipse(0, 0, wid, wid);
+        if (BatesGrain* bates = dynamic_cast<BatesGrain*>(m_grain))
+        {
+            double corewid = bates->GetCoreDiameter() * m_scaleFactor;
+            //"cut out" core using white brush
+            painter->setBrush(Qt::white);
+            painter->setPen(pen);    
+            painter->drawEllipse((wid - corewid) /2.0f, (wid - corewid) / 2.0f, corewid, corewid);
+        }
+        else
+        {
+        //other grain types
+        }
     }
 }
 QRectF GrainGraphicsItem::boundingRect() const
 {
-    return QRectF(0, 0, m_grain->GetLength() * m_scaleFactor, m_grain->GetDiameter() * m_scaleFactor);
+    if (m_isCrossSectionView)
+    {
+        return QRectF(0, 0, m_grain->GetLength() * m_scaleFactor, m_grain->GetDiameter() * m_scaleFactor);        
+    }
+    else
+    {
+        return QRectF(0, 0, m_grain->GetDiameter() * m_scaleFactor, m_grain->GetDiameter() * m_scaleFactor);
+    }
 }
 void GrainGraphicsItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {

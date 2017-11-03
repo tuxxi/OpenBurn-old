@@ -23,6 +23,8 @@ public:
     double GetThroatDiameter();
     double GetExitDiameter();
     OpenBurnNozzle* GetNozzle();
+signals:
+    void SIG_DesignUpdated();
 protected:
     virtual void SeedValues();
     void AddNewControls(QWidget* widet, int row, int col);
