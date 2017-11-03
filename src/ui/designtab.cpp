@@ -9,7 +9,7 @@
 #include "src/ui/designtab.h"
 
 DesignTab::DesignTab(QWidget* parent)
-    : QWidget(parent), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr)
+    : QWidget(parent), m_seed_grain(nullptr), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr)
 {   
     SetupUI();
     connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
@@ -17,6 +17,7 @@ DesignTab::DesignTab(QWidget* parent)
     connect(m_grainsDisplay, SIGNAL(SIG_GrainPositionUpdated(int, int)),
         this, SLOT(SLOT_GrainPositionUpdated(int, int)));
     connect(m_deleteGrainButton, SIGNAL(clicked()), this, SLOT(DeleteGrainButton_Clicked()));
+    connect(m_editGrainButton, SIGNAL(clicked()), this, SLOT(EditGrainButton_Clicked()));
     connect(m_grainsDisplay, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
     m_sim = new MotorSim;
     UpdateDesign();
@@ -41,10 +42,14 @@ void DesignTab::SetupUI()
     //grain buttons
     m_newGrainButton = new QPushButton(tr("New Grain"));
     m_deleteGrainButton = new QPushButton(tr("Delete"));
+    m_editGrainButton = new QPushButton(tr("Edit"));
     m_deleteGrainButton->setEnabled(false);
+    m_editGrainButton->setEnabled(false);
     QGridLayout* gLayout = new QGridLayout;    
     gLayout->addWidget(m_newGrainButton, 0, 1, 2, 2);
     gLayout->addWidget(m_deleteGrainButton, 0, 0);
+    gLayout->addWidget(m_editGrainButton, 1, 0);
+    
     gb_GrainDesign->setLayout(gLayout);
 
     //nozzle and sim settings
@@ -152,15 +157,14 @@ void DesignTab::resizeEvent(QResizeEvent* event)
 void DesignTab::SLOT_NozzDialogClosed()
 {
     m_nozzleDialog = nullptr;
+    qDebug() << "nozzle dialog deleted";
 }
 void DesignTab::SLOT_GrainDialogClosed()
 {
     m_grainDialog = nullptr;
-    qDebug() << "deleted grain dialog!";
+    qDebug() << "grain dialog deleted";
 }
-
-//Recieved from the grain dialog. Updates the grain table widget,
-//and send sout a signal to main window that there was a new grain added
+//Recieved from the grain dialog. Updates the grain table widget
 void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 {
     int numItems = m_grainsDisplay->rowCount();
@@ -176,9 +180,31 @@ void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
         m_grainsDisplay->setItem(numItems, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
     }
 
+    m_seed_grain = grain;
     m_sim->AddGrain(grain);
-    emit SIG_NewGrain(grain);
     UpdateDesign();
+}
+void DesignTab::SLOT_ModifyGrain(OpenBurnGrain* grain)
+{
+    size_t idx = 0;
+    for (; idx < m_sim->GetNumGrains(); idx++)
+    {
+        if (grain == m_sim->m_Grains[idx])
+        {
+            break;
+        }
+    }
+    m_grainsDisplay->setItem(idx, 0, new QTableWidgetItem(num(grain->GetLength())));
+    m_grainsDisplay->setItem(idx, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    m_grainsDisplay->setItem(idx, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
+    m_grainsDisplay->setItem(idx, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
+
+    if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
+    {
+        m_grainsDisplay->setItem(idx, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+    }
+    m_seed_grain = grain;
+    UpdateDesign();    
 }
 //Recieved from the grain table widget. Update the sim!
 void DesignTab::SLOT_GrainPositionUpdated(int oldPos, int newPos)
@@ -195,10 +221,32 @@ void DesignTab::NewGrainButton_Clicked()
 {
     if (!m_grainDialog) //only make one!!
     {
-        m_grainDialog = new GrainDialog;
+
+        m_grainDialog = new GrainDialog(nullptr, m_seed_grain, true);
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
+        connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SIGNAL(SIG_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
-        
+    }
+    m_grainDialog->show();
+    m_grainDialog->activateWindow();
+    m_grainDialog->raise();
+}
+void DesignTab::EditGrainButton_Clicked()
+{
+    OpenBurnGrain* selectedGrain = nullptr;
+    for (int i = 0; i <= m_grainsDisplay->rowCount(); i++)
+    {
+        if (m_grainsDisplay->isItemSelected(m_grainsDisplay->item(i, 0)))
+        {
+            selectedGrain = m_sim->m_Grains[i];
+            break;
+        }
+    }
+    if (!m_grainDialog) //only make one!!
+    {
+        m_grainDialog = new GrainDialog(nullptr, selectedGrain, false);
+        connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
+        connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
     }
     m_grainDialog->show();
     m_grainDialog->activateWindow();
@@ -224,7 +272,7 @@ void DesignTab::NozzleButton_Clicked()
 {
     if (!m_nozzleDialog) //only make one!!
     {
-        m_nozzleDialog = new NozzleDialog;
+        m_nozzleDialog = new NozzleDialog(nullptr, m_sim->m_Nozzle);
         connect(m_nozzleDialog, SIGNAL(SIG_NozzleChanged(OpenBurnNozzle*)), this, SLOT(SLOT_NozzleUpdated(OpenBurnNozzle*)));
         connect(m_nozzleDialog, SIGNAL(destroyed()), this, SLOT(SLOT_NozzDialogClosed()));
     }
@@ -238,4 +286,5 @@ void DesignTab::SLOT_grainTable_cellClicked(int row, int column)
     Q_UNUSED(row);
     //m_seed_grain = m_sim->m_Grains[row];
     m_deleteGrainButton->setEnabled(true);
+    m_editGrainButton->setEnabled(true);
 }

@@ -11,9 +11,10 @@
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* seedGrain, bool newGrain) :
-    QDialog(parent), m_gfxGrain(nullptr), m_Grain(seedGrain), m_isNewGrainWindow(newGrain)
+    QDialog(parent), m_gfxGrain(nullptr), m_Grain(nullptr), m_isNewGrainWindow(newGrain)
 {
-    SetupUI();
+    SetupGraphics();
+    SetupUI(seedGrain); //setup the ui and populate the various options with the "seed" values
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(on_cancelButton_clicked()));
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(on_applyButton_clicked()));
     connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(RefreshUI(GRAINTYPE)));
@@ -22,8 +23,9 @@ GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* seedGrain, bool newGrai
 }
 GrainDialog::~GrainDialog()
 {
+
 }
-void GrainDialog::SetupUI()
+void GrainDialog::SetupUI(OpenBurnGrain* seed)
 {
     if (objectName().isEmpty())
     {
@@ -34,18 +36,20 @@ void GrainDialog::SetupUI()
     resize(400, 400);
     
     m_controlsLayout = new QGridLayout;
-    m_frame = new QFrame(this);
+    m_frame = new QGroupBox(tr("Grain Design"));
     m_frame->setLayout(m_controlsLayout); 
-    m_frame->setFrameShape(QFrame::StyledPanel);
-    m_frame->setFrameShadow(QFrame::Raised);
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(m_frame->sizePolicy().hasHeightForWidth());
+    sizePolicy.setVerticalStretch(1);
+    sizePolicy.setHeightForWidth(true);
     setSizePolicy(sizePolicy);    
-    m_GrainDesign = new BatesGrainDesign(m_frame, static_cast<BatesGrain*>(m_Grain));
-
+    BatesGrain* BatesSeed = dynamic_cast<BatesGrain*>(seed);
+    m_GrainDesign = new BatesGrainDesign(m_frame, BatesSeed);
+    if (BatesSeed && !m_isNewGrainWindow) //editing a valid grain ptr
+    {
+        m_Grain = BatesSeed;
+    }
     // OK and Cancel buttons
     m_applyButton = new QPushButton(m_frame);
     m_cancelButton = new QPushButton(m_frame);
@@ -57,6 +61,14 @@ void GrainDialog::SetupUI()
     m_controlsLayout->addWidget(m_applyButton, 256, 0);
     m_controlsLayout->addWidget(m_cancelButton, 256, 1);
 
+    QVBoxLayout* masterVLayout = new QVBoxLayout;
+    masterVLayout->addWidget(m_frame);    
+    masterVLayout->addWidget(m_graphicsView);
+    setLayout(masterVLayout);
+    UpdateDesign();
+}
+void GrainDialog::SetupGraphics()
+{
     m_graphicsView = new QGraphicsView;
     m_graphicsScene = new QGraphicsScene;
     m_graphicsView->setScene(m_graphicsScene);
@@ -64,14 +76,8 @@ void GrainDialog::SetupUI()
     QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     sizePolicy2.setHorizontalStretch(0);
     sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(m_graphicsView->sizePolicy().hasHeightForWidth());
+    sizePolicy2.setHeightForWidth(true);
     m_graphicsView->setSizePolicy(sizePolicy2);
-
-    QVBoxLayout* masterVLayout = new QVBoxLayout;
-    masterVLayout->addWidget(m_frame);    
-    masterVLayout->addWidget(m_graphicsView);
-
-    setLayout(masterVLayout);
 }
 void GrainDialog::RefreshUI(GRAINTYPE type)
 {
@@ -96,7 +102,7 @@ void GrainDialog::UpdateDesign()
     BatesGrainDesign* design = dynamic_cast<BatesGrainDesign*>(m_GrainDesign);
     if (design)
     {
-        if (!m_Grain)
+        if (!m_Grain) //we are trying to create a new grain
         {
             OpenBurnPropellant* prop = new OpenBurnPropellant();
             m_Grain = new BatesGrain(
@@ -106,7 +112,7 @@ void GrainDialog::UpdateDesign()
                 prop,                    
                 design->GetInhibitedFaces());
         }
-        else //edit
+        else
         {
             BatesGrain* grain = static_cast<BatesGrain*>(m_Grain);
             grain->SetDiameter(design->GetDiameter());
@@ -136,8 +142,13 @@ void GrainDialog::UpdateGraphics()
     m_graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case 
-    m_graphicsView->viewport()->repaint();    
-
+    m_graphicsView->viewport()->repaint();
+    m_gfxGrain->update(m_gfxGrain->boundingRect());    
+}
+void GrainDialog::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    UpdateGraphics();
 }
 void GrainDialog::on_cancelButton_clicked()
 {

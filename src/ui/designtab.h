@@ -22,9 +22,11 @@ signals:
 public slots:
     void SLOT_GrainPositionUpdated(int oldPos, int newPos); 
     void SLOT_NewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
+    void SLOT_ModifyGrain(OpenBurnGrain* grain); //recieved from the grain dialog
     void SLOT_NozzleUpdated(OpenBurnNozzle* nozz);
 private slots:
     void NewGrainButton_Clicked();
+    void EditGrainButton_Clicked();
     void NozzleButton_Clicked();
     void DeleteGrainButton_Clicked();
     void SLOT_GrainDialogClosed();
@@ -45,12 +47,11 @@ private:
     //for quick reference only- more detailed results are available on results tab
     QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
 
-    //OpenBurnNozzle* m_seed_nozzle;    
     QPushButton* m_nozzleSettingsButton;
 
     //grain settings
-    //OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
-    QPushButton *m_newGrainButton, *m_deleteGrainButton;
+    OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
+    QPushButton *m_newGrainButton, *m_deleteGrainButton, *m_editGrainButton;
 
     GrainDialog* m_grainDialog;
     NozzleDialog* m_nozzleDialog;

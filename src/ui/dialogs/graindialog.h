@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QToolButton>
+#include <QGroupBox>
 
 #include "src/grain.h"
 #include "src/util.h"
@@ -31,10 +32,12 @@ private slots:
     void UpdateDesign();    
     void RefreshUI(GRAINTYPE type);    
 private:
-    void SetupUI();
+    void SetupUI(OpenBurnGrain* seed);
+    void SetupGraphics();
     void UpdateGraphics();
+    void resizeEvent(QResizeEvent* event) override;
     QGridLayout* m_controlsLayout;
-    QFrame* m_frame;
+    QGroupBox* m_frame;
 
     QGraphicsView *m_graphicsView;
     QGraphicsScene *m_graphicsScene;
