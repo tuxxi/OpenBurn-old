@@ -28,16 +28,17 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 }
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
 {  
-    for (size_t i = !m_gfxGrains.empty() ? m_gfxGrains.size() : 0; i < grains.size(); ++i)
+    //size_t i = !m_gfxGrains.empty() ? m_gfxGrains.size() : 0; i < grains.size(); ++i)
+    for (size_t i = 0; i < grains.size(); i++)
     {
-        GrainGraphicsItem *newGrain = new GrainGraphicsItem(grains[i], m_scaleFactor, true, this);
+        GrainGraphicsItem* newGrain = new GrainGraphicsItem(grains[i], m_scaleFactor, true, this);
         double len = newGrain->boundingRect().width();
         newGrain->setPos(m_MotorLen, 0);
         m_gfxGrains.push_back(newGrain);
         m_MotorLen += len;
     }
     CalculateMotorHeight();
-    update(boundingRect());    
+    update(boundingRect());
 }
 void MotorGraphicsItem::RemoveGrain(int index)
 {
@@ -54,6 +55,15 @@ void MotorGraphicsItem::RemoveGrain(int index)
     }
     CalculateMotorHeight();
     update(boundingRect());    
+}
+void MotorGraphicsItem::RemoveAllGrains()
+{
+    for (size_t i = 0; i < m_gfxGrains.size(); i++)
+    {
+        delete m_gfxGrains[i];        
+    }
+    m_gfxGrains.clear();
+    m_MotorLen = 0;
 }
 void MotorGraphicsItem::SetScaleFactor(int scale)
 {

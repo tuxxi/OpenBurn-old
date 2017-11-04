@@ -173,5 +173,5 @@ void GrainDialog::on_applyButton_clicked()
     }
     UpdateDesign();
     emit SIG_DIALOG_NewGrain(m_Grain);
-    m_Grain = nullptr;
+    if (m_isNewGrainWindow) m_Grain = nullptr;
 }

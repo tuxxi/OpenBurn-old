@@ -104,18 +104,16 @@ void DesignTab::SetupUI()
 void DesignTab::UpdateDesign()
 {
     if (m_sim->HasGrains())
-    {
-        m_motorObject->SetGrains(m_sim->m_Grains);
+    {        
         m_motorLenLabel->setText(num(m_sim->GetMotorLength()));
         m_motorMajorDiaLabel->setText(num(m_sim->GetMotorMajorDiameter()));
         m_numGrainsLabel->setText(num(m_sim->GetNumGrains()));
 
         if (m_sim->HasNozzle())
         {
-            m_motorObject->SetNozzle(m_sim->m_Nozzle);
-            QString initialKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_INITIAL));
-            QString maxKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_MAX));
-            QString finalKn = num(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_FINAL));
+            QString initialKn = num(round(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_INITIAL)));
+            QString maxKn = num(round(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_MAX)));
+            QString finalKn = num(round(MotorSim::CalcStaticKn(m_sim->m_Grains, m_sim->m_Nozzle, KN_CALC_FINAL)));
     
             m_knLabel->setText(initialKn + "-" + maxKn);    
         }
@@ -133,6 +131,17 @@ void DesignTab::UpdateGraphics()
     {
         m_motorObject = new MotorGraphicsItem(100);
         m_motorDisplayScene->addItem(m_motorObject);
+    }
+    if (m_sim->HasGrains())
+    {
+        //ugly hack: it's easier to just remove everything and add all the grains back than it is to try
+        //to shift everything around and make the length / width work correctly.... 
+        m_motorObject->RemoveAllGrains();
+        m_motorObject->SetGrains(m_sim->m_Grains);
+    }
+    if (m_sim->HasNozzle())
+    {
+        m_motorObject->SetNozzle(m_sim->m_Nozzle);        
     }
 
     //we have to repaint the veiwport otherwise the graphics objects don't update properly

@@ -24,6 +24,7 @@ public:
     void SetGrains(const std::vector<OpenBurnGrain*>& grains);
     void SetNozzle(OpenBurnNozzle* nozzle);
     void RemoveGrain(int index);
+    void RemoveAllGrains();
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_scaleFactor; }
     
