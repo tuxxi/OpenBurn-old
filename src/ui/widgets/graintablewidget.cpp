@@ -36,6 +36,38 @@ void GrainTableWidget::resizeEvent(QResizeEvent* event)
         setColumnWidth(i, this->width()/columnCount());
     }    
 }
+void GrainTableWidget::AddNewGrain(OpenBurnGrain* grain)
+{
+    int numItems = rowCount();
+    setRowCount(numItems+1);
+
+    setItem(numItems, 0, new QTableWidgetItem(num(grain->GetLength())));
+    setItem(numItems, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
+    setItem(numItems, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
+
+    if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
+    {
+        setItem(numItems, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+    }
+}
+void GrainTableWidget::ModifyGrain(OpenBurnGrain* grain, int idx)
+{
+    setItem(idx, 0, new QTableWidgetItem(num(grain->GetLength())));
+    setItem(idx, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    setItem(idx, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
+    setItem(idx, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
+
+    if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
+    {
+        setItem(idx, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+    }
+
+}
+void GrainTableWidget::DeleteGrain(int idx)
+{
+    removeRow(idx);
+}
 //thank you to honiahaka10 on stack overflow
 //https://stackoverflow.com/a/41203632/8508673
 void GrainTableWidget::dropEvent(QDropEvent* event)
