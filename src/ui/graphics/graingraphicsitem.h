@@ -12,7 +12,7 @@ class GrainGraphicsItem : public QGraphicsObject
 {
 public:
     GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection = true, QGraphicsItem *parent = nullptr);
-
+    virtual ~GrainGraphicsItem();
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
     const OpenBurnGrain* GetGrain() { return m_grain; }

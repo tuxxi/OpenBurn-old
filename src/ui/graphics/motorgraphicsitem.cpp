@@ -42,9 +42,12 @@ void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
 }
 void MotorGraphicsItem::RemoveGrain(int index)
 {
+    Q_UNUSED(index);
+    /*
     int grainLen = m_gfxGrains[index]->boundingRect().width();  
     m_MotorLen -= grainLen;
     delete m_gfxGrains[index];
+    m_gfxGrains[index] = nullptr;
     m_gfxGrains.erase(m_gfxGrains.begin() + index);
 
     //shift grains after this one back in line
@@ -54,13 +57,14 @@ void MotorGraphicsItem::RemoveGrain(int index)
         m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());
     }
     CalculateMotorHeight();
-    update(boundingRect());    
+    */
 }
 void MotorGraphicsItem::RemoveAllGrains()
 {
     for (size_t i = 0; i < m_gfxGrains.size(); i++)
     {
-        delete m_gfxGrains[i];        
+        delete m_gfxGrains[i];
+        m_gfxGrains[i] = nullptr;
     }
     m_gfxGrains.clear();
     m_MotorLen = 0;

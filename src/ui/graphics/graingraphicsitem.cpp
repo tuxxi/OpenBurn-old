@@ -6,6 +6,10 @@ GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, boo
 {
     setAcceptDrops(true);
 }
+GrainGraphicsItem::~GrainGraphicsItem()
+{
+    m_grain = nullptr;
+}
 void GrainGraphicsItem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

@@ -1,6 +1,7 @@
 #include "graintablewidget.h"
 
-GrainTableWidget::GrainTableWidget(QWidget *parent) : QTableWidget(parent)
+GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, QWidget *parent) 
+    : QTableWidget(parent), m_Motor(motor)
 {
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setColumnCount(5); //propellant, len, core dia, dia, inhibited face
@@ -24,10 +25,13 @@ GrainTableWidget::GrainTableWidget(QWidget *parent) : QTableWidget(parent)
     resizeRowsToContents();
     horizontalHeader()->setStretchLastSection(true);
     horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     //disable drag drop for now until i can fox it
     //m_grainsDisplay->setDragEnabled(true);
     //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
 }
+GrainTableWidget::~GrainTableWidget() {} 
+
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
@@ -50,6 +54,7 @@ void GrainTableWidget::AddNewGrain(OpenBurnGrain* grain)
     {
         setItem(numItems, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
     }
+    m_Motor->AddGrain(grain);
 }
 void GrainTableWidget::ModifyGrain(OpenBurnGrain* grain, int idx)
 {
@@ -62,12 +67,79 @@ void GrainTableWidget::ModifyGrain(OpenBurnGrain* grain, int idx)
     {
         setItem(idx, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
     }
-
+    m_Motor->UpdateGrain(grain, idx);
+}
+QList<OpenBurnGrain*> GrainTableWidget::GetSelectedGrains()
+{
+    QList<OpenBurnGrain*> selectedList;
+    int counter = 0;
+    for (auto* i : selectedItems())
+    {
+        int idx = row(i);        
+         //selectedItems is each cell in the table so we need to only add the row once
+        counter++;
+        if (idx != -1 && counter % columnCount() == 0)
+        {
+            selectedList.push_back(m_Motor->GetGrains()[idx]);
+        }
+    }
+    return selectedList;
 }
 void GrainTableWidget::DeleteGrain(int idx)
 {
     removeRow(idx);
+    m_Motor->RemoveGrain(idx);
 }
+void GrainTableWidget::DeleteSelectedGrains()
+{
+    int counter = 0;
+    for (auto* i : selectedItems())
+    {
+        int idx = row(i);        
+         //selectedItems is each cell in the table so we need to only modify the row once
+        counter++;
+        if (idx != -1 && counter % columnCount() == 0)
+        {
+            m_Motor->RemoveGrain(idx);
+            removeRow(idx);
+        }
+    }
+}
+void GrainTableWidget::move(bool up)
+{
+    Q_ASSERT(selectedItems().count() > 0);
+    const int sourceRow = row(selectedItems().at(0));
+    const int destRow = (up ? sourceRow-1 : sourceRow+1);
+    Q_ASSERT(destRow >= 0 && destRow < rowCount());
+ 
+    // take whole rows
+    QList<QTableWidgetItem*> sourceItems = takeRow(sourceRow);
+    QList<QTableWidgetItem*> destItems = takeRow(destRow);
+ 
+    // set back in reverse order
+    setRow(sourceRow, destItems);
+    setRow(destRow, sourceItems);
+    m_Motor->SwapGrains(sourceRow, destRow);
+}
+// takes and returns the whole row
+QList<QTableWidgetItem*> GrainTableWidget::takeRow(int row)
+{
+    QList<QTableWidgetItem*> rowItems;
+    for (int col = 0; col < columnCount(); ++col)
+    {
+        rowItems << takeItem(row, col);
+    }
+    return rowItems;
+}
+// sets the whole row
+void GrainTableWidget::setRow(int row, const QList<QTableWidgetItem*>& rowItems)
+{
+    for (int col = 0; col < columnCount(); ++col)
+    {
+        setItem(row, col, rowItems.at(col));
+    }
+}
+
 //thank you to honiahaka10 on stack overflow
 //https://stackoverflow.com/a/41203632/8508673
 void GrainTableWidget::dropEvent(QDropEvent* event)
@@ -105,6 +177,6 @@ void GrainTableWidget::dropEvent(QDropEvent* event)
         }
         int oldRow = (currentOldRow);
         newRow++;
-        emit SIG_GrainPositionUpdated(oldRow, newRow);
+        m_Motor->SwapGrains(oldRow, newRow);
     }
 }

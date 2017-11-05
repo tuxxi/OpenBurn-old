@@ -1,13 +1,13 @@
-#include "grain.h"
+#include <QDebug>
 
+#include "grain.h"
 OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant* prop, int inhibited)
     : m_grainDia(diameter), m_grainLen(length),m_prop(prop), m_numInhibitedFaces(inhibited)
 {
 
 }
 OpenBurnGrain::~OpenBurnGrain()
-{
-
+{    
 }
 double OpenBurnGrain::GetLength() { return m_grainLen; }
 double OpenBurnGrain::GetDiameter() { return m_grainDia; }
@@ -31,7 +31,6 @@ BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellan
 }
 BatesGrain::~BatesGrain()
 {
-
 }
 
 double BatesGrain::GetCoreDiameter() { return m_coreDia; }

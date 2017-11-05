@@ -4,14 +4,14 @@
 class OpenBurnNozzle
 {
 public:
-    OpenBurnNozzle(double throat, double exit)
-        : m_NozzleThroat(throat), m_NozzleExit(exit)
-    {}
-    ~OpenBurnNozzle() {}
+    OpenBurnNozzle(double throat, double exit);
+    virtual ~OpenBurnNozzle();
+    virtual void SetNozzleThroat(double);
+    virtual void SetNozzleExit(double);
 
-    virtual double GetNozzleThroatArea() = 0;
-    virtual double GetNozzleThroat() { return m_NozzleThroat; }
-    virtual double GetNozzleExit() { return m_NozzleExit; }
+    virtual double GetNozzleThroatArea() const;
+    virtual double GetNozzleThroat() const;
+    virtual double GetNozzleExit() const;
 protected:
     double m_NozzleThroat; //nozzle throat diameter
     double m_NozzleExit; //nozzle exit diameter
@@ -20,18 +20,13 @@ protected:
 class ConicalNozzle : public OpenBurnNozzle
 {
 public:
-    ConicalNozzle(double throat, double exit, double halfAngle = 15.0f)
-        : OpenBurnNozzle(throat, exit), m_HalfAngle(halfAngle)
-    {}
-    ~ConicalNozzle();
-    virtual double GetNozzleThroatArea() override;
+    ConicalNozzle(double throat, double exit, double halfAngle = 15.0f);
+    virtual ~ConicalNozzle();
 
-    void SetNozzleThroat(double);
-    void SetNozzleExit(double);
     void SetHalfAngle(double);
     void SetNozzleThroatLen(double);
-    double GetHalfAngle() { return m_HalfAngle; }
-    double GetThroatLength() { return m_throatLength; }
+    double GetHalfAngle() const;
+    double GetThroatLength() const;
 
     //TODO: add calculations to account for departures from ideal performance
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf

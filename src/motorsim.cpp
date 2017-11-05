@@ -4,47 +4,25 @@
 using OpenBurnUtil::g_kGasConstantR;
 
 MotorSim::MotorSim() 
-    : m_Nozzle(nullptr), m_avgPropellant(nullptr)
+    : m_Motor(nullptr)
 {
 
 
 }
-void MotorSim::SetGrains(std::vector<OpenBurnGrain*> grains)
-{
-    m_Grains = grains;
-}
-void MotorSim::AddGrain(OpenBurnGrain* grain)
-{
-    m_Grains.push_back(grain);
-}
-void MotorSim::RemoveGrain(OpenBurnGrain *grain)
-{
-    for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
-    {
-        if (*i == grain)
-        {
-            m_Grains.erase(i);
-        }
-    }
-}
-void MotorSim::RemoveGrain(int index)
-{
-    m_Grains.erase(m_Grains.begin() + index);
-}
-void MotorSim::SetNozzle(OpenBurnNozzle* nozz)
-{
-    m_Nozzle = nozz;
-}
-
 void MotorSim::RunSim(double timestep)
 {
-    CalcAvgPropellant();
-    for (auto i : m_Grains)
+    while(true)
     {
-        i->SetBurnRate(CalcSteadyStateBurnRate(i));
-        // TODO: if (erosive)
-        //i->SetErosiveBurnRate();
-        i->Burn(timestep);
+        for (auto i : m_Motor->GetGrains())
+        {
+            i->SetBurnRate(CalcSteadyStateBurnRate(i));
+            // TODO: if (erosive)
+            //i->SetErosiveBurnRate();
+            if (!i->Burn(timestep))
+            {
+                break;
+            }
+        }    
     }
 }
 //mdot A.K.A Mass flux at given crossflow mach number and port area
@@ -55,8 +33,8 @@ double MotorSim::CalcMassFlux(double machNumber, double portArea)
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
 
-    double temp = m_avgPropellant->GetAdiabaticFlameTemp();
-    double k = m_avgPropellant->GetSpecificHeatRatio();
+    double temp = m_Motor->GetAvgPropellant()->GetAdiabaticFlameTemp();
+    double k = m_Motor->GetAvgPropellant()->GetSpecificHeatRatio();
     double A = machNumber * portArea * CalcChamberPressure() * qSqrt( (k / (temp * g_kGasConstantR)) );
     double B = 1.0f + (k - 1) / 2 * machNumber * machNumber;
     double C = (k - 1.0f) / 2;
@@ -65,18 +43,18 @@ double MotorSim::CalcMassFlux(double machNumber, double portArea)
 double MotorSim::CalcKn()
 {
     double surfaceArea = 0;
-    for (auto i : m_Grains)
+    for (auto i : m_Motor->GetGrains())
     {
         surfaceArea += i->GetBurningSurfaceArea();
     }
-    return surfaceArea / m_Nozzle->GetNozzleThroatArea();
+    return surfaceArea / m_Motor->GetNozzle()->GetNozzleThroatArea();
 }
 double MotorSim::CalcChamberPressure()
 {
     //p = (Kn * a * rho * C* )^(1/(1-n)
-    double exponent = 1.0f / (1.0f - m_avgPropellant->GetBurnRateExp());
-    double p1 = CalcKn() * m_avgPropellant->GetBurnRateCoef() *
-            m_avgPropellant->GetDensity() * m_avgPropellant->GetCharVelocity();
+    double exponent = 1.0f / (1.0f - m_Motor->GetAvgPropellant()->GetBurnRateExp());
+    double p1 = CalcKn() * m_Motor->GetAvgPropellant()->GetBurnRateCoef() *
+        m_Motor->GetAvgPropellant()->GetDensity() * m_Motor->GetAvgPropellant()->GetCharVelocity();
     return qPow(p1, exponent);
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnGrain* grain)
@@ -142,118 +120,3 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-void MotorSim::CalcAvgPropellant()
-{
-    double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_rho = 0;
-    //sum up all the propellant properties
-    for (auto i : m_Grains)
-    {
-        //"weight" each property based on the propellant mass in the motor
-        double mass = i->GetVolume() * i->GetPropellantType()->GetDensity();
-        weighted_a += mass * i->GetPropellantType()->GetBurnRateCoef();
-        weighted_n += mass * i->GetPropellantType()->GetBurnRateExp();
-        weighted_cstar += mass * i->GetPropellantType()->GetCharVelocity();
-        weighted_rho += mass * i->GetPropellantType()->GetDensity();
-        //weighted_cpcv += mass * i->GetPropellantType()->GetSpecificHeatRatio();
-    }
-    double a = weighted_a / m_Grains.size();
-    double n = weighted_n / m_Grains.size();
-    double cstar = weighted_cstar / m_Grains.size();
-    double rho = weighted_rho / m_Grains.size();
-    //double cpcv = weighted_cpcv / m_Grains.size();
-    
-    delete m_avgPropellant; //clear old memory 
-    m_avgPropellant = new OpenBurnPropellant(a, n, cstar, rho, "OPENBURNDEBUG::AVGPROP");
-}
-void MotorSim::SwapGrains(int oldPos, int newPos)
-{
-    //TODO: fix me
-    qDebug() << "Grain idx " << oldPos << "swapping with idx " << newPos << "\n";
-    qDebug() << "m_Grains has size: " << m_Grains.size() << "\n";
-
-    std::swap(m_Grains[oldPos], m_Grains[newPos]); //std::swap uses move semantics afaik
-}
-bool MotorSim::HasNozzle()
-{
-    return m_Nozzle != nullptr;
-}
-bool MotorSim::HasGrains()
-{
-    return m_Grains.size() != 0;
-}
-double MotorSim::GetMotorLength()
-{
-    double len = 0;
-    for (auto i : m_Grains)
-    {
-        len += i->GetLength();
-    }
-    return len;
-}
-double MotorSim::GetMotorMajorDiameter()
-{
-    double dia = 0;
-    for (auto i : m_Grains)
-    {
-        //if the new grain's dia is larger than previously recorded dia, its the motor's major dia.
-        dia < i->GetDiameter() ? dia = i->GetDiameter() : 0.0f;
-    }
-    return dia;
-}
-double MotorSim::GetMotorPropellantMass()
-{
-    double mass = 0;
-    for (auto i : m_Grains)
-    {
-        mass += i->GetVolume() * i->GetPropellantType()->GetDensity();
-    }
-    return mass;
-}
-double MotorSim::CalcStaticKn(const std::vector<OpenBurnGrain*>& initial_grains, OpenBurnNozzle* nozzle, KN_STATIC_CALC_TYPE type)
-{
-    double surfaceArea = 0;
-
-    //http://www.nakka-rocketry.net/design1.html
-    switch (type)
-    {
-    default:
-    case KN_CALC_INITIAL:
-        for (auto i : initial_grains)
-        {
-            surfaceArea += i->GetBurningSurfaceArea();
-        }
-        break;
-    case KN_CALC_MAX:
-        for (auto i : initial_grains)
-        {
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
-            {
-                int inhibited = (2 - bates->GetInhibitedFaces());
-                double webRegression = float(1.0f/6.0f) * (bates->GetLength() - inhibited * bates->GetCoreDiameter());
-                double Ab_max_core_dia = bates->GetCoreDiameter() + (inhibited * webRegression);
-                double Ab_max_len = bates->GetLength() - (inhibited * webRegression);
-    
-                double face_area = 0.25f * M_PI * ((bates->GetDiameter() * bates->GetDiameter()) - (Ab_max_core_dia * Ab_max_core_dia));
-                double core_area = M_PI * Ab_max_core_dia * Ab_max_len;
-    
-                surfaceArea += core_area + inhibited * face_area;    
-            }
-            //other grain types
-        }
-        break;
-    case KN_CALC_FINAL:
-        for (auto i : initial_grains)
-        {
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
-            {
-                double web_thickness = 0.5f * (bates->GetDiameter() - bates->GetCoreDiameter());
-                double core_area = M_PI * bates->GetDiameter() * (bates->GetLength() - 2 * web_thickness);
-                surfaceArea += core_area;    
-            }            
-        }
-        break;
-    }
-    return surfaceArea / nozzle->GetNozzleThroatArea();
-}
-
-

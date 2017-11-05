@@ -8,7 +8,6 @@
 
 namespace OpenBurnUtil
 {
-
     static const QStringList g_kLengthUnits = (QStringList() <<
         QObject::tr("Inches (in)") <<
         QObject::tr("Millimeters (mm)") <<

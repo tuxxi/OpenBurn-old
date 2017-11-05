@@ -16,7 +16,7 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/ui/designtab.h"
 
-#include "src/motorsim.h"
+#include "src/motor.h"
 
 class MainWindow : public QMainWindow
 {
@@ -25,9 +25,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-public slots:
-    void SLOT_NewGrain(OpenBurnGrain *grain);
 
 private slots:
     void menuQuit();
@@ -47,6 +44,6 @@ private:
     QAction *actionOpen, *actionSave, *actionSave_As, *actionQuit, *actionNew, *actionExport;
 
     QTabWidget *tabWidget;
-    DesignTab *m_designTab;    
-    MotorSim *sim;
+    DesignTab *m_designTab;
+    OpenBurnMotor* m_DesignMotor; 
 };

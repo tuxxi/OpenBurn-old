@@ -14,20 +14,20 @@ public:
     void SetAdvancedParams(double Cv, double Cp, double Cs, double Tnot, double molarmass, double mu, double Pr);
 
     //BASIC:
-    double GetBurnRateCoef();
-    double GetBurnRateExp();
-    double GetCharVelocity();
-    double GetDensity();
+    double GetBurnRateCoef() const;
+    double GetBurnRateExp() const;
+    double GetCharVelocity() const;
+    double GetDensity() const;
 
     //ADVANCED:
-    double GetPropellantSpecificHeat();
-    double GetSpecificHeatConstantPressure();
-    double GetSpecificHeatConstantVolume();
-    double GetSpecificHeatRatio(); //defined in propellant.cpp
-    double GetAdiabaticFlameTemp() ;
-    double GetMolarMass();
-    double GetGasViscosity();
-    double GetPrandtlNumber();
+    double GetPropellantSpecificHeat() const;
+    double GetSpecificHeatConstantPressure() const;
+    double GetSpecificHeatConstantVolume() const;
+    double GetSpecificHeatRatio() const;
+    double GetAdiabaticFlameTemp() const;
+    double GetMolarMass() const;
+    double GetGasViscosity() const;
+    double GetPrandtlNumber() const;
 private:
     QString m_PropellantName;
     //BASIC:
