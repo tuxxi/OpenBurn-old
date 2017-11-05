@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QToolButton>
 #include <QGroupBox>
+#include <QList>
 
 #include "src/grain.h"
 #include "src/util.h"
@@ -20,7 +21,14 @@ class GrainDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GrainDialog(QWidget* parent = nullptr, OpenBurnGrain* grain = nullptr, bool newGrain = true);
+    //By default, a new window with no seed values and no grain ptrs to edit exists.
+    //This sets the dialog in "new grain" mode where a new grain pointer is allocted 
+    //every time the "apply/add" button is clicked.
+    //We can also "seed" the dialog with values from the previous editing session, but if the QList of grain ptrs is
+    //empty, it will still be in "new grain" mode. For editing, supply a QList of OpenBurnGrain pointers and the dialog will populate
+    //them all of all of them with the dialog's settings.
+    explicit GrainDialog(QWidget* parent = nullptr, OpenBurnGrain* seedValues = nullptr, 
+        QList<OpenBurnGrain*>m_GrainsToEdit = QList<OpenBurnGrain*>());
     virtual ~GrainDialog();
 
 signals:
@@ -45,7 +53,6 @@ private:
     QPushButton *m_applyButton, *m_cancelButton;
 
     OpenBurnDesignGrain* m_GrainDesign;
-    OpenBurnGrain* m_Grain;
-    GRAINTYPE m_GrainType;
+    QList<OpenBurnGrain*>m_GrainsToEdit;
     bool m_isNewGrainWindow;
 };

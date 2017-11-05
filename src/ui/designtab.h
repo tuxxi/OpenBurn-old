@@ -32,7 +32,6 @@ private slots:
     void SLOT_GrainDialogClosed();
     void SLOT_NozzDialogClosed();
     void SLOT_grainTable_cellClicked(int row, int column);
-    
 private:
     void SetupUI();
     void UpdateDesign();
@@ -55,7 +54,7 @@ private:
 
     GrainDialog* m_grainDialog;
     NozzleDialog* m_nozzleDialog;
-    GrainTableWidget* m_grainsDisplay;
+    GrainTableWidget* m_grainTable;
 
     MotorGraphicsItem* m_motorObject;
     QGraphicsView* m_motorDisplayView;

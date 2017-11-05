@@ -14,11 +14,13 @@ DesignTab::DesignTab(QWidget* parent)
     SetupUI();
     connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
     connect(m_nozzleSettingsButton, SIGNAL(clicked()), this, SLOT(NozzleButton_Clicked()));
-    connect(m_grainsDisplay, SIGNAL(SIG_GrainPositionUpdated(int, int)),
+    connect(m_grainTable, SIGNAL(SIG_GrainPositionUpdated(int, int)),
         this, SLOT(SLOT_GrainPositionUpdated(int, int)));
     connect(m_deleteGrainButton, SIGNAL(clicked()), this, SLOT(DeleteGrainButton_Clicked()));
     connect(m_editGrainButton, SIGNAL(clicked()), this, SLOT(EditGrainButton_Clicked()));
-    connect(m_grainsDisplay, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
+    connect(m_grainTable, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
+    //Double clicking on a row edits that grain
+    connect(m_grainTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(EditGrainButton_Clicked()));
     m_sim = new MotorSim;
     UpdateDesign();
 }
@@ -38,7 +40,7 @@ void DesignTab::SetupUI()
     sizePolicy.setVerticalStretch(0);
     setSizePolicy(sizePolicy);    
 
-    m_grainsDisplay = new GrainTableWidget(this);
+    m_grainTable = new GrainTableWidget(this);
     //grain buttons
     m_newGrainButton = new QPushButton(tr("New Grain"));
     m_deleteGrainButton = new QPushButton(tr("Delete"));
@@ -92,7 +94,7 @@ void DesignTab::SetupUI()
 
     //master layout
     QGridLayout* layout = new QGridLayout;
-    layout->addWidget(m_grainsDisplay, 0, 0);
+    layout->addWidget(m_grainTable, 0, 0);
     layout->addWidget(gb_GrainDesign, 0, 1);
     layout->addWidget(gb_frame_Params, 0, 2);
     layout->addWidget(gb_design_overview, 1, 0, 1, 3);
@@ -176,7 +178,7 @@ void DesignTab::SLOT_GrainDialogClosed()
 //Recieved from the grain dialog. Updates the grain table widget
 void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 {
-    m_grainsDisplay->AddNewGrain(grain);
+    m_grainTable->AddNewGrain(grain);
     m_seed_grain = grain;
     m_sim->AddGrain(grain);
     UpdateDesign();
@@ -187,7 +189,7 @@ void DesignTab::SLOT_ModifyGrain(OpenBurnGrain* grain)
     {
         if (grain == m_sim->m_Grains[idx])
         {
-            m_grainsDisplay->ModifyGrain(grain, idx);
+            m_grainTable->ModifyGrain(grain, idx);
             m_seed_grain = grain;
             UpdateDesign();
             break;   
@@ -210,7 +212,7 @@ void DesignTab::NewGrainButton_Clicked()
     if (!m_grainDialog) //only make one!!
     {
 
-        m_grainDialog = new GrainDialog(nullptr, m_seed_grain, true);
+        m_grainDialog = new GrainDialog(nullptr, m_seed_grain);
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SIGNAL(SIG_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
@@ -221,22 +223,29 @@ void DesignTab::NewGrainButton_Clicked()
 }
 void DesignTab::EditGrainButton_Clicked()
 {
-    OpenBurnGrain* selectedGrain = nullptr;
-    for (auto* i : m_grainsDisplay->selectedItems())
+    QList<OpenBurnGrain*>selectedList;
+    int counter = 0;
+    for (auto* i : m_grainTable->selectedItems())
     {
-        int idx = m_grainsDisplay->row(i);
-        if (idx != -1)
+        int idx = m_grainTable->row(i);        
+         //selectedItems is each cell in the table so we need to only add the row once
+        counter++;
+        if (idx != -1 && counter % m_grainTable->columnCount() == 0)
         {
-            selectedGrain = m_sim->m_Grains[idx];
-            break;    
+            selectedList.push_back(m_sim->m_Grains[idx]);
+            m_seed_grain = m_sim->m_Grains[idx];
         }    
     }
-    if (!m_grainDialog) //only make one!!
+    //we want to be able to click "edit" and edit differently selected grains, so we delete this every time
+    //the edit button is clicked
+    if (m_grainDialog)
     {
-        m_grainDialog = new GrainDialog(nullptr, selectedGrain, false);
-        connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
-        connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
+        m_grainDialog->deleteLater();
     }
+    m_grainDialog = new GrainDialog(nullptr, m_seed_grain, selectedList);
+    connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
+    connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
+
     m_grainDialog->show();
     m_grainDialog->activateWindow();
     m_grainDialog->raise();
@@ -244,12 +253,12 @@ void DesignTab::EditGrainButton_Clicked()
 }
 void DesignTab::DeleteGrainButton_Clicked()
 {
-    for (auto* i : m_grainsDisplay->selectedItems())
+    for (auto* i : m_grainTable->selectedItems())
     {
-        int idx = m_grainsDisplay->row(i);
+        int idx = m_grainTable->row(i);
         if (idx != -1)
         {            
-            m_grainsDisplay->DeleteGrain(idx);
+            m_grainTable->DeleteGrain(idx);
             m_sim->RemoveGrain(idx);
             m_motorObject->RemoveGrain(idx);    
         }
