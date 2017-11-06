@@ -18,6 +18,7 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/ui/designtab.h"
 #include "src/ui/simtab.h"
+#include "src/ui/propellanttab.h"
 
 class MainWindow : public QMainWindow
 {
@@ -47,5 +48,6 @@ private:
     QTabWidget *tabWidget;
     DesignTab *m_designTab;
     SimulationTab* m_SimTab;
+    PropellantTab* m_PropellantTab;
     OpenBurnMotor* m_DesignMotor; 
 };
