@@ -4,70 +4,101 @@
 using OpenBurnUtil::g_kGasConstantR;
 
 MotorSim::MotorSim() 
-    : m_Motor(nullptr)
+    : m_InitialDesignMotor(nullptr), m_TotalBurnTime(0.0f)
 {
 
+}
+MotorSim::MotorSim(OpenBurnMotor* motor)
+    : m_InitialDesignMotor(motor), m_TotalBurnTime(0.0f)
+    
+{
 
+}
+MotorSim::~MotorSim()
+{
+    for (auto* i : m_SimResultData)
+    {
+        delete i;
+    }
+    m_SimResultData.clear();
 }
 void MotorSim::RunSim(double timestep)
 {
+    int iterations = 0;
+    m_TotalBurnTime = 0;
     while(true)
     {
-        for (auto i : m_Motor->GetGrains())
+        OpenBurnMotor* newDataPoint = new OpenBurnMotor;
+        newDataPoint->SetNozzle(m_InitialDesignMotor->GetNozzle());
+
+        if (m_SimResultData.empty()) //start with initial conditions
         {
-            i->SetBurnRate(CalcSteadyStateBurnRate(i));
+            newDataPoint->SetCopyGrains(m_InitialDesignMotor->GetGrains());                        
+        }
+        else //after we've run the sim for one time step, use the previous result as initial condition
+        {
+            newDataPoint->SetCopyGrains(m_SimResultData[iterations-1]->GetGrains());            
+        }
+        int numGrains = 0;
+        for (auto* i : newDataPoint->GetGrains())
+        {
+            numGrains++;
+            double burnRate = CalcSteadyStateBurnRate(newDataPoint, i);
+            qDebug() << "Grain " << numGrains << " burnrate: " << burnRate;
+            
+            i->SetBurnRate(burnRate);
             // TODO: if (erosive)
             //i->SetErosiveBurnRate();
             if (!i->Burn(timestep))
             {
-                break;
+                qDebug() << "Grain " << numGrains << " burned out!";
+                return;
             }
-        }    
+        }
+        m_SimResultData.push_back(newDataPoint);
+        iterations++;
+        m_TotalBurnTime += timestep;
+        double kn = newDataPoint->CalcKn();
+        qDebug() << "Burning!! Iteration: " << iterations << ", total burn time: " << m_TotalBurnTime;
+        qDebug() << "Kn: " << kn;
     }
 }
 //mdot A.K.A Mass flux at given crossflow mach number and port area
-double MotorSim::CalcMassFlux(double machNumber, double portArea)
+double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double portArea)
 {
     //mdot = M * A * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
     //P_0 = gas pressure, T_0 = gas temperature, k = ratio specific heats (cp/cv), M = mach number, R = gas constant
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
 
-    double temp = m_Motor->GetAvgPropellant()->GetAdiabaticFlameTemp();
-    double k = m_Motor->GetAvgPropellant()->GetSpecificHeatRatio();
-    double A = machNumber * portArea * CalcChamberPressure() * qSqrt( (k / (temp * g_kGasConstantR)) );
+    double temp = motor->GetAvgPropellant()->GetAdiabaticFlameTemp();
+    double k = motor->GetAvgPropellant()->GetSpecificHeatRatio();
+    double A = machNumber * portArea * CalcChamberPressure(motor) * qSqrt( (k / (temp * g_kGasConstantR)) );
     double B = 1.0f + (k - 1) / 2 * machNumber * machNumber;
     double C = (k - 1.0f) / 2;
     return A * qPow(B, -1.0f*C);
 }
-double MotorSim::CalcKn()
+double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 {
-    double surfaceArea = 0;
-    for (auto i : m_Motor->GetGrains())
-    {
-        surfaceArea += i->GetBurningSurfaceArea();
-    }
-    return surfaceArea / m_Motor->GetNozzle()->GetNozzleThroatArea();
+    //p = (Kn * a * rho * C* )^(1/(1-n))
+    double exponent = 1.0f / (1.0f - motor->GetAvgPropellant()->GetBurnRateExp());
+    double p1 = motor->CalcKn() * motor->GetAvgPropellant()->GetBurnRateCoef() *
+        motor->GetAvgPropellant()->GetDensity() * motor->GetAvgPropellant()->GetCharVelocity();
+    double chamberPressure = qPow(p1, exponent);
+    qDebug() << "Chamber Pressure: " << chamberPressure;
+    return chamberPressure;
 }
-double MotorSim::CalcChamberPressure()
-{
-    //p = (Kn * a * rho * C* )^(1/(1-n)
-    double exponent = 1.0f / (1.0f - m_Motor->GetAvgPropellant()->GetBurnRateExp());
-    double p1 = CalcKn() * m_Motor->GetAvgPropellant()->GetBurnRateCoef() *
-        m_Motor->GetAvgPropellant()->GetDensity() * m_Motor->GetAvgPropellant()->GetCharVelocity();
-    return qPow(p1, exponent);
-}
-double MotorSim::CalcSteadyStateBurnRate(OpenBurnGrain* grain)
+double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)
 {
     // r = a * p^n
     OpenBurnPropellant* prop = grain->GetPropellantType();
-    return prop->GetBurnRateCoef() * qPow(CalcChamberPressure(), prop->GetBurnRateExp());
+    return prop->GetBurnRateCoef() * qPow(CalcChamberPressure(motor), prop->GetBurnRateExp());
 }
-double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumber)
+double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, double machNumber)
 {
     OpenBurnPropellant* prop = grain->GetPropellantType();
     double k = prop->GetSpecificHeatRatio();
-    double P_s = CalcChamberPressure(); //steady-state chamber pressure
+    double P_s = CalcChamberPressure(motor); //steady-state chamber pressure
 
     //First we have to calculate saint roberts law again, using static pressure at grain surface obtained by:
     //P = P_0(1+ (k-1)/2 * M^2) ^ -k / (k-1)
@@ -79,11 +110,11 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnGrain* grain, double machNumb
     //Normally this value would be used as R_0 but the core mach number is not considered in the basic case,
     //So we calculate it here and subtract the difference from R_e at the end.
     double R_0 = prop->GetBurnRateCoef() * qPow(P, prop->GetBurnRateExp());
-    double R_diff = CalcSteadyStateBurnRate(grain) - R_0; //this factor will be removed later on
+    double R_diff = CalcSteadyStateBurnRate(motor, grain) - R_0; //this factor will be removed later on
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
-    double G = CalcMassFlux(machNumber, grain->GetPortArea()); // mass flux
+    double G = CalcMassFlux(motor, machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop->GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
     double rho = prop->GetDensity(); //propellant density

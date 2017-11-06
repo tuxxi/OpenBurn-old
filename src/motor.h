@@ -1,5 +1,8 @@
 #pragma once
 #include <vector>
+#include <functional>
+#include <algorithm>
+#include <iterator>
 
 #include "grain.h"
 #include "nozzle.h"
@@ -21,7 +24,9 @@ public:
 
     double CalcStaticKn(KN_STATIC_CALC_TYPE type);    
 
+    double CalcKn(); //instantaneous Kn calc for the current motor configuration
     void SetGrains(GrainVector grains);
+    void SetCopyGrains(GrainVector grains);
     void SetNozzle(OpenBurnNozzle* nozz);
     GrainVector GetGrains();
     OpenBurnNozzle* GetNozzle();

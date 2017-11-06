@@ -6,7 +6,7 @@ class OpenBurnPropellant
 {
 public:
     OpenBurnPropellant();
-    OpenBurnPropellant(double a, double n, double cstar, double rho, QString name);
+    OpenBurnPropellant(double a, double n, double cstar, double rho, const QString& name);
         
     void SetPropellantName(const QString& name);
     QString GetPropellantName();
@@ -32,8 +32,8 @@ private:
     QString m_PropellantName;
     //BASIC:
     double m_burnRateCoef, m_burnRateExp; //a, n
-    double m_charVel; //c*, m/s
-    double m_density; //rho, kg/m^3
+    double m_charVel; //c*, m/s or f/s
+    double m_density; //rho, kg/m^3 or slugs/in^3
 
     //ADVANCED:
     double m_PropellantSpecificHeat; //C_s

@@ -4,12 +4,14 @@
 #include <QLabel>
 #include <QToolButton>
 
+#include "src/ui/graphics/motorgraphicsitem.h"
+
 #include "src/ui/dialogs/graindialog.h"
 #include "src/ui/dialogs/nozzledialog.h"
 #include "src/ui/widgets/graintablewidget.h"
 #include "src/util.h"
 #include "src/motor.h"
-#include "src/ui/graphics/motorgraphicsitem.h"
+#include "src/motorsim.h"
 
 class DesignTab : public QWidget
 {
@@ -29,6 +31,8 @@ private slots:
     void DeleteGrainButton_Clicked();
     void MoveGrainUpButton_Clicked();
     void MoveGrainDownButton_Clicked();
+
+    void RunSimButton_Clicked();
 
     void SLOT_GrainDialogClosed();
     void SLOT_NozzDialogClosed();
@@ -65,4 +69,6 @@ private:
     QGraphicsView* m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
     OpenBurnMotor* m_Motor; //The initial design  
+
+    QPushButton* m_RunSim;
 };

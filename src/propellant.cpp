@@ -1,12 +1,13 @@
 #include "propellant.h"
 
 OpenBurnPropellant::OpenBurnPropellant() {}
-OpenBurnPropellant::OpenBurnPropellant(double a, double n, double cstar, double rho, QString name)
+//dimensionless, dimensionless, feet/sec, slugs/in^3
+OpenBurnPropellant::OpenBurnPropellant(double a, double n, double cstar, double rho, const QString& name)
     : m_PropellantName(name), m_burnRateCoef(a), m_burnRateExp(n), m_charVel(cstar), m_density(rho)
 {
 
 }
-
+//dimensionless, dimensionless, feet/sec, slugs/in^3
 void OpenBurnPropellant::SetBasicParams(double a, double n, double cstar, double rho)
 {
     m_burnRateCoef = a;

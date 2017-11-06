@@ -2,31 +2,43 @@
 #include "motor.h"
 
 OpenBurnMotor::OpenBurnMotor()
-    : m_Nozzle(nullptr), m_Grains(std::vector<OpenBurnGrain*>())
+    : m_Nozzle(nullptr), m_Grains(std::vector<OpenBurnGrain*>()), m_avgPropellant(nullptr)
 {
 
 }
-OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, std::vector<OpenBurnGrain*> grains)
-    : m_Nozzle(nozz), m_Grains(grains)
+OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
+    : m_Nozzle(nozz), m_Grains(grains), m_avgPropellant(nullptr)
 {
 
 }
 OpenBurnMotor::~OpenBurnMotor()
 {
-    
+    for (auto i : m_Grains)
+    {
+        RemoveGrain(i);
+    }
+    delete m_avgPropellant;    
 }
 
-void OpenBurnMotor::SetGrains(std::vector<OpenBurnGrain*> grains)
+void OpenBurnMotor::SetGrains(GrainVector grains)
 {
     m_Grains = grains;
+    CalcAvgPropellant();
+}
+void OpenBurnMotor::SetCopyGrains(GrainVector grains)
+{
+    std::transform(grains.begin(), grains.end(), std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
+    CalcAvgPropellant();    
 }
 void OpenBurnMotor::AddGrain(OpenBurnGrain* grain)
 {
     m_Grains.push_back(grain);
+    CalcAvgPropellant();
 }
 void OpenBurnMotor::UpdateGrain(OpenBurnGrain* grain, int index)
 {
     m_Grains[index] = grain;
+    CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
 {
@@ -39,12 +51,14 @@ void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
             m_Grains.erase(i);
         }
     }
+    CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(int index)
 {
     delete m_Grains[index];
     m_Grains[index] = nullptr;    
     m_Grains.erase(m_Grains.begin() + index);
+    CalcAvgPropellant();
 }
 void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
 {
@@ -102,6 +116,15 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
     }
     return surfaceArea / m_Nozzle->GetNozzleThroatArea();
 }
+double OpenBurnMotor::CalcKn()
+{
+    double surfaceArea = 0;
+    for (auto i : m_Grains)
+    {
+        surfaceArea += i->GetBurningSurfaceArea();
+    }
+    return surfaceArea / m_Nozzle->GetNozzleThroatArea();
+}
 void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
 {
     //TODO: fix me
@@ -148,6 +171,7 @@ double OpenBurnMotor::GetMotorPropellantMass()
 }
 void OpenBurnMotor::CalcAvgPropellant()
 {
+    /*
     double weighted_a = 0, weighted_n = 0, weighted_cstar = 0, weighted_rho = 0;
     //sum up all the propellant properties
     for (auto  i : m_Grains)
@@ -160,12 +184,21 @@ void OpenBurnMotor::CalcAvgPropellant()
         weighted_rho += mass * i->GetPropellantType()->GetDensity();
         //weighted_cpcv += mass * i->GetPropellantType()->GetSpecificHeatRatio();
     }
-    double a = weighted_a / m_Grains.size();
-    double n = weighted_n / m_Grains.size();
-    double cstar = weighted_cstar / m_Grains.size();
-    double rho = weighted_rho / m_Grains.size();
-    //double cpcv = weighted_cpcv / m_Grains.size();
-    
-    delete m_avgPropellant; //clear old memory 
-    m_avgPropellant = new OpenBurnPropellant(a, n, cstar, rho, "OPENBURNDEBUG::AVGPROP");
+    double a = weighted_a / GetNumGrains();
+    double n = weighted_n / GetNumGrains();
+    double cstar = weighted_cstar / GetNumGrains();
+    double rho = weighted_rho / GetNumGrains();
+    //double cpcv = weighted_cpcv / GetNumGrains();
+    const QString debugName = "OPENBURNDEBUG::AVGPROP";
+    if (!m_avgPropellant)
+    {
+        m_avgPropellant = new OpenBurnPropellant(a, n, cstar, rho, debugName);        
+    }
+    else
+    {
+        m_avgPropellant->SetBasicParams(a, n, cstar, rho);
+        m_avgPropellant->SetPropellantName(debugName);
+    }
+    */
+    if (HasGrains()) m_avgPropellant = m_Grains[0]->GetPropellantType();
 }

@@ -22,7 +22,7 @@ DesignTab::DesignTab(OpenBurnMotor* motor, QWidget* parent)
     connect(m_grainTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(EditGrainButton_Clicked()));
     connect(m_moveGrainUp, SIGNAL(clicked()), this, SLOT(MoveGrainUpButton_Clicked()));
     connect(m_moveGrainDown, SIGNAL(clicked()), this, SLOT(MoveGrainDownButton_Clicked()));
-    
+    connect(m_RunSim, SIGNAL(clicked()), this, SLOT(RunSimButton_Clicked()));
     UpdateDesign();
 }
 DesignTab::~DesignTab() 
@@ -110,8 +110,11 @@ void DesignTab::SetupUI()
     //QGridLayout* gridLayoutSimResults = new QGridLayout;
 
     QGridLayout* designLayout = new QGridLayout;
+    m_RunSim = new QPushButton(tr("RUN SIM"));
+    m_RunSim->setEnabled(false);
     designLayout->addWidget(gb_design_params, 0, 2, 1, 1);    
     designLayout->addWidget(m_motorDisplayView, 1, 0, 1, 3);
+    designLayout->addWidget(m_RunSim, 0, 1);
     gb_design_overview->setLayout(designLayout);
 
     //master layout
@@ -139,7 +142,8 @@ void DesignTab::UpdateDesign()
             QString maxKn = num(round(m_Motor->CalcStaticKn(KN_CALC_MAX)));
             QString finalKn = num(round(m_Motor->CalcStaticKn(KN_CALC_FINAL)));
     
-            m_knLabel->setText(initialKn + "-" + maxKn);    
+            m_knLabel->setText(initialKn + "-" + maxKn);
+            m_RunSim->setEnabled(true);            
         }
     }
     if (m_Motor->HasNozzle())
@@ -240,7 +244,7 @@ void DesignTab::SLOT_ModifyGrain(OpenBurnGrain* grain)
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
     m_Motor->SetNozzle(nozz);    
-    UpdateDesign();    
+    UpdateDesign();
 }
 void DesignTab::NewGrainButton_Clicked()
 {
@@ -312,4 +316,9 @@ void DesignTab::MoveGrainDownButton_Clicked()
 {
     m_grainTable->move(false);
     UpdateDesign();
+}
+void DesignTab::RunSimButton_Clicked()
+{
+    MotorSim* sim = new MotorSim(m_Motor);
+    sim->RunSim();
 }

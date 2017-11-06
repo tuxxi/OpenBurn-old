@@ -103,6 +103,9 @@ void GrainDialog::UpdateDesign()
         if (m_isNewGrainWindow && m_GrainsToEdit.isEmpty())
         {
             OpenBurnPropellant* prop = new OpenBurnPropellant();
+            double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(0.065f);
+            prop->SetBasicParams(0.0665f, 0.319f, 3100.f, rho);
+            prop->SetPropellantName("KNSU - TEST");
             OpenBurnGrain* grain = new BatesGrain(
                 design->GetDiameter(),        
                 design->GetCoreDiameter(),

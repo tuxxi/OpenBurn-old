@@ -33,6 +33,7 @@ public:
     //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
     virtual bool Burn(double timestep) = 0;
 
+    virtual OpenBurnGrain* Clone() = 0;
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
 //protected:
     double m_grainDia, m_grainLen;
@@ -56,6 +57,8 @@ public:
     virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
 
+    virtual BatesGrain* Clone() override;
+    
     virtual double GetCoreDiameter();
     virtual void SetCoreDiameter(double dia);
 private:
