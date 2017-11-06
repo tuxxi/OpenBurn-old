@@ -82,8 +82,9 @@ void MainWindow::SetupUI()
     
     tabWidget = new QTabWidget(this);
     m_designTab = new DesignTab(m_DesignMotor);
+    m_SimTab = new SimulationTab(m_DesignMotor);
     tabWidget->addTab(m_designTab, tr("Design"));
-
+    tabWidget->addTab(m_SimTab, tr("Simulation"));
     setCentralWidget(tabWidget);
 }
 

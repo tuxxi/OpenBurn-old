@@ -32,7 +32,6 @@ private slots:
     void MoveGrainUpButton_Clicked();
     void MoveGrainDownButton_Clicked();
 
-    void RunSimButton_Clicked();
 
     void SLOT_GrainDialogClosed();
     void SLOT_NozzDialogClosed();
@@ -69,6 +68,4 @@ private:
     QGraphicsView* m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
     OpenBurnMotor* m_Motor; //The initial design  
-
-    QPushButton* m_RunSim;
 };

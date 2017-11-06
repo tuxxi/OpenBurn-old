@@ -4,6 +4,20 @@
 
 #include "motor.h"
 
+struct MotorSimDataPoint
+{
+    OpenBurnMotor* motor;
+    double pressure;
+    double massflux;
+    double burnRate;
+    double time;
+    MotorSimDataPoint() : motor(nullptr), pressure(0), massflux(0), burnRate(0), time(0) 
+    {}
+    ~MotorSimDataPoint()
+    {
+        delete motor;
+    }
+};
 class MotorSim
 {
 public:
@@ -24,8 +38,11 @@ public:
 
     void RunSim(double timestep = 0.01f);
 
+    double GetTotalBurnTime() const;
+    std::vector<MotorSimDataPoint*> GetResults();
 private:
-    std::vector<OpenBurnMotor*> m_SimResultData;
+    void ClearAllData();
+    std::vector<MotorSimDataPoint*> m_SimResultData;
     OpenBurnMotor* m_InitialDesignMotor;
 
     double m_TotalBurnTime;

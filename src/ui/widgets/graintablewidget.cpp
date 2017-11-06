@@ -45,27 +45,27 @@ void GrainTableWidget::AddNewGrain(OpenBurnGrain* grain)
     int numItems = rowCount();
     setRowCount(numItems+1);
 
-    setItem(numItems, 0, new QTableWidgetItem(num(grain->GetLength())));
-    setItem(numItems, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    setItem(numItems, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
+    setItem(numItems, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
     setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
-    setItem(numItems, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
+    setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
 
     if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
     {
-        setItem(numItems, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+        setItem(numItems, 2, new QTableWidgetItem(QString::number(bates->GetCoreDiameter())));
     }
     m_Motor->AddGrain(grain);
 }
 void GrainTableWidget::ModifyGrain(OpenBurnGrain* grain, int idx)
 {
-    setItem(idx, 0, new QTableWidgetItem(num(grain->GetLength())));
-    setItem(idx, 1, new QTableWidgetItem(num(grain->GetDiameter())));
+    setItem(idx, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
+    setItem(idx, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
     setItem(idx, 3, new QTableWidgetItem(grain->GetPropellantType()->GetPropellantName()));
-    setItem(idx, 4, new QTableWidgetItem(num(grain->GetInhibitedFaces())));
+    setItem(idx, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
 
     if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
     {
-        setItem(idx, 2, new QTableWidgetItem(num(bates->GetCoreDiameter())));
+        setItem(idx, 2, new QTableWidgetItem(QString::number(bates->GetCoreDiameter())));
     }
     m_Motor->UpdateGrain(grain, idx);
 }

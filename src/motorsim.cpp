@@ -26,26 +26,29 @@ void MotorSim::RunSim(double timestep)
 {
     int iterations = 0;
     m_TotalBurnTime = 0;
+    ClearAllData();
     while(true)
     {
-        OpenBurnMotor* newDataPoint = new OpenBurnMotor;
-        newDataPoint->SetNozzle(m_InitialDesignMotor->GetNozzle());
+        MotorSimDataPoint* newDataPoint = new MotorSimDataPoint;
+        OpenBurnMotor* newDataPointMotor = new OpenBurnMotor;
+        newDataPointMotor->SetNozzle(m_InitialDesignMotor->GetNozzle());
 
         if (m_SimResultData.empty()) //start with initial conditions
         {
-            newDataPoint->SetCopyGrains(m_InitialDesignMotor->GetGrains());                        
+            newDataPointMotor->SetCopyGrains(m_InitialDesignMotor->GetGrains());                        
         }
         else //after we've run the sim for one time step, use the previous result as initial condition
         {
-            newDataPoint->SetCopyGrains(m_SimResultData[iterations-1]->GetGrains());            
+            newDataPointMotor->SetCopyGrains(m_SimResultData[iterations-1]->motor->GetGrains());            
         }
+        newDataPoint->motor = newDataPointMotor;
         int numGrains = 0;
-        for (auto* i : newDataPoint->GetGrains())
+        for (auto* i : newDataPointMotor->GetGrains())
         {
             numGrains++;
-            double burnRate = CalcSteadyStateBurnRate(newDataPoint, i);
-            qDebug() << "Grain " << numGrains << " burnrate: " << burnRate;
-            
+            double burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
+            newDataPoint->burnRate = burnRate; 
+            newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);    
             i->SetBurnRate(burnRate);
             // TODO: if (erosive)
             //i->SetErosiveBurnRate();
@@ -55,12 +58,11 @@ void MotorSim::RunSim(double timestep)
                 return;
             }
         }
-        m_SimResultData.push_back(newDataPoint);
         iterations++;
         m_TotalBurnTime += timestep;
-        double kn = newDataPoint->CalcKn();
-        qDebug() << "Burning!! Iteration: " << iterations << ", total burn time: " << m_TotalBurnTime;
-        qDebug() << "Kn: " << kn;
+        newDataPoint->time = m_TotalBurnTime;
+        m_SimResultData.push_back(newDataPoint);
+        
     }
 }
 //mdot A.K.A Mass flux at given crossflow mach number and port area
@@ -85,7 +87,6 @@ double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
     double p1 = motor->CalcKn() * motor->GetAvgPropellant()->GetBurnRateCoef() *
         motor->GetAvgPropellant()->GetDensity() * motor->GetAvgPropellant()->GetCharVelocity();
     double chamberPressure = qPow(p1, exponent);
-    qDebug() << "Chamber Pressure: " << chamberPressure;
     return chamberPressure;
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)
@@ -150,4 +151,20 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     }
     double R_e = R_total - R_0 - R_diff;
     return R_e;
+}
+std::vector<MotorSimDataPoint*> MotorSim::GetResults()
+{
+    return m_SimResultData;
+}
+double MotorSim::GetTotalBurnTime() const
+{
+    return m_TotalBurnTime;
+}
+void MotorSim::ClearAllData()
+{
+    for (auto i : m_SimResultData)
+    {
+        delete i;
+    }
+    m_SimResultData.clear();
 }

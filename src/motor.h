@@ -15,8 +15,10 @@ enum KN_STATIC_CALC_TYPE
 
 typedef std::vector<OpenBurnGrain*> GrainVector;
 
-class OpenBurnMotor
+//we inherit from QObject in order to use signals and slots
+class OpenBurnMotor : public QObject
 {
+    Q_OBJECT
 public:
     OpenBurnMotor();
     OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains);
@@ -45,7 +47,8 @@ public:
     double GetMotorMajorDiameter();
     double GetMotorPropellantMass();
     const OpenBurnPropellant* GetAvgPropellant();
-
+signals:
+    void SIG_DesignReady();
 private:
     OpenBurnNozzle* m_Nozzle;
     GrainVector m_Grains;

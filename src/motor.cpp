@@ -15,9 +15,10 @@ OpenBurnMotor::~OpenBurnMotor()
 {
     for (auto i : m_Grains)
     {
-        RemoveGrain(i);
+        delete i;
     }
-    delete m_avgPropellant;    
+    m_Grains.clear();
+    //delete m_avgPropellant;    
 }
 
 void OpenBurnMotor::SetGrains(GrainVector grains)

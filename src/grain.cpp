@@ -62,7 +62,7 @@ bool BatesGrain::Burn(double timestep)
 
     m_coreDia += (2 * burnDist);
     m_grainLen -= burnDist * (2 - m_numInhibitedFaces);
-    if (m_coreDia < m_grainDia) return true;
+    if (m_coreDia <= m_grainDia) return true;
     else return false;
 }
 BatesGrain* BatesGrain::Clone()

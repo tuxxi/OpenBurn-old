@@ -12,11 +12,12 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
+#include "src/motor.h"
+
 #include "src/ui/widgets/graintablewidget.h"
 #include "src/ui/dialogs/graindialog.h"
 #include "src/ui/designtab.h"
-
-#include "src/motor.h"
+#include "src/ui/simtab.h"
 
 class MainWindow : public QMainWindow
 {
@@ -45,5 +46,6 @@ private:
 
     QTabWidget *tabWidget;
     DesignTab *m_designTab;
+    SimulationTab* m_SimTab;
     OpenBurnMotor* m_DesignMotor; 
 };

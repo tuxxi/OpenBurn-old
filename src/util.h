@@ -4,7 +4,6 @@
 #include <QString>
 #include <QObject>
 
-#define num QString::number
 namespace OpenBurnUtil
 {
     static const QStringList g_kLengthUnits = (QStringList() <<
