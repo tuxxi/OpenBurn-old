@@ -6,9 +6,13 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QFile>
+#include <QJsonObject>
 
 #include <vector>
 #include <utility>
+
+#include "src/propellant.h"
 
 typedef std::pair<QComboBox*, QLineEdit*> IngredientLine;
 class PropellantTab : public QWidget
@@ -17,9 +21,25 @@ class PropellantTab : public QWidget
 public:
     explicit PropellantTab(QWidget* parent = nullptr);
     ~PropellantTab();
+private slots:
+    void SaveButton_Clicked();
+    void DeleteButton_Clicked();
+    void NewButton_Clicked();
+    void PropellantComboBox_Changed(int);
+
+    void UpdatePropellant();
 private:
     void SetupUI();
-    
+    void ConnectLineEditSignals();
+    void SetDefaultValues();
+    //Propellant Database
+    bool LoadDatabase(const QString& filename);
+    bool SaveDatabase();
+    std::vector<OpenBurnPropellant*> m_Propellants;
+    QString m_propellantFileName;
+
+    QGroupBox* m_gb_edit;
+
     QComboBox* m_cb_propSelection;
     QPushButton* m_SavePropButton, *m_DeletePropButton, *m_NewPropButton, *m_CalculateButton;
     QLineEdit* m_line_propName;
