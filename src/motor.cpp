@@ -201,5 +201,21 @@ void OpenBurnMotor::CalcAvgPropellant()
         m_avgPropellant->SetPropellantName(debugName);
     }
     */
+    //todo: fix this and make it actually work properly 
     if (HasGrains()) m_avgPropellant = m_Grains[0]->GetPropellantType();
+}
+double OpenBurnMotor::GetVolumeLoading()
+{
+    double propellantVolume = 0;
+    for (auto i : m_Grains)
+    {
+        propellantVolume += i->GetVolume();
+    }
+    double chamberVolume = .25f * M_PI * GetMotorMajorDiameter() * GetMotorMajorDiameter() * GetMotorLength();
+    return propellantVolume / chamberVolume;
+}
+double OpenBurnMotor::GetPortThroatRatio()
+{
+    //the nth grain in the list of n grains should always be the one at the nozzle end.
+    return m_Grains[GetNumGrains()-1]->GetPortArea() / m_Nozzle->GetNozzleThroatArea();
 }

@@ -45,7 +45,11 @@ public:
     
     double GetMotorLength();
     double GetMotorMajorDiameter();
+    //this is in slugs by default
     double GetMotorPropellantMass();
+    double GetVolumeLoading();
+    double GetPortThroatRatio();
+
     const OpenBurnPropellant* GetAvgPropellant();
 signals:
     void SIG_DesignReady();

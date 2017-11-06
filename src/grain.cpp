@@ -49,8 +49,9 @@ double BatesGrain::GetPortArea()
 }
 double BatesGrain::GetVolume()
 {
-    double face_area = 0.25f * M_PI * ((m_grainDia * m_grainDia) - (m_coreDia * m_coreDia));
-    return face_area * m_grainLen;
+    double radiusSq = (m_grainDia / 2.f) * (m_grainDia / 2.f);
+    double coreRadiusSq = (m_coreDia / 2.f) * (m_coreDia / 2.f);
+    return M_PI * m_grainLen * (radiusSq - coreRadiusSq);
 }
 double BatesGrain::GetHydraulicDiameter()
 {

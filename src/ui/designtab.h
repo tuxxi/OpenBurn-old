@@ -44,8 +44,7 @@ private:
     
     //design overview - static
     QLabel* m_motorMajorDiaLabel, *m_motorLenLabel, *m_nozzleDiaLabel, *m_nozzleExitLabel, *m_knLabel,
-        *m_numGrainsLabel;
-    //*m_propellantMassLabel,
+        *m_numGrainsLabel, *m_propellantMassLabel, *m_portThroatRatioLabel, *m_VolumeLoadingLabel;
 
     //simulated results - requires a sim to be run
     //for quick reference only- more detailed results are available on results tab

@@ -88,28 +88,45 @@ void DesignTab::SetupUI()
     m_motorDisplayView->show();
 
     QGroupBox* gb_design_params = new QGroupBox(tr("Design Parameters"));
-    QGridLayout* gridLayoutDesignParams = new QGridLayout;
+    QGroupBox* gb_prop_params = new QGroupBox(tr("Propellant Parameters"));
+    QGroupBox* gb_nozz_params = new QGroupBox(tr("Nozzle Parameters")); 
+    QGridLayout* gl_Motor = new QGridLayout;    
+    QGridLayout* gl_Propellant = new QGridLayout;
+    QGridLayout* gl_Nozzle = new QGridLayout;
 
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Kn:")), 0, 0);
-    gridLayoutDesignParams->addWidget(m_knLabel = new QLabel, 0, 1);
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Throat Diameter:")), 1, 0);
-    gridLayoutDesignParams->addWidget(m_nozzleDiaLabel = new QLabel, 1, 1);
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 2, 0);
-    gridLayoutDesignParams->addWidget(m_nozzleExitLabel = new QLabel, 2, 1);
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Grains:")), 3, 0);
-    gridLayoutDesignParams->addWidget(m_numGrainsLabel = new QLabel, 3, 1);
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Diameter:")), 4, 0);
-    gridLayoutDesignParams->addWidget(m_motorMajorDiaLabel = new QLabel, 4, 1);
-    gridLayoutDesignParams->addWidget(new QLabel(tr("Motor Length:")), 5, 0);
-    gridLayoutDesignParams->addWidget(m_motorLenLabel = new QLabel, 5, 1);
+    gl_Motor->addWidget(new QLabel(tr("Kn:")), 0, 0);
+    gl_Motor->addWidget(m_knLabel = new QLabel, 0, 1);
+    gl_Motor->addWidget(new QLabel(tr("Port/Throat Ratio:")), 2, 0);
+    gl_Motor->addWidget(m_portThroatRatioLabel = new QLabel, 2, 1);
 
-    gb_design_params->setLayout(gridLayoutDesignParams);
+    gl_Propellant->addWidget(new QLabel(tr("Number of Segments:")), 0, 0);
+    gl_Propellant->addWidget(m_numGrainsLabel = new QLabel, 0, 1);
+    gl_Propellant->addWidget(new QLabel(tr("Motor Diameter:")), 1, 0);
+    gl_Propellant->addWidget(m_motorMajorDiaLabel = new QLabel, 1, 1);
+    gl_Propellant->addWidget(new QLabel(tr("Motor Length:")), 2, 0);
+    gl_Propellant->addWidget(m_motorLenLabel = new QLabel, 2, 1);
+    gl_Propellant->addWidget(new QLabel(tr("Propellant Mass:")), 3, 0);
+    gl_Propellant->addWidget(m_propellantMassLabel = new QLabel, 3, 1);
+    gl_Propellant->addWidget(new QLabel(tr("Volume Loading:")), 4, 0);
+    gl_Propellant->addWidget(m_VolumeLoadingLabel = new QLabel, 4, 1);
 
+    gl_Nozzle->addWidget(new QLabel(tr("Nozzle Throat Diameter:")), 0, 0);
+    gl_Nozzle->addWidget(m_nozzleDiaLabel = new QLabel, 0, 1);
+    gl_Nozzle->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 1, 0);
+    gl_Nozzle->addWidget(m_nozzleExitLabel = new QLabel, 1, 1);
+    
+    gb_design_params->setLayout(gl_Motor);
+    gb_nozz_params->setLayout(gl_Nozzle);
+    gb_prop_params->setLayout(gl_Propellant);
+    
     //QGroupBox* gb_sim_quick_results = new QGroupBox(tr("Sim Results"));
     //QGridLayout* gridLayoutSimResults = new QGridLayout;
 
     QGridLayout* designLayout = new QGridLayout;
-    designLayout->addWidget(gb_design_params, 0, 2, 1, 1);    
+    designLayout->addWidget(gb_design_params, 0, 2, 1, 1);
+    designLayout->addWidget(gb_nozz_params, 0, 1, 1, 1);
+    designLayout->addWidget(gb_prop_params, 0, 0, 1, 1);
+    
     designLayout->addWidget(m_motorDisplayView, 1, 0, 1, 3);
     gb_design_overview->setLayout(designLayout);
 
@@ -131,7 +148,8 @@ void DesignTab::UpdateDesign()
         m_motorLenLabel->setText(QString::number(m_Motor->GetMotorLength()));
         m_motorMajorDiaLabel->setText(QString::number(m_Motor->GetMotorMajorDiameter()));
         m_numGrainsLabel->setText(QString::number(m_Motor->GetNumGrains()));
-
+        m_propellantMassLabel->setText(QString::number(m_Motor->GetMotorPropellantMass(), 'g', 2));
+        m_VolumeLoadingLabel->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'g', 2) + '%');
         if (m_Motor->HasNozzle())
         {
             QString initialKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_INITIAL)));
@@ -139,6 +157,7 @@ void DesignTab::UpdateDesign()
             QString finalKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_FINAL)));
     
             m_knLabel->setText(initialKn + "-" + maxKn);
+            m_portThroatRatioLabel->setText(QString::number(m_Motor->GetPortThroatRatio(), 'g', 2));
             emit(m_Motor->SIG_DesignReady()); //design is ready, so anyone who is listening knows they can use it now!
         }
     }
