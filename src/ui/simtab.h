@@ -1,5 +1,6 @@
 #include <QWidget>
 #include <QPushButton>
+#include <QLabel>
 
 #include "src/motorsim.h"
 #include "src/ui/widgets/qcustomplot.h"
@@ -13,11 +14,13 @@ public:
 private slots:
     void RunSimButton_Clicked();
     void SLOT_DesignReady();
+    void UpdateSimulation();    
 private:
     void SetupUI();
 
+    QLabel* m_maxPressureLabel, *m_BurnTimeLabel;
     QCustomPlot* m_Plotter;
-    QPushButton* m_RunSimulationButton;
+    QPushButton* m_RunSimulationButton, *m_SimSettingsButton;
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
 };

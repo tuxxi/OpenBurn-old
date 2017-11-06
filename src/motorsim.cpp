@@ -24,10 +24,13 @@ MotorSim::~MotorSim()
 }
 void MotorSim::RunSim(double timestep)
 {
-    int iterations = 0;
-    m_TotalBurnTime = 0;
     ClearAllData();
-    while(true)
+    
+    int iterations = 0;
+    size_t numBurnedOut = 0;
+    
+    m_TotalBurnTime = 0;
+    while(numBurnedOut < m_InitialDesignMotor->GetNumGrains())
     {
         MotorSimDataPoint* newDataPoint = new MotorSimDataPoint;
         OpenBurnMotor* newDataPointMotor = new OpenBurnMotor;
@@ -42,27 +45,25 @@ void MotorSim::RunSim(double timestep)
             newDataPointMotor->SetCopyGrains(m_SimResultData[iterations-1]->motor->GetGrains());            
         }
         newDataPoint->motor = newDataPointMotor;
-        int numGrains = 0;
-        for (auto* i : newDataPointMotor->GetGrains())
-        {
-            numGrains++;
-            double burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
-            newDataPoint->burnRate = burnRate; 
-            newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);    
-            i->SetBurnRate(burnRate);
-            // TODO: if (erosive)
-            //i->SetErosiveBurnRate();
-            if (!i->Burn(timestep))
-            {
-                qDebug() << "Grain " << numGrains << " burned out!";
-                return;
-            }
-        }
-        iterations++;
         m_TotalBurnTime += timestep;
         newDataPoint->time = m_TotalBurnTime;
+        iterations++;        
+        for (auto* i : newDataPointMotor->GetGrains())
+        {
+            double burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
+            newDataPoint->burnRate = burnRate;
+            i->SetBurnRate(burnRate);            
+            newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);    
+
+            // TODO: if (erosive)
+            //i->SetErosiveBurnRate();
+            if (!i->Burn(timestep)) //OpenBurnGrain::Burn should return false if the grain burned out
+            {
+                numBurnedOut++;
+                qDebug() << "At time T=" << m_TotalBurnTime << ", "<< numBurnedOut << " grains burned out!";                
+            }
+        }
         m_SimResultData.push_back(newDataPoint);
-        
     }
 }
 //mdot A.K.A Mass flux at given crossflow mach number and port area

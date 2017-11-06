@@ -58,12 +58,22 @@ double BatesGrain::GetHydraulicDiameter()
 }
 bool BatesGrain::Burn(double timestep)
 {
-    double burnDist = (m_rNot + m_rErosive) * timestep;
-
-    m_coreDia += (2 * burnDist);
-    m_grainLen -= burnDist * (2 - m_numInhibitedFaces);
-    if (m_coreDia <= m_grainDia) return true;
-    else return false;
+    if (m_coreDia <= m_grainDia)
+    {
+        double burnDist = (m_rNot + m_rErosive) * timestep;
+        
+        m_coreDia += (2 * burnDist);
+        m_grainLen -= burnDist * (2 - m_numInhibitedFaces);  
+        return true;      
+    }
+    else
+    {
+        return false;        
+    }
+}
+bool BatesGrain::IsBurnedOut()
+{
+    return m_coreDia <= m_grainDia;
 }
 BatesGrain* BatesGrain::Clone()
 {

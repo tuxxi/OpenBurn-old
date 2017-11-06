@@ -119,6 +119,7 @@ void GrainTableWidget::move(bool up)
     // set back in reverse order
     setRow(sourceRow, destItems);
     setRow(destRow, sourceItems);
+    selectRow(destRow);
     m_Motor->SwapGrains(sourceRow, destRow);
 }
 // takes and returns the whole row

@@ -32,7 +32,7 @@ public:
     //burn faces and regress size params based on burn rate. run this once per time step
     //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
     virtual bool Burn(double timestep) = 0;
-
+    virtual bool IsBurnedOut() = 0;
     virtual OpenBurnGrain* Clone() = 0;
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
 //protected:
@@ -56,7 +56,7 @@ public:
     virtual double GetVolume() override;
     virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
-
+    virtual bool IsBurnedOut() override;
     virtual BatesGrain* Clone() override;
     
     virtual double GetCoreDiameter();
