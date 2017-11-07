@@ -3,11 +3,10 @@
 
 #include "simtab.h"
 
-SimulationTab::SimulationTab(OpenBurnMotor* motor, QWidget* parent)
-    : QWidget(parent), m_Motor(motor)
+SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, QWidget* parent)
+    : QWidget(parent), m_Motor(motor), m_Simulator(sim)
 {
     SetupUI();
-    m_Simulator = new MotorSim(m_Motor);  
     connect(m_RunSimulationButton, SIGNAL(clicked()), this, SLOT(RunSimButton_Clicked())); 
     connect(m_Motor, SIGNAL(SIG_DesignReady()), this, SLOT(SLOT_DesignReady())); 
 }

@@ -11,7 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     m_DesignMotor = new OpenBurnMotor();
     m_Propellants = new PropellantList();
+    m_Simulator = new MotorSim(m_DesignMotor);
     SetupUI();
+    connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(SLOT_SimulationStarted()));
+    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool)));    
 }
 void MainWindow::SetupUI()
 {
@@ -23,6 +26,8 @@ void MainWindow::SetupUI()
     menuBar = new QMenuBar(this);
     menuBar->setGeometry(QRect(0, 0, 800, 20));
     setMenuBar(menuBar);
+    m_statusBar = new QStatusBar;
+    setStatusBar(m_statusBar);
     
     menuFile = new QMenu(menuBar);
     menuEdit = new QMenu(menuBar);
@@ -75,15 +80,12 @@ void MainWindow::SetupUI()
     menuFile->addSeparator();
     menuFile->addAction(actionQuit);
 
-    statusBar = new QStatusBar(this);
-    setStatusBar(statusBar);
-
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
     
     tabWidget = new QTabWidget(this);
     m_designTab = new DesignTab(m_DesignMotor, m_Propellants);
-    m_SimTab = new SimulationTab(m_DesignMotor);
+    m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator);
     m_PropellantTab = new PropellantTab(m_Propellants);
     tabWidget->addTab(m_designTab, tr("Design"));
     tabWidget->addTab(m_SimTab, tr("Simulation"));
@@ -143,20 +145,37 @@ void MainWindow::menuOpen()
         m_DesignMotor->ReadJSON(motor, m_Propellants);
         file.close();
     }
+    m_CurrentFilename = fileName;
     m_designTab->UpdateDesign();
+    m_statusBar->showMessage(tr("Opened file ") + m_CurrentFilename, 3000);    
 }
 
 void MainWindow::menuSaveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
             tr("OpenBurn File (*.obm)"));
-
+    SaveFile(fileName);
+}
+void MainWindow::menuSave()
+{
+    if (!m_CurrentFilename.isEmpty())
+    {
+        SaveFile(m_CurrentFilename);
+    }
+    else
+    {
+        menuSaveAs();
+    }
+}
+void MainWindow::SaveFile(QString fileName)
+{
     if (!fileName.isEmpty())
     {
         if (!fileName.contains(".obm"))
         {
             fileName += ".obm";
         }
+        m_CurrentFilename = fileName;
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly))
         {
@@ -170,11 +189,24 @@ void MainWindow::menuSaveAs()
             QJsonDocument saveDoc(motorObject);
             file.write(saveDoc.toJson());
             file.close();
+            m_statusBar->showMessage(tr("File saved."), 3000);
         }
     }
 
 }
-void MainWindow::menuSave()
+void MainWindow::SLOT_SimulationStarted()
 {
-    //save file
+    m_statusBar->showMessage(tr("Starting simulation"), 3000);    
+}
+void MainWindow::SLOT_SimulationFinished(bool success)
+{
+    if (success)
+    {
+        m_statusBar->showMessage(tr("Simulation finished"), 5000);            
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Simulation ERROR"));        
+        m_statusBar->showMessage(tr("Simulation ERROR!"), 5000);            
+    }
 }

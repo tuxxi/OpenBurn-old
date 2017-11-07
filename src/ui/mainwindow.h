@@ -11,6 +11,7 @@
 #include <QTabWidget>
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QStatusBar>
 
 #include "src/motor.h"
 
@@ -33,10 +34,13 @@ private slots:
     void menuOpen();
     void menuSave();
     void menuSaveAs();
+
+    void SLOT_SimulationStarted();
+    void SLOT_SimulationFinished(bool success);
 private:
     void closeEvent(QCloseEvent*);
     void SetupUI();
-
+    void SaveFile(QString filename);
     QWidget *centralWidget;
 
     QMenuBar *menuBar;
@@ -45,6 +49,7 @@ private:
 
     QAction *actionOpen, *actionSave, *actionSave_As, *actionQuit, *actionNew, *actionExport;
 
+    QStatusBar *m_statusBar;
     QTabWidget *tabWidget;
     DesignTab *m_designTab;
     SimulationTab* m_SimTab;
@@ -52,4 +57,6 @@ private:
 
     OpenBurnMotor* m_DesignMotor;
     PropellantList* m_Propellants;
+    MotorSim* m_Simulator;
+    QString m_CurrentFilename;
 };

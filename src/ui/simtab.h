@@ -9,7 +9,7 @@ class SimulationTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SimulationTab(OpenBurnMotor* design, QWidget* parent = nullptr);
+    explicit SimulationTab(OpenBurnMotor* design, MotorSim* sim, QWidget* parent = nullptr);
     ~SimulationTab();
 private slots:
     void RunSimButton_Clicked();

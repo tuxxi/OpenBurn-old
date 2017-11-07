@@ -30,6 +30,8 @@ void MotorSim::RunSim(double timestep)
     size_t numBurnedOut = 0;
     
     m_TotalBurnTime = 0;
+
+    emit SimulationStarted();
     while(numBurnedOut < m_InitialDesignMotor->GetNumGrains())
     {
         MotorSimDataPoint* newDataPoint = new MotorSimDataPoint;
@@ -64,7 +66,13 @@ void MotorSim::RunSim(double timestep)
             }
         }
         m_SimResultData.push_back(newDataPoint);
+        if (iterations > int(1e6))
+        {
+            emit SimulationFinished(false);            
+            break;
+        }
     }
+    emit SimulationFinished(true);
 }
 //mdot A.K.A Mass flux at given crossflow mach number and port area
 double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double portArea)

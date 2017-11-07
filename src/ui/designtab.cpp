@@ -276,7 +276,7 @@ void DesignTab::EditGrainButton_Clicked()
     {
         m_grainDialog->deleteLater();
     }
-    m_grainDialog = new GrainDialog(m_Propellants, m_seed_grain, m_grainTable->GetSelectedGrains());
+    m_grainDialog = new GrainDialog(m_Propellants, m_grainTable->GetSelectedGrains()[0], m_grainTable->GetSelectedGrains());
     connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
     connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
 

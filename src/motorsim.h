@@ -18,8 +18,9 @@ struct MotorSimDataPoint
         delete motor;
     }
 };
-class MotorSim
+class MotorSim : public QObject
 {
+    Q_OBJECT
 public:
     MotorSim();
     MotorSim(OpenBurnMotor* initialDesign);
@@ -40,6 +41,11 @@ public:
 
     double GetTotalBurnTime() const;
     std::vector<MotorSimDataPoint*> GetResults();
+    
+signals:
+    void SimulationStarted();
+    //false if there was an error
+    void SimulationFinished(bool success);
 private:
     void ClearAllData();
     std::vector<MotorSimDataPoint*> m_SimResultData;
