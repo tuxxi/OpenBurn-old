@@ -322,11 +322,39 @@ void DesignTab::SLOT_grainTable_cellClicked(int row, int column)
 }
 void DesignTab::MoveGrainUpButton_Clicked()
 {
-    m_grainTable->move(true);
+    QList<int> indices = m_grainTable->GetSelectedGrainIndices();
+    while (!indices.empty())
+    {
+        int selectedIdx = indices.first();  
+        indices.pop_front();   
+        if (selectedIdx <= 0)   
+        {
+            return;
+        }
+        else
+        {
+            m_Motor->SwapGrains(selectedIdx, selectedIdx-1);
+        }
+    }
     UpdateDesign();
 }
 void DesignTab::MoveGrainDownButton_Clicked()
 {
-    m_grainTable->move(false);
     UpdateDesign();
+    QList<int> indices = m_grainTable->GetSelectedGrainIndices();
+    while (!indices.empty())
+    {
+        int selectedIdx = indices.last();  
+        indices.pop_front();   
+        if (selectedIdx >= int(m_Motor->GetNumGrains() - 1))   
+        {
+            return;
+        }
+        else
+        {
+            m_Motor->SwapGrains(selectedIdx, selectedIdx+1);
+        }
+    }
+    UpdateDesign();
+
 }

@@ -14,7 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_Simulator = new MotorSim(m_DesignMotor);
     SetupUI();
     connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(SLOT_SimulationStarted()));
-    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool)));    
+    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool))); 
+    connect(m_PropellantTab, SIGNAL(PropellantsUpdated()), this, SLOT(SLOT_PropellantsUpdated()));
 }
 void MainWindow::SetupUI()
 {
@@ -208,5 +209,19 @@ void MainWindow::SLOT_SimulationFinished(bool success)
     {
         QMessageBox::critical(this, tr("Error"), tr("Simulation ERROR"));        
         m_statusBar->showMessage(tr("Simulation ERROR!"), 5000);            
+    }
+}
+//this slot sets all the grains to a new propellant type if the propellant database happens to change
+void MainWindow::SLOT_PropellantsUpdated()
+{
+    for (auto prop : *m_Propellants)
+    {
+        for (auto grain : m_DesignMotor->GetGrains())
+        {
+            if (grain->GetPropellantType().GetPropellantName() == prop.GetPropellantName())
+            {
+                grain->SetPropellantType(prop);
+            }
+        }    
     }
 }

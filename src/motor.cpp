@@ -66,6 +66,11 @@ void OpenBurnMotor::RemoveGrain(int index)
     emit SIG_DesignUpdated();    
     CalcAvgPropellant();
 }
+void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
+{
+    std::swap(m_Grains[oldPos], m_Grains[newPos]); //std::swap uses move semantics afaik
+    emit SIG_DesignUpdated();    
+}
 void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
 {
     emit SIG_DesignUpdated();
@@ -131,14 +136,6 @@ double OpenBurnMotor::CalcKn()
         surfaceArea += i->GetBurningSurfaceArea();
     }
     return surfaceArea / m_Nozzle->GetNozzleThroatArea();
-}
-void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
-{
-    //TODO: fix me
-    qDebug() << "Grain idx " << oldPos << "swapping with idx " << newPos << "\n";
-    qDebug() << "m_Grains has size: " << m_Grains.size() << "\n";
-
-    std::swap(m_Grains[oldPos], m_Grains[newPos]); //std::swap uses move semantics afaik
 }
 bool OpenBurnMotor::HasNozzle() const
 {

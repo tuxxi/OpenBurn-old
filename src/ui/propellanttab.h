@@ -22,6 +22,9 @@ class PropellantTab : public QWidget
 public:
     explicit PropellantTab(PropellantList* propellants, QWidget* parent = nullptr);
     ~PropellantTab();
+signals:
+    void PropellantsUpdated();
+
 private slots:
     void SaveButton_Clicked();
     void DeleteButton_Clicked();

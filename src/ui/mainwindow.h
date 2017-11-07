@@ -37,6 +37,7 @@ private slots:
 
     void SLOT_SimulationStarted();
     void SLOT_SimulationFinished(bool success);
+    void SLOT_PropellantsUpdated();
 private:
     void closeEvent(QCloseEvent*);
     void SetupUI();

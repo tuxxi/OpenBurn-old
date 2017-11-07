@@ -188,7 +188,7 @@ void PropellantTab::ConnectLineEditSignals()
 void PropellantTab::UpdatePropellant()
 {
     int idx = m_cb_propSelection->currentIndex() > 0 ? m_cb_propSelection->currentIndex() : 0;
-    OpenBurnPropellant prop = (*m_Propellants)[idx];
+    OpenBurnPropellant& prop = (*m_Propellants)[idx];
     m_cb_propSelection->setItemText(idx, m_line_propName->text());    
     prop.SetPropellantName(m_line_propName->text());
     prop.SetBasicParams(
@@ -203,7 +203,10 @@ void PropellantTab::SaveButton_Clicked()
 {
     qDebug() << "Saving database!";
     UpdatePropellant();
-    SaveDatabase();
+    if (SaveDatabase())
+    {
+        emit PropellantsUpdated();
+    }
 }
 void PropellantTab::DeleteButton_Clicked()
 {
