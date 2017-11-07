@@ -84,11 +84,11 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double po
 double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 {
     //p = (Kn * a * rho * C* )^(1/(1-n))
+    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(motor->GetAvgPropellant()->GetDensity());
+    double Cstar = motor->GetAvgPropellant()->GetCharVelocity();
     double exponent = 1.0f / (1.0f - motor->GetAvgPropellant()->GetBurnRateExp());
-    double p1 = motor->CalcKn() * motor->GetAvgPropellant()->GetBurnRateCoef() *
-        motor->GetAvgPropellant()->GetDensity() * motor->GetAvgPropellant()->GetCharVelocity();
-    double chamberPressure = qPow(p1, exponent);
-    return chamberPressure;
+    double p1 = motor->CalcKn() * motor->GetAvgPropellant()->GetBurnRateCoef() * rho * Cstar;
+   return qPow(p1, exponent);
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)
 {
@@ -119,7 +119,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double G = CalcMassFlux(motor, machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop->GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
-    double rho = prop->GetDensity(); //propellant density
+    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(prop->GetDensity()); //propellant density
     double C_p = prop->GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
     double T_0 = prop->GetAdiabaticFlameTemp();// adiabatic flame temperature
     double mu = prop->GetGasViscosity(); //viscoisty of combustion products

@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     m_DesignMotor = new OpenBurnMotor();
+    m_Propellants = new std::vector<OpenBurnPropellant*>();
     SetupUI();
 }
 void MainWindow::SetupUI()
@@ -81,9 +82,9 @@ void MainWindow::SetupUI()
     setSizePolicy(sizePolicy);
     
     tabWidget = new QTabWidget(this);
-    m_designTab = new DesignTab(m_DesignMotor);
+    m_designTab = new DesignTab(m_DesignMotor, m_Propellants);
     m_SimTab = new SimulationTab(m_DesignMotor);
-    m_PropellantTab = new PropellantTab;
+    m_PropellantTab = new PropellantTab(m_Propellants);
     tabWidget->addTab(m_designTab, tr("Design"));
     tabWidget->addTab(m_SimTab, tr("Simulation"));
     tabWidget->addTab(m_PropellantTab, tr("Propellants"));
@@ -93,6 +94,7 @@ void MainWindow::SetupUI()
 MainWindow::~MainWindow()
 {
     delete m_DesignMotor;
+    delete m_Propellants;
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {

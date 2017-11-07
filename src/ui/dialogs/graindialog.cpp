@@ -10,8 +10,14 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/grain.h"
 
-GrainDialog::GrainDialog(QWidget *parent, OpenBurnGrain* seedValues, QList<OpenBurnGrain*>grains) :
-    QDialog(parent), m_gfxGrain(nullptr), m_GrainsToEdit(grains), m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
+GrainDialog::GrainDialog(std::vector<OpenBurnPropellant*> *prop,
+     OpenBurnGrain* seedValues, 
+     QList<OpenBurnGrain*>grains, 
+     QWidget *parent) 
+     :
+    QDialog(parent), m_gfxGrain(nullptr), m_GrainsToEdit(grains), 
+    m_Propellants(prop),
+    m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
 {
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
@@ -47,7 +53,7 @@ void GrainDialog::SetupUI(OpenBurnGrain* seed)
     BatesGrain* BatesSeed = dynamic_cast<BatesGrain*>(seed);
 
     //Default to BATES grain design mode
-    m_GrainDesign = new BatesGrainDesign(m_frame, BatesSeed);        
+    m_GrainDesign = new BatesGrainDesign(m_Propellants, BatesSeed, m_frame);        
 
     // OK and Cancel buttons
     m_applyButton = new QPushButton(m_frame);
@@ -84,7 +90,10 @@ void GrainDialog::RefreshUI(GRAINTYPE type)
     m_GrainDesign->deleteLater();
     if (type == GRAINTYPE_BATES)
     {
-        m_GrainDesign = new BatesGrainDesign(m_frame, static_cast<BatesGrain*>(m_GrainsToEdit.first()));
+        m_GrainDesign = new BatesGrainDesign(
+            m_Propellants, 
+            static_cast<BatesGrain*>(m_GrainsToEdit.first()), 
+            m_frame);
         m_controlsLayout->addWidget(m_GrainDesign, 1, 0, 3, 3);
         connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(RefreshUI(GRAINTYPE))); 
         connect(m_GrainDesign, SIGNAL(SIG_GrainDesign_Changed()), this, SLOT(UpdateDesign()));        
@@ -93,7 +102,7 @@ void GrainDialog::RefreshUI(GRAINTYPE type)
     {
         //other grain types
     }
-    UpdateDesign();    
+    UpdateDesign();
 }
 void GrainDialog::UpdateDesign()
 {
@@ -102,15 +111,11 @@ void GrainDialog::UpdateDesign()
     {
         if (m_isNewGrainWindow && m_GrainsToEdit.isEmpty())
         {
-            OpenBurnPropellant* prop = new OpenBurnPropellant();
-            double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(0.065f);
-            prop->SetBasicParams(0.0665f, 0.319f, 3100.f, rho);
-            prop->SetPropellantName("KNSU - TEST");
             OpenBurnGrain* grain = new BatesGrain(
                 design->GetDiameter(),        
                 design->GetCoreDiameter(),
                 design->GetLength(),
-                prop,                    
+                design->GetPropellant(),                    
                 design->GetInhibitedFaces());
             m_GrainsToEdit.push_back(grain);
         }
@@ -123,6 +128,7 @@ void GrainDialog::UpdateDesign()
                 grain->SetCoreDiameter(design->GetCoreDiameter());
                 grain->SetLength(design->GetLength());
                 grain->SetInhibitedFaces(design->GetInhibitedFaces());
+                grain->SetPropellantType(design->GetPropellant());
                 i = grain;
             }
         }

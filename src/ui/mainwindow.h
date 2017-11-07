@@ -49,5 +49,7 @@ private:
     DesignTab *m_designTab;
     SimulationTab* m_SimTab;
     PropellantTab* m_PropellantTab;
-    OpenBurnMotor* m_DesignMotor; 
+
+    OpenBurnMotor* m_DesignMotor;
+    std::vector<OpenBurnPropellant*> *m_Propellants;
 };

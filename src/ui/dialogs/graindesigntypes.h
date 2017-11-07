@@ -22,7 +22,11 @@ class OpenBurnDesignGrain : public QWidget
 {
     Q_OBJECT
 public:
-    explicit OpenBurnDesignGrain(QWidget* parent = nullptr, OpenBurnGrain* seed = nullptr);
+    explicit OpenBurnDesignGrain(
+        std::vector<OpenBurnPropellant*> *prop, 
+        OpenBurnGrain* seed = nullptr, 
+        QWidget* parent = nullptr);
+
     virtual ~OpenBurnDesignGrain();
 
     double GetLength();
@@ -53,6 +57,8 @@ protected:
     QToolButton *m_modifyPropellantDatabase;
 private:
     QGridLayout* controlsLayout;
+    std::vector<OpenBurnPropellant*>* m_Propellants;
+    
     void SetupUI();
     
 };
@@ -62,7 +68,11 @@ class BatesGrainDesign : public OpenBurnDesignGrain
 {
     Q_OBJECT
 public:
-    explicit BatesGrainDesign(QWidget* parent = nullptr, BatesGrain* seed = nullptr);
+    explicit BatesGrainDesign(
+        std::vector<OpenBurnPropellant*> *prop, 
+        OpenBurnGrain* seed = nullptr, 
+        QWidget* parent = nullptr);
+        
     virtual ~BatesGrainDesign();
 
     double GetCoreDiameter();

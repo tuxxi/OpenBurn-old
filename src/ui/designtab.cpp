@@ -8,9 +8,9 @@
 
 #include "src/ui/designtab.h"
 
-DesignTab::DesignTab(OpenBurnMotor* motor, QWidget* parent)
+DesignTab::DesignTab(OpenBurnMotor* motor, std::vector<OpenBurnPropellant*>* propellantTypes, QWidget* parent)
     : QWidget(parent), m_seed_grain(nullptr), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr),
-    m_Motor(motor)
+    m_Motor(motor), m_Propellants(propellantTypes)
 {   
     SetupUI();
     connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
@@ -265,7 +265,7 @@ void DesignTab::NewGrainButton_Clicked()
 {
     if (!m_grainDialog) //only make one!!
     {
-        m_grainDialog = new GrainDialog(nullptr, m_seed_grain);
+        m_grainDialog = new GrainDialog(m_Propellants, m_seed_grain);
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
     }
@@ -281,7 +281,7 @@ void DesignTab::EditGrainButton_Clicked()
     {
         m_grainDialog->deleteLater();
     }
-    m_grainDialog = new GrainDialog(nullptr, m_seed_grain, m_grainTable->GetSelectedGrains());
+    m_grainDialog = new GrainDialog(m_Propellants, m_seed_grain, m_grainTable->GetSelectedGrains());
     connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
     connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
 

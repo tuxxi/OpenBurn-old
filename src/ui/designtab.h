@@ -17,7 +17,7 @@ class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnMotor* motor, QWidget* parent = nullptr);
+    explicit DesignTab(OpenBurnMotor* motor, std::vector<OpenBurnPropellant*>* propellant, QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;
 public slots:
@@ -67,4 +67,5 @@ private:
     QGraphicsView* m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
     OpenBurnMotor* m_Motor; //The initial design  
+    std::vector<OpenBurnPropellant*>* m_Propellants;
 };

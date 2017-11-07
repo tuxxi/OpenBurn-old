@@ -4,8 +4,10 @@
 #include "src/ui/dialogs/graindesigntypes.h"
 #include "src/util.h"
 
-OpenBurnDesignGrain::OpenBurnDesignGrain(QWidget* parent, OpenBurnGrain* seed)
-    : QWidget(parent), m_seedGrain(seed)
+OpenBurnDesignGrain::OpenBurnDesignGrain(std::vector<OpenBurnPropellant*> *prop,
+    OpenBurnGrain* seed,
+    QWidget* parent)
+    : QWidget(parent), m_seedGrain(seed), m_Propellants(prop)
 {
     SetupUI();
     connect(m_grainTypeComboBox, SIGNAL(currentIndexChanged(int)), 
@@ -30,6 +32,13 @@ void OpenBurnDesignGrain::SetupUI()
     //Propellant Selection Box 
     m_propellantComboBox = new QComboBox(this);
     QLabel* label = new QLabel(tr("Propellant Type"), this);
+    if (m_Propellants)
+    {
+        for (auto* i : *m_Propellants)
+        {
+            m_propellantComboBox->addItem(i->GetPropellantName());            
+        }
+    }
     m_modifyPropellantDatabase = new QToolButton(this);
     m_modifyPropellantDatabase->setText("...");    
     controlsLayout->addWidget(label, 1, 0);
@@ -108,7 +117,11 @@ GRAINTYPE OpenBurnDesignGrain::GetGrainType()
 {
     return static_cast<GRAINTYPE>(m_grainTypeComboBox->currentIndex());
 }
-//OpenBurnPropellant* OpenBurnDesignGrain::GetPropellant()
+OpenBurnPropellant* OpenBurnDesignGrain::GetPropellant()
+{
+    int idx = m_propellantComboBox->currentIndex() > 0 ? m_propellantComboBox->currentIndex() : 0;
+    return (*m_Propellants)[idx];
+}
 
 void OpenBurnDesignGrain::on_grainType_changed(int idx)
 {
@@ -121,8 +134,11 @@ void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 }
 
 //BATES
-BatesGrainDesign::BatesGrainDesign(QWidget* parent, BatesGrain* seed)
-    : OpenBurnDesignGrain(parent, seed)
+BatesGrainDesign::BatesGrainDesign(
+    std::vector<OpenBurnPropellant*> *prop, 
+    OpenBurnGrain* seed , 
+    QWidget* parent)
+    : OpenBurnDesignGrain(prop, seed, parent)
 {
     //Grain Core Diameter
     m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);

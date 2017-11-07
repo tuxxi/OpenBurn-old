@@ -15,11 +15,12 @@
 #include "src/propellant.h"
 
 typedef std::pair<QComboBox*, QLineEdit*> IngredientLine;
+
 class PropellantTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropellantTab(QWidget* parent = nullptr);
+    explicit PropellantTab(std::vector<OpenBurnPropellant*>* propellant, QWidget* parent = nullptr);
     ~PropellantTab();
 private slots:
     void SaveButton_Clicked();
@@ -35,7 +36,7 @@ private:
     //Propellant Database
     bool LoadDatabase(const QString& filename);
     bool SaveDatabase();
-    std::vector<OpenBurnPropellant*> m_Propellants;
+    std::vector<OpenBurnPropellant*> *m_Propellants;
     QString m_propellantFileName;
 
     QGroupBox* m_gb_edit;

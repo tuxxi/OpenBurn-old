@@ -11,12 +11,12 @@
 
 const static QString DEFAULT_NAME = QString("New Propellant");
 
-PropellantTab::PropellantTab(QWidget* parent)
-    : QWidget(parent)
+PropellantTab::PropellantTab(std::vector<OpenBurnPropellant*>* propellants, QWidget* parent)
+    : QWidget(parent), m_Propellants(propellants)
 {
     SetupUI();
     LoadDatabase("user/propellants.json");
-    if (m_Propellants.size() == 0)
+    if (m_Propellants->size() == 0)
     {
         m_gb_edit->setEnabled(false);        
     }
@@ -122,14 +122,14 @@ bool PropellantTab::LoadDatabase(const QString& filename)
         
         QByteArray data = file.readAll();
         QJsonDocument loadDoc(QJsonDocument::fromJson(data));
-        m_Propellants.clear();
+        m_Propellants->clear();
         QJsonArray propellantArray = loadDoc.object()["propellants"].toArray();
         for (int i = 0; i < propellantArray.size(); ++i)
         {
             QJsonObject propellantObject = propellantArray[i].toObject();
             OpenBurnPropellant* prop = new OpenBurnPropellant;
             prop->ReadJSON(propellantObject);
-            m_Propellants.push_back(prop);
+            m_Propellants->push_back(prop);
             m_cb_propSelection->addItem(prop->GetPropellantName());
         }
         return true;
@@ -143,7 +143,7 @@ bool PropellantTab::SaveDatabase()
     {
         QJsonObject propellantObject;
         QJsonArray propellantArray;
-        for (auto i : m_Propellants)
+        for (auto i : *m_Propellants)
         {
             QJsonObject prop;
             i->WriteJSON(prop);
@@ -164,7 +164,7 @@ void PropellantTab::PropellantComboBox_Changed(int idx)
         m_gb_edit->setEnabled(true); 
         m_DeletePropButton->setEnabled(true);
 
-        OpenBurnPropellant* propellant = m_Propellants[idx];
+        OpenBurnPropellant* propellant = (*m_Propellants)[idx];
         m_cb_propSelection->setCurrentIndex(idx);
         m_line_propName->setText(propellant->GetPropellantName());
         m_line_propBRCoef->setText(QString::number(propellant->GetBurnRateCoef()));
@@ -187,7 +187,7 @@ void PropellantTab::ConnectLineEditSignals()
 void PropellantTab::UpdatePropellant()
 {
     int idx = m_cb_propSelection->currentIndex() > 0 ? m_cb_propSelection->currentIndex() : 0;
-    OpenBurnPropellant* prop = m_Propellants[idx];
+    OpenBurnPropellant* prop = (*m_Propellants)[idx];
     m_cb_propSelection->setItemText(idx, m_line_propName->text());    
     prop->SetPropellantName(m_line_propName->text());
     prop->SetBasicParams(
@@ -209,17 +209,17 @@ void PropellantTab::DeleteButton_Clicked()
     int oldIndex = m_cb_propSelection->currentIndex() > 0 ? m_cb_propSelection->currentIndex() : 0;    
     QMessageBox::StandardButton resBtn =
         QMessageBox::question( this, "OpenBurn", tr("Are you sure you want to delete propellant: ")
-         + m_Propellants[oldIndex]->GetPropellantName(),
+         + (*m_Propellants)[oldIndex]->GetPropellantName(),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     
     if (resBtn == QMessageBox::Yes)
     {
-        delete m_Propellants[oldIndex];
-        m_Propellants[oldIndex] = nullptr;
-        m_Propellants.erase(m_Propellants.begin() + oldIndex);
+        delete (*m_Propellants)[oldIndex];
+        (*m_Propellants)[oldIndex] = nullptr;
+        m_Propellants->erase(m_Propellants->begin() + oldIndex);
         m_cb_propSelection->setCurrentIndex(oldIndex);
         m_cb_propSelection->removeItem(oldIndex);
-        if (m_Propellants.empty())
+        if (m_Propellants->empty())
         {
             m_gb_edit->setEnabled(false);
             m_DeletePropButton->setEnabled(false);
@@ -234,9 +234,9 @@ void PropellantTab::DeleteButton_Clicked()
 void PropellantTab::NewButton_Clicked()
 {
     OpenBurnPropellant* prop = new OpenBurnPropellant(DEFAULT_NAME);
-    m_Propellants.push_back(prop);
+    m_Propellants->push_back(prop);
     m_cb_propSelection->addItem(DEFAULT_NAME);
-    m_cb_propSelection->setCurrentIndex(m_Propellants.size() - 1);
+    m_cb_propSelection->setCurrentIndex(m_Propellants->size() - 1);
     SetDefaultValues();
 
     m_gb_edit->setEnabled(true);

@@ -2,10 +2,10 @@
 
 OpenBurnPropellant::OpenBurnPropellant()
     : OpenBurnPropellant("N/A")
-    {}
+{}
 OpenBurnPropellant::OpenBurnPropellant(const QString& name)
     : OpenBurnPropellant(name, 0, 0, 0, 0, 1.25)
- {}
+{}
 //dimensionless, dimensionless, feet/sec, slugs/in^3
 OpenBurnPropellant::OpenBurnPropellant(const QString& name, double a, double n, double cstar, double rho, double gamma)
     : m_PropellantName(name), m_burnRateCoef(a), m_burnRateExp(n), m_charVel(cstar), m_density(rho), m_specificHeatRatio(gamma),   
@@ -59,7 +59,7 @@ void OpenBurnPropellant::ReadJSON(const QJsonObject& object)
     m_PropellantName = object["name"].toString();
     m_burnRateCoef = object["a"].toDouble();
     m_burnRateExp = object["n"].toDouble();
-    m_charVel = object["Cstar"].toDouble();
+    m_charVel = object["CStar"].toDouble();
     m_density = object["rho"].toDouble();
     m_specificHeatRatio = object["gamma"].toDouble();
     
