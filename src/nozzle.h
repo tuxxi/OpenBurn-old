@@ -1,5 +1,5 @@
 #pragma once
-
+#include <QJsonObject>
 
 class OpenBurnNozzle
 {
@@ -12,6 +12,10 @@ public:
     virtual double GetNozzleThroatArea() const;
     virtual double GetNozzleThroat() const;
     virtual double GetNozzleExit() const;
+
+    virtual void ReadJSON(const QJsonObject& object) = 0;
+    virtual void WriteJSON(QJsonObject &object) = 0;
+
 protected:
     double m_NozzleThroat; //nozzle throat diameter
     double m_NozzleExit; //nozzle exit diameter
@@ -27,6 +31,9 @@ public:
     void SetNozzleThroatLen(double);
     double GetHalfAngle() const;
     double GetThroatLength() const;
+
+    virtual void ReadJSON(const QJsonObject& object) override;
+    virtual void WriteJSON(QJsonObject &object) override;
 
     //TODO: add calculations to account for departures from ideal performance
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf

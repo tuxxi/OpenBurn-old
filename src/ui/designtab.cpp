@@ -8,7 +8,7 @@
 
 #include "src/ui/designtab.h"
 
-DesignTab::DesignTab(OpenBurnMotor* motor, std::vector<OpenBurnPropellant*>* propellantTypes, QWidget* parent)
+DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, QWidget* parent)
     : QWidget(parent), m_seed_grain(nullptr), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr),
     m_Motor(motor), m_Propellants(propellantTypes)
 {   
@@ -17,11 +17,13 @@ DesignTab::DesignTab(OpenBurnMotor* motor, std::vector<OpenBurnPropellant*>* pro
     connect(m_nozzleSettingsButton, SIGNAL(clicked()), this, SLOT(NozzleButton_Clicked()));
     connect(m_deleteGrainButton, SIGNAL(clicked()), this, SLOT(DeleteGrainButton_Clicked()));
     connect(m_editGrainButton, SIGNAL(clicked()), this, SLOT(EditGrainButton_Clicked()));
+    connect(m_moveGrainUp, SIGNAL(clicked()), this, SLOT(MoveGrainUpButton_Clicked()));
+    connect(m_moveGrainDown, SIGNAL(clicked()), this, SLOT(MoveGrainDownButton_Clicked()));
+
     connect(m_grainTable, SIGNAL(cellClicked(int, int)), this, SLOT(SLOT_grainTable_cellClicked(int, int)));
     //Double clicking on a row edits that grain
     connect(m_grainTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(EditGrainButton_Clicked()));
-    connect(m_moveGrainUp, SIGNAL(clicked()), this, SLOT(MoveGrainUpButton_Clicked()));
-    connect(m_moveGrainDown, SIGNAL(clicked()), this, SLOT(MoveGrainDownButton_Clicked()));
+    connect(m_Motor, SIGNAL(SIG_DesignUpdated()), m_grainTable, SLOT(Update()));
     UpdateDesign();
 }
 DesignTab::~DesignTab() 
@@ -239,26 +241,19 @@ void DesignTab::SLOT_GrainDialogClosed()
 //Recieved from the grain dialog. Updates the grain table widget
 void DesignTab::SLOT_NewGrain(OpenBurnGrain* grain)
 {
-    m_grainTable->AddNewGrain(grain);
+    m_Motor->AddGrain(grain);
+    UpdateDesign();    
     SetSeed(grain);    
-    UpdateDesign();
 }
 void DesignTab::SLOT_ModifyGrain(OpenBurnGrain* grain)
 {
-    SetSeed(grain);
-    for (size_t idx = 0; idx < m_Motor->GetNumGrains(); idx++)
-    {
-        if (grain == m_Motor->GetGrains()[idx])
-        {
-            m_grainTable->ModifyGrain(grain, idx);
-            UpdateDesign();
-            break;   
-        }
-    }
+    emit m_Motor->SIG_DesignUpdated();
+    UpdateDesign(); 
+    SetSeed(grain);    
 }
 void DesignTab::SLOT_NozzleUpdated(OpenBurnNozzle* nozz)
 {
-    m_Motor->SetNozzle(nozz);    
+    m_Motor->SetNozzle(nozz);  
     UpdateDesign();
 }
 void DesignTab::NewGrainButton_Clicked()
@@ -292,10 +287,13 @@ void DesignTab::EditGrainButton_Clicked()
 }
 void DesignTab::DeleteGrainButton_Clicked()
 {
-    m_grainTable->DeleteSelectedGrains();
-
-    //refacor me plz :( this is very bad
-    
+    QList<int> selected = m_grainTable->GetSelectedGrainIndices();
+    int count = 0;
+    for (auto i : selected)
+    {
+        m_Motor->RemoveGrain(i - count);
+        count++;
+    }    
     //disable the button again since we no longer have anything selected
     m_deleteGrainButton->setEnabled(false);
     UpdateDesign();

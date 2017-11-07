@@ -1,8 +1,8 @@
 #include <QDebug>
 
 #include "grain.h"
-OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant* prop, int inhibited)
-    : m_grainDia(diameter), m_grainLen(length),m_prop(prop), m_numInhibitedFaces(inhibited)
+OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant prop, int inhibited)
+    : m_grainDia(diameter), m_grainLen(length),m_propellantType(prop), m_numInhibitedFaces(inhibited)
 {
 
 }
@@ -12,19 +12,22 @@ OpenBurnGrain::~OpenBurnGrain()
 double OpenBurnGrain::GetLength() { return m_grainLen; }
 double OpenBurnGrain::GetDiameter() { return m_grainDia; }
 int OpenBurnGrain::GetInhibitedFaces() { return m_numInhibitedFaces; }
-OpenBurnPropellant* OpenBurnGrain::GetPropellantType() { return m_prop; }
+OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_propellantType; }
 void OpenBurnGrain::SetLength(double length) { m_grainLen = length; }
 void OpenBurnGrain::SetDiameter(double dia) { m_grainDia = dia; }
 void OpenBurnGrain::SetInhibitedFaces(int faces) { m_numInhibitedFaces = faces; }
-void OpenBurnGrain::SetPropellantType(OpenBurnPropellant* prop) { m_prop = prop; }
+void OpenBurnGrain::SetPropellantType(OpenBurnPropellant prop) { m_propellantType = prop; }
 void OpenBurnGrain::SetBurnRate(double steadyState, double erosiveFactor)
 {
     m_rNot = steadyState;
     m_rErosive = erosiveFactor;
 }
 
+BatesGrain::BatesGrain()
+    : OpenBurnGrain(0, 0, OpenBurnPropellant()), m_coreDia(0)
+{}
 // Bates Grains
-BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant* prop, int inhibitedfaces)
+BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces)
     : OpenBurnGrain(dia, len, prop, inhibitedfaces), m_coreDia(coredia)
 {
 
@@ -79,4 +82,21 @@ bool BatesGrain::IsBurnedOut()
 BatesGrain* BatesGrain::Clone()
 {
     return new BatesGrain(*this);
+}
+void BatesGrain::ReadJSON(const QJsonObject& object, QString& propellantNameReturn)
+{
+    m_coreDia = object["corediameter"].toDouble();
+    m_grainDia = object["diameter"].toDouble();
+    m_grainLen = object["length"].toDouble();
+    m_numInhibitedFaces = object["inhibited"].toInt();
+    propellantNameReturn = object["propellant"].toString();
+}
+void BatesGrain::WriteJSON(QJsonObject& object)
+{
+    object["_type"] = "BATES";
+    object["length"] = m_grainLen;
+    object["diameter"] = m_grainDia;
+    object["corediameter"] = m_coreDia;
+    object["propellant"] = m_propellantType.GetPropellantName();
+    object["inhibited"] = m_numInhibitedFaces;
 }

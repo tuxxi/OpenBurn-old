@@ -10,7 +10,7 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/grain.h"
 
-GrainDialog::GrainDialog(std::vector<OpenBurnPropellant*> *prop,
+GrainDialog::GrainDialog(PropellantList* prop,
      OpenBurnGrain* seedValues, 
      QList<OpenBurnGrain*>grains, 
      QWidget *parent) 

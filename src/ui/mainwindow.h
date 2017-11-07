@@ -51,5 +51,5 @@ private:
     PropellantTab* m_PropellantTab;
 
     OpenBurnMotor* m_DesignMotor;
-    std::vector<OpenBurnPropellant*> *m_Propellants;
+    PropellantList* m_Propellants;
 };

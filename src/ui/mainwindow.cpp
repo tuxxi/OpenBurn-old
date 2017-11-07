@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     m_DesignMotor = new OpenBurnMotor();
-    m_Propellants = new std::vector<OpenBurnPropellant*>();
+    m_Propellants = new PropellantList();
     SetupUI();
 }
 void MainWindow::SetupUI()
@@ -127,7 +127,7 @@ void MainWindow::menuQuit()
 void MainWindow::menuOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
-            tr("OpenBurn File (*.obm);;BurnSim File (*.bsx)"));
+            tr("OpenBurn File (*.obm)"));
 
     if (!fileName.isEmpty())
     {
@@ -137,18 +137,26 @@ void MainWindow::menuOpen()
             QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
             return;
         }
+        QByteArray data = file.readAll();
+        QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+        QJsonObject motor = loadDoc.object();
+        m_DesignMotor->ReadJSON(motor, m_Propellants);
         file.close();
     }
-
+    m_designTab->UpdateDesign();
 }
 
 void MainWindow::menuSaveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
-            tr("OpenBurn File (*.obm);;BurnSim File (*.bsx)"));
+            tr("OpenBurn File (*.obm)"));
 
     if (!fileName.isEmpty())
     {
+        if (!fileName.contains(".obm"))
+        {
+            fileName += ".obm";
+        }
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly))
         {
@@ -157,10 +165,10 @@ void MainWindow::menuSaveAs()
         }
         else
         {
-            /*QTextStream stream(&file);
-            stream << ui->textEdit->toPlainText();
-            stream.flush();
-            */
+            QJsonObject motorObject;
+            m_DesignMotor->WriteJSON(motorObject);
+            QJsonDocument saveDoc(motorObject);
+            file.write(saveDoc.toJson());
             file.close();
         }
     }

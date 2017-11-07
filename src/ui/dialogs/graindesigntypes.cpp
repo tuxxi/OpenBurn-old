@@ -4,7 +4,8 @@
 #include "src/ui/dialogs/graindesigntypes.h"
 #include "src/util.h"
 
-OpenBurnDesignGrain::OpenBurnDesignGrain(std::vector<OpenBurnPropellant*> *prop,
+OpenBurnDesignGrain::OpenBurnDesignGrain(
+    PropellantList* prop,
     OpenBurnGrain* seed,
     QWidget* parent)
     : QWidget(parent), m_seedGrain(seed), m_Propellants(prop)
@@ -34,9 +35,9 @@ void OpenBurnDesignGrain::SetupUI()
     QLabel* label = new QLabel(tr("Propellant Type"), this);
     if (m_Propellants)
     {
-        for (auto* i : *m_Propellants)
+        for (auto i : *m_Propellants)
         {
-            m_propellantComboBox->addItem(i->GetPropellantName());            
+            m_propellantComboBox->addItem(i.GetPropellantName());            
         }
     }
     m_modifyPropellantDatabase = new QToolButton(this);
@@ -117,7 +118,7 @@ GRAINTYPE OpenBurnDesignGrain::GetGrainType()
 {
     return static_cast<GRAINTYPE>(m_grainTypeComboBox->currentIndex());
 }
-OpenBurnPropellant* OpenBurnDesignGrain::GetPropellant()
+OpenBurnPropellant& OpenBurnDesignGrain::GetPropellant()
 {
     int idx = m_propellantComboBox->currentIndex() > 0 ? m_propellantComboBox->currentIndex() : 0;
     return (*m_Propellants)[idx];
@@ -135,7 +136,7 @@ void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 
 //BATES
 BatesGrainDesign::BatesGrainDesign(
-    std::vector<OpenBurnPropellant*> *prop, 
+    PropellantList* prop, 
     OpenBurnGrain* seed , 
     QWidget* parent)
     : OpenBurnDesignGrain(prop, seed, parent)

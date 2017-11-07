@@ -25,6 +25,7 @@ void OpenBurnMotor::SetGrains(GrainVector grains)
 {
     m_Grains = grains;
     CalcAvgPropellant();
+    emit SIG_DesignUpdated();
 }
 void OpenBurnMotor::SetCopyGrains(GrainVector grains)
 {
@@ -34,11 +35,13 @@ void OpenBurnMotor::SetCopyGrains(GrainVector grains)
 void OpenBurnMotor::AddGrain(OpenBurnGrain* grain)
 {
     m_Grains.push_back(grain);
+    emit SIG_DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::UpdateGrain(OpenBurnGrain* grain, int index)
 {
     m_Grains[index] = grain;
+    emit SIG_DesignUpdated();
     CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
@@ -48,10 +51,11 @@ void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
         if (*i == grain)
         {
             delete *i; 
-            *i = nullptr;            
+            *i = nullptr;         
             m_Grains.erase(i);
         }
     }
+    emit SIG_DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(int index)
@@ -59,17 +63,19 @@ void OpenBurnMotor::RemoveGrain(int index)
     delete m_Grains[index];
     m_Grains[index] = nullptr;    
     m_Grains.erase(m_Grains.begin() + index);
+    emit SIG_DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
 {
+    emit SIG_DesignUpdated();
     m_Nozzle = nozz;
 }
 
 size_t OpenBurnMotor::GetNumGrains() { return m_Grains.size(); }
 GrainVector OpenBurnMotor::GetGrains() { return m_Grains;}
 OpenBurnNozzle* OpenBurnMotor::GetNozzle() { return m_Nozzle; }
-const OpenBurnPropellant* OpenBurnMotor::GetAvgPropellant() { return m_avgPropellant; }
+const OpenBurnPropellant& OpenBurnMotor::GetAvgPropellant() { return m_avgPropellant; }
 
 double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
 {
@@ -166,7 +172,7 @@ double OpenBurnMotor::GetMotorPropellantMass()
     double mass = 0;
     for (auto i : m_Grains)
     {
-        mass += i->GetVolume() * i->GetPropellantType()->GetDensity();
+        mass += i->GetVolume() * i->GetPropellantType().GetDensity();
     }
     return mass;
 }
@@ -178,12 +184,12 @@ void OpenBurnMotor::CalcAvgPropellant()
     for (auto  i : m_Grains)
     {
         //"weight" each property based on the propellant mass in the motor
-        double mass = i->GetVolume() * i->GetPropellantType()->GetDensity();
-        weighted_a += mass * i->GetPropellantType()->GetBurnRateCoef();
-        weighted_n += mass * i->GetPropellantType()->GetBurnRateExp();
-        weighted_cstar += mass * i->GetPropellantType()->GetCharVelocity();
-        weighted_rho += mass * i->GetPropellantType()->GetDensity();
-        //weighted_cpcv += mass * i->GetPropellantType()->GetSpecificHeatRatio();
+        double mass = i->GetVolume() * i->GetPropellantType().GetDensity();
+        weighted_a += mass * i->GetPropellantType().GetBurnRateCoef();
+        weighted_n += mass * i->GetPropellantType().GetBurnRateExp();
+        weighted_cstar += mass * i->GetPropellantType().GetCharVelocity();
+        weighted_rho += mass * i->GetPropellantType().GetDensity();
+        //weighted_cpcv += mass * i->GetPropellantType().GetSpecificHeatRatio();
     }
     double a = weighted_a / GetNumGrains();
     double n = weighted_n / GetNumGrains();
@@ -218,4 +224,84 @@ double OpenBurnMotor::GetPortThroatRatio()
 {
     //the nth grain in the list of n grains should always be the one at the nozzle end.
     return m_Grains[GetNumGrains()-1]->GetPortArea() / m_Nozzle->GetNozzleThroatArea();
+}
+void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database)
+{
+    PropellantList propellants;
+    QJsonArray propellantArray = object["propellants"].toArray();
+    for (auto i : propellantArray)
+    {
+        QJsonObject propellantObject = i.toObject();
+        OpenBurnPropellant prop;
+        prop.ReadJSON(propellantObject);
+        propellants.push_back(prop);
+    }
+    QJsonArray grainArray = object["grains"].toArray(); 
+    for(auto i : grainArray)
+    {
+        QJsonObject grainObject = i.toObject();
+        if (grainObject["_type"] == "BATES")
+        {
+            BatesGrain* bates = new BatesGrain;
+            QString propellantName;
+            bates->ReadJSON(grainObject, propellantName);
+            for (auto i : propellants)
+            {
+                if (propellantName == i.GetPropellantName())
+                {
+                    bates->SetPropellantType(i);
+                }
+            }
+            AddGrain(bates);
+        }
+    }
+    QJsonObject nozzleObject = object["nozzle"].toObject();
+    if(nozzleObject["_type"] == "CONICAL")
+    {
+        ConicalNozzle* nozz = new ConicalNozzle(0, 0);
+        nozz->ReadJSON(nozzleObject);
+        SetNozzle(nozz);
+    }    
+}
+void OpenBurnMotor::WriteJSON(QJsonObject &object)
+{
+    QJsonArray grainArray;
+    PropellantList propellants;
+    for(auto grain : m_Grains)
+    {
+        QJsonObject object;
+        grain->WriteJSON(object);
+        grainArray.append(object);
+
+        if (propellants.empty()) //no propellants yet
+        {
+            propellants.push_back(grain->GetPropellantType());
+        }
+        else
+        {
+            for (auto prop : propellants)
+            {
+                if (!(prop == grain->GetPropellantType())) //we haven't seen this propellant before
+                {
+                    propellants.push_back(prop);
+                }
+            }
+        }
+    }
+    QJsonObject nozzle;    
+    if (HasNozzle())
+    {
+        m_Nozzle->WriteJSON(nozzle);        
+    }
+
+    QJsonArray propellantsArray;
+    for(auto i : propellants)
+    {
+        QJsonObject prop;
+        i.WriteJSON(prop);
+        propellantsArray.append(prop);
+    }
+    object["grains"] = grainArray;    
+    object["nozzle"] = nozzle;
+    object["propellants"] = propellantsArray;    
 }

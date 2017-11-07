@@ -15,19 +15,17 @@ public:
     explicit GrainTableWidget(OpenBurnMotor* motor, QWidget *parent = nullptr);
     ~GrainTableWidget();
 
-
     virtual void dropEvent(QDropEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
-    void AddNewGrain(OpenBurnGrain* grain);
-    void ModifyGrain(OpenBurnGrain* grain, int idx);
-
+    QList<int>GetSelectedGrainIndices();
     QList<OpenBurnGrain*>GetSelectedGrains();
-    void DeleteGrain(int idx);
-    void DeleteSelectedGrains();
-
+    
     void move(bool up);
     QList<QTableWidgetItem*> takeRow(int row);
     void setRow(int row, const QList<QTableWidgetItem*>& rowItems);
+public slots:
+    void Update();
+
 private:
     OpenBurnMotor* m_Motor;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "src/propellant.h"
 #include <QtMath>
+#include <QJsonObject>
 
 enum GRAINTYPE
 {
@@ -10,18 +11,18 @@ enum GRAINTYPE
 class OpenBurnGrain
 {
 public:
-    OpenBurnGrain(double length, double diameter, OpenBurnPropellant* prop, int inhibited = 0 );
+    OpenBurnGrain(double length, double diameter, OpenBurnPropellant prop, int inhibited = 0 );
     virtual ~OpenBurnGrain();
 
     virtual double GetLength();
     virtual double GetDiameter();
     virtual int GetInhibitedFaces();
-    virtual OpenBurnPropellant* GetPropellantType();
+    virtual OpenBurnPropellant& GetPropellantType();
     
     virtual void SetLength(double length);
     virtual void SetDiameter(double dia);
     virtual void SetInhibitedFaces(int faces);
-    virtual void SetPropellantType(OpenBurnPropellant* prop);
+    virtual void SetPropellantType(OpenBurnPropellant prop);
 
 
     virtual double GetBurningSurfaceArea() = 0; //return the burning surface area of the propellant
@@ -35,9 +36,13 @@ public:
     virtual bool IsBurnedOut() = 0;
     virtual OpenBurnGrain* Clone() = 0;
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
-//protected:
+
+    virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) = 0;
+    virtual void WriteJSON(QJsonObject &object) = 0;
+
+protected:
     double m_grainDia, m_grainLen;
-    OpenBurnPropellant* m_prop;
+    OpenBurnPropellant m_propellantType;
     int m_numInhibitedFaces;
 
     double m_rNot, m_rErosive; //burn rates, additive (i.e r = r_0 + r_e)
@@ -47,7 +52,8 @@ public:
 class BatesGrain : public OpenBurnGrain
 {
 public:
-    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant* prop, int inhibitedfaces = 0);
+    BatesGrain();
+    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces = 0);
 
     virtual ~BatesGrain() override;
     
@@ -61,6 +67,10 @@ public:
     
     virtual double GetCoreDiameter();
     virtual void SetCoreDiameter(double dia);
+
+    virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) override;
+    virtual void WriteJSON(QJsonObject &object) override;
+
 private:
     double m_coreDia;
 };

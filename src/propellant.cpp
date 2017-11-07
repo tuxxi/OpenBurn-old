@@ -38,7 +38,7 @@ void OpenBurnPropellant::SetAdvancedParams(double Cv, double Cp, double Cs, doub
     m_prandtlNumber = Pr;
 }
 void OpenBurnPropellant::SetPropellantName(const QString& name) { m_PropellantName = name; }
-QString& OpenBurnPropellant::GetPropellantName() { return m_PropellantName; }
+QString& OpenBurnPropellant::GetPropellantName() const { return const_cast<QString&>(m_PropellantName); }
 
 double OpenBurnPropellant::GetBurnRateCoef() const { return m_burnRateCoef; }
 double OpenBurnPropellant::GetBurnRateExp() const { return m_burnRateExp; }
@@ -89,4 +89,13 @@ void OpenBurnPropellant::WriteJSON(QJsonObject &object)
     object["m"] = m_molarMass;
     object["mu"] = m_gasViscosity;
     object["Pr"] = m_prandtlNumber;
+}
+bool OpenBurnPropellant::operator==(const OpenBurnPropellant& other)
+{
+    return other.GetPropellantName() == m_PropellantName &&
+        other.GetBurnRateCoef() == m_burnRateCoef &&
+        other.GetBurnRateExp() == m_burnRateExp &&
+        other.GetCharVelocity() == m_charVel && 
+        other.GetDensity() == m_density &&
+        other.GetSpecificHeatRatio() == m_specificHeatRatio;
 }

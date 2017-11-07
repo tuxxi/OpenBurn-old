@@ -27,7 +27,7 @@ public:
     //We can also "seed" the dialog with values from the previous editing session, but if the QList of grain ptrs is
     //empty, it will still be in "new grain" mode. For editing, supply a QList of OpenBurnGrain pointers and the dialog will populate
     //them all of all of them with the dialog's settings.
-    explicit GrainDialog(std::vector<OpenBurnPropellant*>* propellants,
+    explicit GrainDialog(PropellantList* propellants,
         OpenBurnGrain* seedValues = nullptr, 
         QList<OpenBurnGrain*>m_GrainsToEdit = QList<OpenBurnGrain*>(),
         QWidget* parent = nullptr
@@ -57,7 +57,7 @@ private:
 
     OpenBurnDesignGrain* m_GrainDesign;
     QList<OpenBurnGrain*>m_GrainsToEdit;
-    std::vector<OpenBurnPropellant*>* m_Propellants;
+    PropellantList* m_Propellants;
     
     bool m_isNewGrainWindow;
 };

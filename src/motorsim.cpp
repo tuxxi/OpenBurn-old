@@ -74,8 +74,8 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double po
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
 
-    double temp = motor->GetAvgPropellant()->GetAdiabaticFlameTemp();
-    double k = motor->GetAvgPropellant()->GetSpecificHeatRatio();
+    double temp = motor->GetAvgPropellant().GetAdiabaticFlameTemp();
+    double k = motor->GetAvgPropellant().GetSpecificHeatRatio();
     double A = machNumber * portArea * CalcChamberPressure(motor) * qSqrt( (k / (temp * g_kGasConstantR)) );
     double B = 1.0f + (k - 1) / 2 * machNumber * machNumber;
     double C = (k - 1.0f) / 2;
@@ -84,22 +84,22 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double po
 double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 {
     //p = (Kn * a * rho * C* )^(1/(1-n))
-    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(motor->GetAvgPropellant()->GetDensity());
-    double Cstar = motor->GetAvgPropellant()->GetCharVelocity();
-    double exponent = 1.0f / (1.0f - motor->GetAvgPropellant()->GetBurnRateExp());
-    double p1 = motor->CalcKn() * motor->GetAvgPropellant()->GetBurnRateCoef() * rho * Cstar;
+    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(motor->GetAvgPropellant().GetDensity());
+    double Cstar = motor->GetAvgPropellant().GetCharVelocity();
+    double exponent = 1.0f / (1.0f - motor->GetAvgPropellant().GetBurnRateExp());
+    double p1 = motor->CalcKn() * motor->GetAvgPropellant().GetBurnRateCoef() * rho * Cstar;
    return qPow(p1, exponent);
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)
 {
     // r = a * p^n
-    OpenBurnPropellant* prop = grain->GetPropellantType();
-    return prop->GetBurnRateCoef() * qPow(CalcChamberPressure(motor), prop->GetBurnRateExp());
+    OpenBurnPropellant prop = grain->GetPropellantType();
+    return prop.GetBurnRateCoef() * qPow(CalcChamberPressure(motor), prop.GetBurnRateExp());
 }
 double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, double machNumber)
 {
-    OpenBurnPropellant* prop = grain->GetPropellantType();
-    double k = prop->GetSpecificHeatRatio();
+    OpenBurnPropellant prop = grain->GetPropellantType();
+    double k = prop.GetSpecificHeatRatio();
     double P_s = CalcChamberPressure(motor); //steady-state chamber pressure
 
     //First we have to calculate saint roberts law again, using static pressure at grain surface obtained by:
@@ -111,19 +111,19 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     //This burn rate value is __lower__ than saint robert's law due to stagnation pressure considerations.
     //Normally this value would be used as R_0 but the core mach number is not considered in the basic case,
     //So we calculate it here and subtract the difference from R_e at the end.
-    double R_0 = prop->GetBurnRateCoef() * qPow(P, prop->GetBurnRateExp());
+    double R_0 = prop.GetBurnRateCoef() * qPow(P, prop.GetBurnRateExp());
     double R_diff = CalcSteadyStateBurnRate(motor, grain) - R_0; //this factor will be removed later on
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
     double G = CalcMassFlux(motor, machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
-    double C_s = prop->GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
-    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(prop->GetDensity()); //propellant density
-    double C_p = prop->GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
-    double T_0 = prop->GetAdiabaticFlameTemp();// adiabatic flame temperature
-    double mu = prop->GetGasViscosity(); //viscoisty of combustion products
-    double Pr = prop->GetPrandtlNumber(); //prandtl number
+    double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
+    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(prop.GetDensity()); //propellant density
+    double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
+    double T_0 = prop.GetAdiabaticFlameTemp();// adiabatic flame temperature
+    double mu = prop.GetGasViscosity(); //viscoisty of combustion products
+    double Pr = prop.GetPrandtlNumber(); //prandtl number
 
     double T_s = OpenBurnUtil::g_kSurfaceTemperature; //Temperature of burning propellant surface
     double T_i = OpenBurnUtil::g_kAmbientTemperature; //Base temperature of propellant (degrees K)

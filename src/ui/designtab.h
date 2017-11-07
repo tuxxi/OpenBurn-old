@@ -17,9 +17,10 @@ class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnMotor* motor, std::vector<OpenBurnPropellant*>* propellant, QWidget* parent = nullptr);
+    explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;
+    void UpdateDesign();  
 public slots:
     void SLOT_NewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
     void SLOT_ModifyGrain(OpenBurnGrain* grain); //recieved from the grain dialog
@@ -39,8 +40,7 @@ private slots:
 private:
     void SetSeed(OpenBurnGrain* grain);
     void SetupUI();
-    void UpdateDesign();
-    void UpdateGraphics();
+    void UpdateGraphics();  
     
     //design overview - static
     QLabel* m_motorMajorDiaLabel, *m_motorLenLabel, *m_nozzleDiaLabel, *m_nozzleExitLabel, *m_knLabel,
@@ -67,5 +67,5 @@ private:
     QGraphicsView* m_motorDisplayView;
     QGraphicsScene* m_motorDisplayScene;
     OpenBurnMotor* m_Motor; //The initial design  
-    std::vector<OpenBurnPropellant*>* m_Propellants;
+    PropellantList* m_Propellants;
 };

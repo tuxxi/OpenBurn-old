@@ -29,3 +29,18 @@ double ConicalNozzle::GetThroatLength() const { return m_throatLength; }
 
 void ConicalNozzle::SetHalfAngle(double angl) { m_HalfAngle = angl; }
 void ConicalNozzle::SetNozzleThroatLen(double len) { m_throatLength = len; }
+void ConicalNozzle::ReadJSON(const QJsonObject& object)
+{
+    m_NozzleThroat = object["throat"].toDouble();
+    m_NozzleExit =  object["exit"].toDouble();
+    m_HalfAngle = object["divergentangle"].toDouble();
+    m_throatLength = object["throatlength"].toDouble();
+}
+void ConicalNozzle::WriteJSON(QJsonObject& object)
+{
+    object["_type"] = "CONICAL";
+    object["throat"] = m_NozzleThroat;
+    object["exit"] = m_NozzleExit;
+    object["divergentangle"] = m_HalfAngle;
+    object["throatlength"] = m_throatLength;
+}

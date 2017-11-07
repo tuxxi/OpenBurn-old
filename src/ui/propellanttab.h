@@ -20,7 +20,7 @@ class PropellantTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropellantTab(std::vector<OpenBurnPropellant*>* propellant, QWidget* parent = nullptr);
+    explicit PropellantTab(PropellantList* propellants, QWidget* parent = nullptr);
     ~PropellantTab();
 private slots:
     void SaveButton_Clicked();
@@ -36,7 +36,7 @@ private:
     //Propellant Database
     bool LoadDatabase(const QString& filename);
     bool SaveDatabase();
-    std::vector<OpenBurnPropellant*> *m_Propellants;
+    PropellantList* m_Propellants;
     QString m_propellantFileName;
 
     QGroupBox* m_gb_edit;

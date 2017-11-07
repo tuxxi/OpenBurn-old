@@ -11,7 +11,7 @@
 
 const static QString DEFAULT_NAME = QString("New Propellant");
 
-PropellantTab::PropellantTab(std::vector<OpenBurnPropellant*>* propellants, QWidget* parent)
+PropellantTab::PropellantTab(PropellantList* propellants, QWidget* parent)
     : QWidget(parent), m_Propellants(propellants)
 {
     SetupUI();
@@ -20,7 +20,8 @@ PropellantTab::PropellantTab(std::vector<OpenBurnPropellant*>* propellants, QWid
     {
         m_gb_edit->setEnabled(false);        
     }
-    else{
+    else
+    {
         PropellantComboBox_Changed(0); //finish setting up UI so that we've got the 1st entry highlighted
     }
 
@@ -119,7 +120,6 @@ bool PropellantTab::LoadDatabase(const QString& filename)
     QFile file(filename);
     if (file.open(QIODevice::ReadOnly))
     {
-        
         QByteArray data = file.readAll();
         QJsonDocument loadDoc(QJsonDocument::fromJson(data));
         m_Propellants->clear();
@@ -127,11 +127,12 @@ bool PropellantTab::LoadDatabase(const QString& filename)
         for (int i = 0; i < propellantArray.size(); ++i)
         {
             QJsonObject propellantObject = propellantArray[i].toObject();
-            OpenBurnPropellant* prop = new OpenBurnPropellant;
-            prop->ReadJSON(propellantObject);
+            OpenBurnPropellant prop;
+            prop.ReadJSON(propellantObject);
             m_Propellants->push_back(prop);
-            m_cb_propSelection->addItem(prop->GetPropellantName());
+            m_cb_propSelection->addItem(prop.GetPropellantName());
         }
+        file.close();
         return true;
     }
     return false;
@@ -146,7 +147,7 @@ bool PropellantTab::SaveDatabase()
         for (auto i : *m_Propellants)
         {
             QJsonObject prop;
-            i->WriteJSON(prop);
+            i.WriteJSON(prop);
             propellantArray.append(prop);
         }
         propellantObject["propellants"] = propellantArray;
@@ -164,14 +165,14 @@ void PropellantTab::PropellantComboBox_Changed(int idx)
         m_gb_edit->setEnabled(true); 
         m_DeletePropButton->setEnabled(true);
 
-        OpenBurnPropellant* propellant = (*m_Propellants)[idx];
+        OpenBurnPropellant propellant = (*m_Propellants)[idx];
         m_cb_propSelection->setCurrentIndex(idx);
-        m_line_propName->setText(propellant->GetPropellantName());
-        m_line_propBRCoef->setText(QString::number(propellant->GetBurnRateCoef()));
-        m_line_propBRExp->setText(QString::number(propellant->GetBurnRateExp()));
-        m_line_propDensity->setText(QString::number(propellant->GetDensity()));
-        m_line_propCStar->setText(QString::number(propellant->GetCharVelocity()));
-        m_line_propSpecificHeatRatio->setText(QString::number(propellant->GetSpecificHeatRatio()));
+        m_line_propName->setText(propellant.GetPropellantName());
+        m_line_propBRCoef->setText(QString::number(propellant.GetBurnRateCoef()));
+        m_line_propBRExp->setText(QString::number(propellant.GetBurnRateExp()));
+        m_line_propDensity->setText(QString::number(propellant.GetDensity()));
+        m_line_propCStar->setText(QString::number(propellant.GetCharVelocity()));
+        m_line_propSpecificHeatRatio->setText(QString::number(propellant.GetSpecificHeatRatio()));
     }
 }
 void PropellantTab::ConnectLineEditSignals()
@@ -187,10 +188,10 @@ void PropellantTab::ConnectLineEditSignals()
 void PropellantTab::UpdatePropellant()
 {
     int idx = m_cb_propSelection->currentIndex() > 0 ? m_cb_propSelection->currentIndex() : 0;
-    OpenBurnPropellant* prop = (*m_Propellants)[idx];
+    OpenBurnPropellant prop = (*m_Propellants)[idx];
     m_cb_propSelection->setItemText(idx, m_line_propName->text());    
-    prop->SetPropellantName(m_line_propName->text());
-    prop->SetBasicParams(
+    prop.SetPropellantName(m_line_propName->text());
+    prop.SetBasicParams(
         m_line_propBRCoef->text().toDouble(),
         m_line_propBRExp->text().toDouble(),
         m_line_propCStar->text().toDouble(),
@@ -209,13 +210,11 @@ void PropellantTab::DeleteButton_Clicked()
     int oldIndex = m_cb_propSelection->currentIndex() > 0 ? m_cb_propSelection->currentIndex() : 0;    
     QMessageBox::StandardButton resBtn =
         QMessageBox::question( this, "OpenBurn", tr("Are you sure you want to delete propellant: ")
-         + (*m_Propellants)[oldIndex]->GetPropellantName(),
+         + (*m_Propellants)[oldIndex].GetPropellantName(),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     
     if (resBtn == QMessageBox::Yes)
     {
-        delete (*m_Propellants)[oldIndex];
-        (*m_Propellants)[oldIndex] = nullptr;
         m_Propellants->erase(m_Propellants->begin() + oldIndex);
         m_cb_propSelection->setCurrentIndex(oldIndex);
         m_cb_propSelection->removeItem(oldIndex);
@@ -233,7 +232,7 @@ void PropellantTab::DeleteButton_Clicked()
 }
 void PropellantTab::NewButton_Clicked()
 {
-    OpenBurnPropellant* prop = new OpenBurnPropellant(DEFAULT_NAME);
+    OpenBurnPropellant prop(DEFAULT_NAME);
     m_Propellants->push_back(prop);
     m_cb_propSelection->addItem(DEFAULT_NAME);
     m_cb_propSelection->setCurrentIndex(m_Propellants->size() - 1);

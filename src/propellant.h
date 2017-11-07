@@ -2,6 +2,8 @@
 #include <QString>
 #include <QJsonObject>
 
+#include <vector>
+
 #include "util.h"
 
 class OpenBurnPropellant
@@ -12,8 +14,9 @@ public:
     OpenBurnPropellant(const QString& name, double a, double n, double cstar, double rho, double gamma = 1.25);
     ~OpenBurnPropellant();
 
+    bool operator==(const OpenBurnPropellant& other);
     void SetPropellantName(const QString& name);
-    QString& GetPropellantName();
+    QString& GetPropellantName() const;
     void SetBasicParams(double a, double n, double cstar, double rho, double gamma = 1.25);
     void SetAdvancedParams(double Cv, double Cp, double Cs, double Tnot, double molarmass, double mu, double Pr);
 
@@ -52,3 +55,4 @@ private:
     double m_gasViscosity; //mu, kg/m-sec
     double m_prandtlNumber; //Pr
 };
+typedef std::vector<OpenBurnPropellant> PropellantList;

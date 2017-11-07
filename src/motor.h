@@ -1,4 +1,7 @@
 #pragma once
+#include <QJsonObject>
+#include <QJsonArray>
+
 #include <vector>
 #include <functional>
 #include <algorithm>
@@ -50,9 +53,13 @@ public:
     double GetVolumeLoading();
     double GetPortThroatRatio();
 
-    const OpenBurnPropellant* GetAvgPropellant();
+    const OpenBurnPropellant& GetAvgPropellant();
+
+    void ReadJSON(const QJsonObject& object, PropellantList* database);
+    void WriteJSON(QJsonObject &object);
 signals:
     void SIG_DesignReady();
+    void SIG_DesignUpdated();
 private:
     OpenBurnNozzle* m_Nozzle;
     GrainVector m_Grains;
@@ -60,6 +67,6 @@ private:
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
     //weighted average based on mass of each segment of propellant
     void CalcAvgPropellant();
-    OpenBurnPropellant* m_avgPropellant;
+    OpenBurnPropellant m_avgPropellant;
 
 };
