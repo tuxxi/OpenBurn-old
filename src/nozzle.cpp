@@ -11,9 +11,16 @@ double OpenBurnNozzle::GetNozzleExit() const { return m_NozzleExit; }
 double OpenBurnNozzle::GetNozzleThroat() const { return m_NozzleThroat; }
 double OpenBurnNozzle::GetNozzleThroatArea() const
 {
-    return 0.25f * M_PI * GetNozzleThroat() * GetNozzleThroat();
+    return 0.25f * M_PI * m_NozzleThroat * m_NozzleThroat;
 }
-
+double OpenBurnNozzle::GetNozzleExitArea() const
+{
+    return 0.25f * M_PI * m_NozzleExit * m_NozzleExit;
+}
+double OpenBurnNozzle::GetNozzleExpansionRatio() const
+{
+    return GetNozzleExitArea() / GetNozzleThroatArea();
+}
 void OpenBurnNozzle::SetNozzleThroat(double throat) { m_NozzleThroat = throat; }
 void OpenBurnNozzle::SetNozzleExit(double exit) { m_NozzleExit = exit; }
 
@@ -43,4 +50,8 @@ void ConicalNozzle::WriteJSON(QJsonObject& object)
     object["exit"] = m_NozzleExit;
     object["divergentangle"] = m_HalfAngle;
     object["throatlength"] = m_throatLength;
+}
+double ConicalNozzle::GetNozzleDivergenceLossFactor() const
+{
+    return (1.f + qCos(qDegreesToRadians(m_HalfAngle)) ) / 2.f;
 }

@@ -1,19 +1,19 @@
 {
     "propellants": [
         {
-            "CStar": 5100,
+            "CStar": 5050,
             "Cp": 0,
             "Cs": 0,
             "Cv": 0,
             "Pr": 0,
             "T0": 0,
-            "a": 0.062,
+            "a": 0.06233,
             "gamma": 1.25,
             "m": 0,
             "mu": 0,
-            "n": 0.12,
+            "n": 0.1167,
             "name": "Orange Sunset",
-            "rho": 0.061
+            "rho": 0.059
         },
         {
             "CStar": 3100,

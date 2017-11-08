@@ -116,7 +116,8 @@ void DesignTab::SetupUI()
     gl_Nozzle->addWidget(m_nozzleDiaLabel = new QLabel, 0, 1);
     gl_Nozzle->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 1, 0);
     gl_Nozzle->addWidget(m_nozzleExitLabel = new QLabel, 1, 1);
-    
+    gl_Nozzle->addWidget(new QLabel(tr("Expansion Ratio:")), 2, 0);
+    gl_Nozzle->addWidget(m_expansionRatioLabel = new QLabel, 2, 1);
     gb_design_params->setLayout(gl_Motor);
     gb_nozz_params->setLayout(gl_Nozzle);
     gb_prop_params->setLayout(gl_Propellant);
@@ -167,6 +168,7 @@ void DesignTab::UpdateDesign()
     {
         m_nozzleDiaLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleThroat()));
         m_nozzleExitLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExit()));
+        m_expansionRatioLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'g', 3));
     }
     UpdateGraphics(); 
 }

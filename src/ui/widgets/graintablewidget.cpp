@@ -130,6 +130,7 @@ void GrainTableWidget::setRow(int row, const QList<QTableWidgetItem*>& rowItems)
 
 void GrainTableWidget::dropEvent(QDropEvent* event)
 {
+    Q_UNUSED(event);
     /*
     if(event->source() == this)
     {

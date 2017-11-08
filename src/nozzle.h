@@ -10,9 +10,12 @@ public:
     virtual void SetNozzleExit(double);
 
     virtual double GetNozzleThroatArea() const;
+    virtual double GetNozzleExitArea() const;
     virtual double GetNozzleThroat() const;
     virtual double GetNozzleExit() const;
+    virtual double GetNozzleExpansionRatio() const;
 
+    virtual double GetNozzleDivergenceLossFactor() const = 0;
     virtual void ReadJSON(const QJsonObject& object) = 0;
     virtual void WriteJSON(QJsonObject &object) = 0;
 
@@ -31,7 +34,8 @@ public:
     void SetNozzleThroatLen(double);
     double GetHalfAngle() const;
     double GetThroatLength() const;
-
+    
+    virtual double GetNozzleDivergenceLossFactor() const override;
     virtual void ReadJSON(const QJsonObject& object) override;
     virtual void WriteJSON(QJsonObject &object) override;
 

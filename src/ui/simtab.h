@@ -18,7 +18,7 @@ private slots:
 private:
     void SetupUI();
 
-    QLabel* m_maxPressureLabel, *m_BurnTimeLabel;
+    QLabel* m_maxPressureLabel, *m_BurnTimeLabel, *m_totalImpulseLabel, *m_motorDesignationLabel;
     QCustomPlot* m_Plotter;
     QPushButton* m_RunSimulationButton, *m_SimSettingsButton;
     OpenBurnMotor* m_Motor;

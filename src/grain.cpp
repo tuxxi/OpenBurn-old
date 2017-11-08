@@ -2,7 +2,7 @@
 
 #include "grain.h"
 OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant prop, int inhibited)
-    : m_grainDia(diameter), m_grainLen(length),m_propellantType(prop), m_numInhibitedFaces(inhibited)
+    : m_grainDia(diameter), m_grainLen(length),m_propellantType(prop), m_numInhibitedFaces(inhibited), m_isBurnedOut(false)
 {
 
 }
@@ -13,6 +13,7 @@ double OpenBurnGrain::GetLength() { return m_grainLen; }
 double OpenBurnGrain::GetDiameter() { return m_grainDia; }
 int OpenBurnGrain::GetInhibitedFaces() { return m_numInhibitedFaces; }
 OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_propellantType; }
+bool OpenBurnGrain::GetIsBurnedOut() { return m_isBurnedOut; }
 void OpenBurnGrain::SetLength(double length) { m_grainLen = length; }
 void OpenBurnGrain::SetDiameter(double dia) { m_grainDia = dia; }
 void OpenBurnGrain::SetInhibitedFaces(int faces) { m_numInhibitedFaces = faces; }
@@ -67,11 +68,12 @@ bool BatesGrain::Burn(double timestep)
         double burnDist = (m_rNot + m_rErosive) * timestep;
         
         m_coreDia += (2 * burnDist);
-        m_grainLen -= burnDist * (2 - m_numInhibitedFaces);  
+        m_grainLen -= burnDist * (2 - m_numInhibitedFaces);
         return true;      
     }
     else
     {
+        m_isBurnedOut = true;        
         return false;        
     }
 }

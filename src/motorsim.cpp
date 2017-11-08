@@ -4,15 +4,15 @@
 using OpenBurnUtil::g_kGasConstantR;
 
 MotorSim::MotorSim() 
-    : m_InitialDesignMotor(nullptr), m_TotalBurnTime(0.0f)
+    : MotorSim(nullptr)
 {
 
 }
 MotorSim::MotorSim(OpenBurnMotor* motor)
-    : m_InitialDesignMotor(motor), m_TotalBurnTime(0.0f)
+    : m_InitialDesignMotor(motor), m_TotalBurnTime(0), m_TotalImpulse(0)
     
 {
-
+    m_Settings = new MotorSimSettings(14.7, .85, .99);
 }
 MotorSim::~MotorSim()
 {
@@ -21,6 +21,7 @@ MotorSim::~MotorSim()
         delete i;
     }
     m_SimResultData.clear();
+    delete m_Settings;
 }
 void MotorSim::RunSim(double timestep)
 {
@@ -30,7 +31,7 @@ void MotorSim::RunSim(double timestep)
     size_t numBurnedOut = 0;
     
     m_TotalBurnTime = 0;
-
+    m_TotalImpulse = 0;
     emit SimulationStarted();
     while(numBurnedOut < m_InitialDesignMotor->GetNumGrains())
     {
@@ -46,27 +47,27 @@ void MotorSim::RunSim(double timestep)
         {
             newDataPointMotor->SetCopyGrains(m_SimResultData[iterations-1]->motor->GetGrains());            
         }
-        newDataPoint->motor = newDataPointMotor;
         m_TotalBurnTime += timestep;
         newDataPoint->time = m_TotalBurnTime;
-        iterations++;        
+        newDataPoint->motor = newDataPointMotor;        
+        newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
+        newDataPoint->thrust = CalcThrust(newDataPoint->motor, newDataPoint->pressure);
+        m_TotalImpulse += (newDataPoint->thrust * timestep);
+        iterations++;
         for (auto* i : newDataPointMotor->GetGrains())
         {
             double burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
             newDataPoint->burnRate = burnRate;
             i->SetBurnRate(burnRate);            
-            newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);    
-
             // TODO: if (erosive)
             //i->SetErosiveBurnRate();
-            if (!i->Burn(timestep)) //OpenBurnGrain::Burn should return false if the grain burned out
+            if (!i->GetIsBurnedOut() && !i->Burn(timestep)) //OpenBurnGrain::Burn should return false if the grain burned out
             {
                 numBurnedOut++;
-                qDebug() << "At time T=" << m_TotalBurnTime << ", "<< numBurnedOut << " grains burned out!";                
             }
         }
         m_SimResultData.push_back(newDataPoint);
-        if (iterations > int(1e6))
+        if (iterations > int(1e5))
         {
             emit SimulationFinished(false);            
             break;
@@ -92,11 +93,47 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double po
 double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 {
     //p = (Kn * a * rho * C* )^(1/(1-n))
-    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(motor->GetAvgPropellant().GetDensity());
+    double rho = OpenBurnUtil::PoundsToSlugs(motor->GetAvgPropellant().GetDensity());
     double Cstar = motor->GetAvgPropellant().GetCharVelocity();
     double exponent = 1.0f / (1.0f - motor->GetAvgPropellant().GetBurnRateExp());
     double p1 = motor->CalcKn() * motor->GetAvgPropellant().GetBurnRateCoef() * rho * Cstar;
-   return qPow(p1, exponent);
+    return qPow(p1, exponent);
+}
+double MotorSim::CalcThrust(OpenBurnMotor* motor, double chamberPressure)
+{
+    //REAL thrust coeff = Nd * Nt * (Nf * Cfv + (1 - nf (ambient))) - ambient
+    //Nd is divergence loss, 
+    //Nd is two phase flow loss
+    //Nf is skin friction loss
+    OpenBurnNozzle* nozzle =  motor->GetNozzle();
+    double idealCoef = CalcIdealThrustCoefficient(motor, chamberPressure);
+    double exitP = m_Settings->ambientPressure * nozzle->GetNozzleExitArea();
+    double throatP = chamberPressure * nozzle->GetNozzleThroatArea();
+    double ambientPressureCorrection = exitP / throatP;
+    double divergenceLoss = nozzle->GetNozzleDivergenceLossFactor();
+    double skinFrictionLoss = (1.f - m_Settings->skinFrictionEfficency) * ambientPressureCorrection;
+    double realCoef = (divergenceLoss * m_Settings->twoPhaseFlowEfficency * 
+        (m_Settings->skinFrictionEfficency * idealCoef + skinFrictionLoss) ) - ambientPressureCorrection;
+    
+    return realCoef * nozzle->GetNozzleThroatArea() * chamberPressure;
+}
+double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, double chamberPressure)
+{
+    //F = At * P1 * sqrt [ (2k^2 / k-1) (2/k+1 )^k+1k-1 * 1- (P2/P1)^(k-1/k) )] + (p2-p3)A2
+    //See Rocket Propulsion Elements, Eq. 3-29
+    //A lot of this equation deals with k, so we'll do our best to simplify those first
+    double k = motor->GetAvgPropellant().GetSpecificHeatRatio();
+    double kSquareTerm = (2.f * k * k) / (k - 1.f);
+    double twoOverKTerm = 2.f / (k + 1.f);
+    double kOverItselfTerm = (k + 1.f) / (k - 1.f);
+    double kMinusOne = (k - 1.f) / k;
+
+    //assuming exit pressure = ambient pressure for now.
+    double exitPressure = m_Settings->ambientPressure;
+    double pRatio = exitPressure / chamberPressure;     
+    double momentumThrust = qSqrt(kSquareTerm * qPow(twoOverKTerm,kOverItselfTerm) * (1.f - qPow(pRatio, kMinusOne)));
+    double pressureThrust = ((exitPressure - m_Settings->ambientPressure) * motor->GetNozzle()->GetNozzleExpansionRatio() ) / chamberPressure;
+    return momentumThrust + pressureThrust;
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)
 {
@@ -127,7 +164,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double G = CalcMassFlux(motor, machNumber, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
-    double rho = OpenBurnUtil::CONVERT_PoundsToSlugs(prop.GetDensity()); //propellant density
+    double rho = OpenBurnUtil::PoundsToSlugs(prop.GetDensity()); //propellant density
     double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
     double T_0 = prop.GetAdiabaticFlameTemp();// adiabatic flame temperature
     double mu = prop.GetGasViscosity(); //viscoisty of combustion products
@@ -168,6 +205,26 @@ std::vector<MotorSimDataPoint*> MotorSim::GetResults()
 double MotorSim::GetTotalBurnTime() const
 {
     return m_TotalBurnTime;
+}
+double MotorSim::GetTotalImpulse() const
+{
+    return m_TotalImpulse;
+}
+double MotorSim::GetMaxPressure() const
+{
+    double maxPressure = 0;
+    for (auto i : m_SimResultData)
+    {
+        if (i->pressure > maxPressure)
+        {
+            maxPressure = i->pressure;
+        }
+    }
+    return maxPressure;
+}
+double MotorSim::GetAvgThrust() const
+{
+    return m_TotalImpulse / m_TotalBurnTime;
 }
 void MotorSim::ClearAllData()
 {

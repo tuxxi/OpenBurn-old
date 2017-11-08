@@ -24,7 +24,7 @@ public:
     virtual void SetInhibitedFaces(int faces);
     virtual void SetPropellantType(OpenBurnPropellant prop);
 
-
+    virtual bool GetIsBurnedOut();
     virtual double GetBurningSurfaceArea() = 0; //return the burning surface area of the propellant
 
     virtual double GetPortArea() = 0;
@@ -46,6 +46,7 @@ protected:
     int m_numInhibitedFaces;
 
     double m_rNot, m_rErosive; //burn rates, additive (i.e r = r_0 + r_e)
+    bool m_isBurnedOut;
 };
 
 //a cylindrical bates grain

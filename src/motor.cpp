@@ -133,7 +133,10 @@ double OpenBurnMotor::CalcKn()
     double surfaceArea = 0;
     for (auto i : m_Grains)
     {
-        surfaceArea += i->GetBurningSurfaceArea();
+        if (!i->GetIsBurnedOut())
+        {
+            surfaceArea += i->GetBurningSurfaceArea();            
+        }
     }
     return surfaceArea / m_Nozzle->GetNozzleThroatArea();
 }

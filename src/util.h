@@ -17,8 +17,11 @@ namespace OpenBurnUtil
         QObject::tr("Degrees") << 
         QObject::tr("Radians"));
 
-    double CONVERT_PoundsToSlugs(double lbs);
-    double CONVERT_InchesToMeters(double inches);
+    double PoundsToSlugs(double lbs);
+    double PoundsToNewtons(double lbs);    
+    //double InchesToMeters(double inches);
+
+    char GetMotorClass(double nsec);
     static const double g_kGasConstantR = 8.3144621; //J / mol * k
     static const int g_kNumInterations = 200;
     static const int g_kAmbientTemperature = 297; //degrees K

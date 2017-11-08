@@ -43,12 +43,14 @@ private:
     void UpdateGraphics();  
     
     //design overview - static
-    QLabel* m_motorMajorDiaLabel, *m_motorLenLabel, *m_nozzleDiaLabel, *m_nozzleExitLabel, *m_knLabel,
-        *m_numGrainsLabel, *m_propellantMassLabel, *m_portThroatRatioLabel, *m_VolumeLoadingLabel;
+    QLabel *m_motorMajorDiaLabel, *m_motorLenLabel, *m_numGrainsLabel, *m_propellantMassLabel, *m_VolumeLoadingLabel;
 
+    QLabel* m_nozzleDiaLabel, *m_nozzleExitLabel, *m_expansionRatioLabel; 
+
+    QLabel *m_knLabel, *m_portThroatRatioLabel;
     //simulated results - requires a sim to be run
     //for quick reference only- more detailed results are available on results tab
-    QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
+    //QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
 
     QPushButton* m_nozzleSettingsButton;
 
