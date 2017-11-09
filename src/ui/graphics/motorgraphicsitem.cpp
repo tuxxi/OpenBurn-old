@@ -9,7 +9,12 @@ MotorGraphicsItem::MotorGraphicsItem(int scale_factor, QGraphicsItem *parent)
 }
 QRectF MotorGraphicsItem::boundingRect() const
 {
-    return QRectF(0, 0, m_MotorLen + (m_gfxNozzle ? m_gfxNozzle->boundingRect().width() : 0), m_MotorHeight);
+    double nozzleLen = 0;
+    if (m_gfxNozzle)
+    {
+        nozzleLen = m_gfxNozzle->boundingRect().width();
+    }
+    return QRectF(0, 0, m_MotorLen + nozzleLen, m_MotorHeight);
 }
 void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

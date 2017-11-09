@@ -112,7 +112,7 @@ void GrainDialog::UpdateDesign()
         if (m_isNewGrainWindow && m_GrainsToEdit.isEmpty())
         {
             OpenBurnGrain* grain = new BatesGrain(
-                design->GetDiameter(),        
+                design->GetDiameter(),
                 design->GetCoreDiameter(),
                 design->GetLength(),
                 design->GetPropellant(),                    

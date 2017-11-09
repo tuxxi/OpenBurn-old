@@ -120,8 +120,11 @@ GRAINTYPE OpenBurnDesignGrain::GetGrainType()
 }
 OpenBurnPropellant& OpenBurnDesignGrain::GetPropellant()
 {
-    int idx = m_propellantComboBox->currentIndex() > 0 ? m_propellantComboBox->currentIndex() : 0;
-    return (*m_Propellants)[idx];
+    if (!m_Propellants->empty())
+    {
+        int idx = m_propellantComboBox->currentIndex() > 0 ? m_propellantComboBox->currentIndex() : 0;
+        return (*m_Propellants)[idx];
+    }
 }
 
 void OpenBurnDesignGrain::on_grainType_changed(int idx)

@@ -3,10 +3,13 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QGroupBox>
-
 #include <QDebug>
 
 #include "src/ui/designtab.h"
+
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
 
 DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, QWidget* parent)
     : QWidget(parent), m_seed_grain(nullptr), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr),
@@ -195,18 +198,17 @@ void DesignTab::UpdateGraphics()
         m_motorObject->SetNozzle(m_Motor->GetNozzle());        
     }
 
-    //we have to repaint the veiwport otherwise the graphics objects don't update properly
-    //m_motorObject->update(m_motorObject->boundingRect());
-    m_motorDisplayView->viewport()->repaint();
-
     //set the motor display scene to the middle of the view plus a bit of padding on the sides
     m_motorDisplayScene->setSceneRect(m_motorObject->boundingRect());
     QRectF bounds = QRectF(m_motorObject->boundingRect().left(), m_motorObject->boundingRect().top(), 
         m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
+
+    qDebug() << "bounds are : " << bounds.width() << " by " << bounds.height();
+
     m_motorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case 
-    m_motorDisplayView->viewport()->repaint();    
+    repaint();
 }
 void DesignTab::resizeEvent(QResizeEvent* event)
 {

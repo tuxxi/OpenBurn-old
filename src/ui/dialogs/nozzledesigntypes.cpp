@@ -81,6 +81,7 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     m_halfAngleSpinBox = new QDoubleSpinBox(this);
     m_halfAngleSpinBox->setDecimals(1);
     m_halfAngleSpinBox->setSingleStep(1);
+    m_halfAngleSpinBox->setValue(15.f); //default to 15 degrees :)
     QLabel* label_3 = new QLabel(tr("Divergent Half Angle"), this);
     m_halfAngleUnits = new QComboBox(this);
     m_halfAngleUnits->setLayoutDirection(Qt::LeftToRight);

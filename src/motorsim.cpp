@@ -112,7 +112,7 @@ double MotorSim::CalcThrust(OpenBurnMotor* motor, double chamberPressure)
     double ambientPressureCorrection = exitP / throatP;
     double divergenceLoss = nozzle->GetNozzleDivergenceLossFactor();
     double skinFrictionLoss = (1.f - m_Settings->skinFrictionEfficency) * ambientPressureCorrection;
-    double realCoef = (divergenceLoss * m_Settings->twoPhaseFlowEfficency * 
+    double realCoef = (divergenceLoss * m_Settings->twoPhaseFlowEfficency *
         (m_Settings->skinFrictionEfficency * idealCoef + skinFrictionLoss) ) - ambientPressureCorrection;
     
     return realCoef * nozzle->GetNozzleThroatArea() * chamberPressure;

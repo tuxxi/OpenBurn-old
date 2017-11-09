@@ -2,8 +2,8 @@
 
 NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle,
     int scale_factor, double nozzle_height, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_color(Qt::lightGray), m_Nozzle(nozzle), m_nozzleHeight(nozzle_height), 
-    m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
+    : QGraphicsObject(parent), m_color(Qt::lightGray), m_Nozzle(nozzle), m_nozzleHeight(nozzle_height),
+      m_nozzleLength(0.f), m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
 {
 
 }
@@ -68,7 +68,29 @@ void NozzleGraphicsItem::paint(QPainter *painter,
 }
 QRectF NozzleGraphicsItem::boundingRect() const
 {
-   return QRectF(0, 0, m_nozzleLength, m_nozzleHeight);
+    //Because the viewport gets at the bounding rect of the nozzle before the nozzle has finished painting,
+    //m_nozzleLen is not done being set in the paint() method.
+    //We have to either force the viewport to repaint before boundingRect() is called,
+    //or do this ugly pile of inefficent garbage
+
+    //TODO: please fix me :( im a sad and lonely dynamic cast and i have no place being here
+    double nozzleLen = 0;
+    if (ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle))
+    {
+        double exitRadius = 0.5f * (m_Nozzle->GetNozzleExit() * m_scaleFactor);
+        double throatRadius = 0.5f * (m_Nozzle->GetNozzleThroat() * m_scaleFactor);
+
+        double convergentAngle = 25; // ?? allow user to change? maybe?
+        double throatHeightUpper = m_nozzleHeight * 0.5f + throatRadius;
+        double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));
+
+        double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
+        double throatLen = 20.0f; //nozz->GetThroatLen();
+        double divergentLen = exitRadius * (1.0f / qTan(qDegreesToRadians(divergentAngle))); //cot
+
+        nozzleLen = convergentLen + throatLen + divergentLen;
+    }
+   return QRectF(0, 0, nozzleLen, m_nozzleHeight);
 }
 void NozzleGraphicsItem::UpdateNozzle(OpenBurnNozzle* nozz)
 {
