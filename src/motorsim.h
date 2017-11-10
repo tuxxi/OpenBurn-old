@@ -47,7 +47,8 @@ public:
 
     //whole chamber:
     double CalcChamberPressure(OpenBurnMotor* motor);
-
+    double CalcExitMachNumber(OpenBurnMotor* motor);
+    double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
     //
     double CalcThrust(OpenBurnMotor* motor, double chamberPressure);
     double CalcIdealThrustCoefficient(OpenBurnMotor* motor, double chamberPressure);
