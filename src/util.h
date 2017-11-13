@@ -17,8 +17,13 @@ namespace OpenBurnUtil
         QObject::tr("Degrees") << 
         QObject::tr("Radians"));
 
+    static const QStringList g_kPressureUnits = (QStringList() <<
+        QObject::tr("Pounds / sq inch (psi)") <<
+        QObject::tr("Atmospheres (atm)") <<
+        QObject::tr("Megapascals (mPa)"));
+
     double PoundsToSlugs(double lbs);
-    double PoundsToNewtons(double lbs);    
+    double PoundsToNewtons(double lbs);
     //double InchesToMeters(double inches);
 
     char GetMotorClass(double nsec);

@@ -4,11 +4,17 @@
 #include "simtab.h"
 
 SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, QWidget* parent)
-    : QWidget(parent), m_Motor(motor), m_Simulator(sim)
+    : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SettingsDialog(nullptr)
 {
     SetupUI();
+    connect(m_Motor, SIGNAL(SIG_DesignReady()), this, SLOT(SLOT_DesignReady()));
     connect(m_RunSimulationButton, SIGNAL(clicked()), this, SLOT(RunSimButton_Clicked())); 
-    connect(m_Motor, SIGNAL(SIG_DesignReady()), this, SLOT(SLOT_DesignReady())); 
+    connect(m_SimSettingsButton, SIGNAL(clicked()), this, SLOT(SimSettingsButton_Clicked()));
+    m_Settings = new MotorSimSettings;
+}
+SimulationTab::~SimulationTab()
+{
+    delete m_Settings;
 }
 void SimulationTab::SetupUI()
 {
@@ -57,19 +63,10 @@ void SimulationTab::SetupUI()
     masterLayout->addWidget(gb_Simulate);
     setLayout(masterLayout);
 }
-SimulationTab::~SimulationTab()
-{
-
-}
-void SimulationTab::RunSimButton_Clicked()
-{
-    UpdateSimulation();
-}
 void SimulationTab::UpdateSimulation()
 {
-    double timestep = 0.01f;
-    m_Simulator->RunSim(timestep);
-    const int numPoints = m_Simulator->GetTotalBurnTime() / timestep;
+    m_Simulator->RunSim(m_Settings);
+    const int numPoints = m_Simulator->GetTotalBurnTime() / m_Settings->timeStep;
 
     double maxPressure = m_Simulator->GetMaxPressure();
     QVector<double> x(numPoints), y(numPoints);
@@ -99,4 +96,18 @@ void SimulationTab::UpdateSimulation()
 void SimulationTab::SLOT_DesignReady()
 {
     m_RunSimulationButton->setEnabled(true);
+}
+void SimulationTab::SimSettingsButton_Clicked()
+{
+    if (m_SettingsDialog == nullptr)
+    {
+        m_SettingsDialog = new SimSettingsDialog(m_Settings);
+    }
+    m_SettingsDialog->show();
+    m_SettingsDialog->activateWindow();
+    m_SettingsDialog->raise();
+}
+void SimulationTab::RunSimButton_Clicked()
+{
+    UpdateSimulation();
 }

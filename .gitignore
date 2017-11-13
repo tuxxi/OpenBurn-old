@@ -6,3 +6,6 @@ ui_*.h
 Makefile
 OpenBurn
 .vscode/
+
+#OpenBurn Files
+*.obm

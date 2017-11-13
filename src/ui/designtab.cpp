@@ -203,8 +203,6 @@ void DesignTab::UpdateGraphics()
     QRectF bounds = QRectF(m_motorObject->boundingRect().left(), m_motorObject->boundingRect().top(), 
         m_motorObject->boundingRect().width() + 50, m_motorObject->boundingRect().height() + 15);
 
-    qDebug() << "bounds are : " << bounds.width() << " by " << bounds.height();
-
     m_motorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case 

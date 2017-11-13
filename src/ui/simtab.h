@@ -4,6 +4,7 @@
 
 #include "src/motorsim.h"
 #include "src/ui/widgets/qcustomplot.h"
+#include "src/ui/dialogs/simsettingsdialog.h"
 
 class SimulationTab : public QWidget
 {
@@ -13,6 +14,7 @@ public:
     ~SimulationTab();
 private slots:
     void RunSimButton_Clicked();
+    void SimSettingsButton_Clicked();
     void SLOT_DesignReady();
     void UpdateSimulation();    
 private:
@@ -23,4 +25,6 @@ private:
     QPushButton* m_RunSimulationButton, *m_SimSettingsButton;
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
+    MotorSimSettings* m_Settings;
+    SimSettingsDialog* m_SettingsDialog;
 };

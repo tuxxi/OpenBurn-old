@@ -12,7 +12,7 @@ MotorSim::MotorSim(OpenBurnMotor* motor)
     : m_InitialDesignMotor(motor), m_TotalBurnTime(0), m_TotalImpulse(0)
     
 {
-    m_Settings = new MotorSimSettings(14.7, .85, .99);
+
 }
 MotorSim::~MotorSim()
 {
@@ -21,9 +21,8 @@ MotorSim::~MotorSim()
         delete i;
     }
     m_SimResultData.clear();
-    delete m_Settings;
 }
-void MotorSim::RunSim(double timestep)
+void MotorSim::RunSim(MotorSimSettings* settings)
 {
     ClearAllData();
     
@@ -47,12 +46,12 @@ void MotorSim::RunSim(double timestep)
         {
             newDataPointMotor->SetCopyGrains(m_SimResultData[iterations-1]->motor->GetGrains());            
         }
-        m_TotalBurnTime += timestep;
+        m_TotalBurnTime += settings->timeStep;
         newDataPoint->time = m_TotalBurnTime;
         newDataPoint->motor = newDataPointMotor;        
         newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
-        newDataPoint->thrust = CalcThrust(newDataPoint->motor, newDataPoint->pressure);
-        m_TotalImpulse += (newDataPoint->thrust * timestep);
+        newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
+        m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
         iterations++;
         for (auto* i : newDataPointMotor->GetGrains())
         {
@@ -61,7 +60,7 @@ void MotorSim::RunSim(double timestep)
             i->SetBurnRate(burnRate);            
             // TODO: if (erosive)
             //i->SetErosiveBurnRate();
-            if (!i->GetIsBurnedOut() && !i->Burn(timestep)) //OpenBurnGrain::Burn should return false if the grain burned out
+            if (!i->GetIsBurnedOut() && !i->Burn(settings->timeStep)) //OpenBurnGrain::Burn should return false if the grain burned out
             {
                 numBurnedOut++;
             }
@@ -96,35 +95,35 @@ double MotorSim::CalcExitMachNumber(OpenBurnMotor* motor)
 {
     //Ae/A* = ((gamma + 1) / 2) ^ exponent * (1 + gamma
     //where exponent = (gamma +1) / 2(gamma - 1)
-    double gamma = motor->GetAvgPropellant().GetSpecificHeatRatio();
-    double areaRatio = motor->GetNozzle()->GetNozzleExpansionRatio();
-    double gp1 = gamma + 1.f; //gamma plus 1
-    double gm1 = gamma -1.f ; //gamma minus 1
-
-    double deriv = 0, arn = 0, fac = 0, macho = 0;
-
-    double exponent = gp1 / (2.f * gm1) ;
-
-    double aro = areaRatio / 2.f;          //initial guess
+    double machNumber = 0;
     if (motor->GetNozzle()->GetNozzleExit() <= motor->GetNozzle()->GetNozzleThroat()) //sonic nozzle
     {
         return 1.f;
     }
     else
     {
-        macho = 2.2f;                    //supersonic
+        machNumber = 2.2f; //supersonic
     }
-    double machn = macho + .05f;
-    while (qAbs(areaRatio - aro) > .0001f)
+    double gamma = motor->GetAvgPropellant().GetSpecificHeatRatio();
+    double areaRatio = motor->GetNozzle()->GetNozzleExpansionRatio();
+    double gp1 = gamma + 1.f; //gamma plus 1
+    double gm1 = gamma -1.f ; //gamma minus 1
+
+    double deriv = 0, areaRatioNew = 0, fac = 0;
+    double exponent = gp1 / (2.f * gm1) ;
+
+    double areaRatioGuess = areaRatio / 2.f; //initial guess
+    double machGuess = machNumber + .05f;
+    while (qAbs(areaRatio - areaRatioGuess) > .0001f)
     {
-       fac = 1.f + 0.5f * gm1 * machn * machn;
-       arn = 1.f / (machn * qPow(fac, -exponent) * qPow(gp1/2.f, exponent));
-       deriv = (arn - aro)/(machn-macho);
-       aro = arn;
-       macho = machn ;
-       machn = macho + (areaRatio - aro)/deriv;
+       fac = 1.f + 0.5f * gm1 * machGuess * machGuess;
+       areaRatioNew = 1.f / (machGuess * qPow(fac, -exponent) * qPow(gp1/2.f, exponent));
+       deriv = (areaRatioNew - areaRatioGuess)/(machGuess-machNumber);
+       areaRatioGuess = areaRatioNew;
+       machNumber = machGuess;
+       machGuess = machNumber + (areaRatio - areaRatioGuess)/deriv;
     }
-    return macho;
+    return machNumber;
 }
 //Calculates the nozzle exit pressure given an exit mach number and chamber pressure
 double MotorSim::CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach)
@@ -145,7 +144,7 @@ double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 }
 //Calculates the actual thrust coefficent using some emperical inefficency factors,
 //then applys that Cf to the throat area and pressure to give the real thrust value
-double MotorSim::CalcThrust(OpenBurnMotor* motor, double chamberPressure)
+double MotorSim::CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure)
 {
     //http://www.dtic.mil/dtic/tr/fulltext/u2/a099791.pdf
     //REAL thrust coeff = Nd * Nt * (Nf * Cfv + (1 - nf))
@@ -155,16 +154,16 @@ double MotorSim::CalcThrust(OpenBurnMotor* motor, double chamberPressure)
     //Cfv is the ideal thrust coefficent. Note that the reference text includes a correction
     //for ambient pressure, this is already done by the ideal thrust coefficent calculation.
     OpenBurnNozzle* nozzle =  motor->GetNozzle();
-    double idealCoef = CalcIdealThrustCoefficient(motor, chamberPressure);
+    double idealCoef = CalcIdealThrustCoefficient(motor, settings, chamberPressure);
     double divergenceLoss = nozzle->GetNozzleDivergenceLossFactor();
-    double skinFrictionLoss = (1.f - m_Settings->skinFrictionEfficency);
-    double realCoef = (divergenceLoss * m_Settings->twoPhaseFlowEfficency *
-        (m_Settings->skinFrictionEfficency * idealCoef + skinFrictionLoss));
+    double skinFrictionLoss = (1.f - settings->skinFrictionEfficency);
+    double realCoef = (divergenceLoss * settings->twoPhaseFlowEfficency *
+        (settings->skinFrictionEfficency * idealCoef + skinFrictionLoss));
     
     return realCoef * nozzle->GetNozzleThroatArea() * chamberPressure;
 }
 //Calculates the ideal thrust coefficent given an operating pressure
-double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, double chamberPressure)
+double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure)
 {
     //F = At * P1 * sqrt [ (2k^2 / k-1) (2/k+1 )^k+1k-1 * 1- (P2/P1)^(k-1/k) )] + (p2-p3)A2
     //See Rocket Propulsion Elements, Eq. 3-29
@@ -180,7 +179,7 @@ double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, double chamber
     double exitPressure = CalcExitPressure(motor, chamberPressure, exitMach);
     double pRatio = exitPressure / chamberPressure;
     double momentumThrust = qSqrt(kSquareTerm * qPow(twoOverKTerm,kOverItselfTerm) * (1.f - qPow(pRatio, kMinusOne)));
-    double pressureThrust = ((exitPressure - m_Settings->ambientPressure) * motor->GetNozzle()->GetNozzleExpansionRatio() ) / chamberPressure;
+    double pressureThrust = ((exitPressure - settings->ambientPressure) * motor->GetNozzle()->GetNozzleExpansionRatio() ) / chamberPressure;
     return momentumThrust + pressureThrust;
 }
 double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain)

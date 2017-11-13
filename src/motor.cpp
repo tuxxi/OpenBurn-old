@@ -234,6 +234,13 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
         QJsonObject propellantObject = i.toObject();
         OpenBurnPropellant prop;
         prop.ReadJSON(propellantObject);
+        for (auto k : *database)
+        {
+            if (prop.GetPropellantName() == k.GetPropellantName())
+            {
+                //duplicate stuff
+            }
+        }
         propellants.push_back(prop);
     }
     QJsonArray grainArray = object["grains"].toArray(); 

@@ -25,8 +25,15 @@ struct MotorSimSettings
     double ambientPressure;
     double twoPhaseFlowEfficency; //% of combustion that is gaseous. Burnsim assumes 85% by default.
     double skinFrictionEfficency; //99% is typical for this value
-    MotorSimSettings(double ambient, double twophase, double skinfriction)
-        : ambientPressure(ambient), twoPhaseFlowEfficency(twophase), skinFrictionEfficency(skinfriction)
+    double timeStep;
+
+    //default settings
+    MotorSimSettings()
+        : MotorSimSettings(14.7f, 0.85f, 0.98f)
+    {}
+    MotorSimSettings(double ambient, double twophase, double skinfriction, double timestep = 0.01f)
+        : ambientPressure(ambient), twoPhaseFlowEfficency(twophase), 
+        skinFrictionEfficency(skinfriction), timeStep(timestep)
     {}
 };
 class MotorSim : public QObject
@@ -50,9 +57,9 @@ public:
     double CalcExitMachNumber(OpenBurnMotor* motor);
     double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
     //
-    double CalcThrust(OpenBurnMotor* motor, double chamberPressure);
-    double CalcIdealThrustCoefficient(OpenBurnMotor* motor, double chamberPressure);
-    void RunSim(double timestep = 0.01f);
+    double CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
+    double CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
+    void RunSim(MotorSimSettings* settings);
 
     double GetTotalBurnTime() const;
     double GetMaxPressure() const;
@@ -60,14 +67,13 @@ public:
     double GetAvgThrust() const;
     double GetTotalImpulse() const;
     std::vector<MotorSimDataPoint*> GetResults();
-    
+
 signals:
     void SimulationStarted();
     //false if there was an error
     void SimulationFinished(bool success);
 private:
     void ClearAllData();
-    MotorSimSettings* m_Settings;
     std::vector<MotorSimDataPoint*> m_SimResultData;
     OpenBurnMotor* m_InitialDesignMotor;
 
