@@ -90,8 +90,8 @@ void SimulationTab::UpdateSimulation()
     double thrustN = OpenBurnUtil::PoundsToNewtons(m_Simulator->GetAvgThrust());
     QString designation(OpenBurnUtil::GetMotorClass(nsec));
     QString thrust(QString::number(round(thrustN)));
-    
-    m_motorDesignationLabel->setText(designation + "-" + thrust);
+    QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(nsec), 'g', 2));
+    m_motorDesignationLabel->setText(percent + "% " + designation + "-" + thrust);
 }
 void SimulationTab::SLOT_DesignReady()
 {

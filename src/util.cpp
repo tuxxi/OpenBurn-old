@@ -27,4 +27,20 @@ namespace OpenBurnUtil
         }
         return designation;
     }
+    double GetMotorClassPercent(double nsec)
+    {
+        if (nsec < 10.0f)
+        { 
+            if (nsec > 5.0f ) return nsec / 10.0f; //C 
+            else if (nsec > 2.5f) return nsec / 5.0f; //B
+            else if (nsec > 1.25f) return nsec / 2.5f; //A
+            else return 0.0f; //below A, very unlikely :)          
+        }
+
+        char designation = GetMotorClass(nsec);
+        int exponent =  designation - 'D'; //D is 10 - 20, we want log2(lower limit)/10
+
+        double minNsInClass = 10.0f * pow(2, exponent);
+        return 100.0f * (nsec - minNsInClass) / minNsInClass;
+    }
 }
