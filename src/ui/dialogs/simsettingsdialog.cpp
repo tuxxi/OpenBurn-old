@@ -3,6 +3,7 @@
 #include <QGroupBox>
 #include "simsettingsdialog.h"
 
+#include "src/units.h"
 SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, QWidget* parent)
     : QDialog(parent), m_Settings(settings)
 {
@@ -26,7 +27,7 @@ void SimSettingsDialog::SetupUI()
     m_sb_ambientPressure->setSingleStep(0.1f);
     m_sb_ambientPressure->setMinimum(0.0f);
     m_cb_ambientPressureUnits = new QComboBox;
-    m_cb_ambientPressureUnits->addItems(OpenBurnUtil::g_kPressureUnits);
+    m_cb_ambientPressureUnits->addItems(OpenBurnUnits::g_kPressureUnits);
     layout->addWidget(m_cb_ambientPressureUnits, 0, 2);
 
     layout->addWidget(new QLabel(tr("Ambient Temperature")), 1, 0);
@@ -35,7 +36,7 @@ void SimSettingsDialog::SetupUI()
     m_sb_ambientTemp->setSingleStep(0.1f);
     m_sb_ambientTemp->setMinimum(0.0f);
     m_cb_ambientTempUnits = new QComboBox;
-    m_cb_ambientTempUnits->addItems(OpenBurnUtil::g_kTemperatureUnits);
+    m_cb_ambientTempUnits->addItems(OpenBurnUnits::g_kTemperatureUnits);
     layout->addWidget(m_cb_ambientTempUnits, 1, 2);
 
     layout->addWidget(new QLabel(tr("Two-phase flow efficiency (%)")), 2, 0);

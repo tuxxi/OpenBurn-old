@@ -10,6 +10,7 @@
 #include <QToolButton>
 
 #include "src/nozzle.h"
+#include "src/units.h"
 
 //this class represents the default design for a nozzle
 

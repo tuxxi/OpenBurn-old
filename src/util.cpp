@@ -3,9 +3,6 @@
 
 namespace OpenBurnUtil
 {
-    double PoundsToSlugs(double lbs) { return 0.031081f * lbs; }   
-    double PoundsToNewtons(double lbs) { return 4.44822f * lbs; } 
-
     char GetMotorClass(double nsec)
     {
         char designation = 0;

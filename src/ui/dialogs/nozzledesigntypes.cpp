@@ -27,7 +27,7 @@ void OpenBurnDesignNozzle::SetupUI()
     m_throatDiaSpinBox->setSingleStep(0.25f);
     QLabel* label = new QLabel(tr("Throat Diameter"), this);
     m_throatDiaUnits = new QComboBox(this);
-    m_throatDiaUnits->addItems(OpenBurnUtil::g_kLengthUnits);
+    m_throatDiaUnits->addItems(OpenBurnUnits::g_kLengthUnits);
     layout->addWidget(label, 1, 0);
     layout->addWidget(m_throatDiaSpinBox, 1, 1);
     layout->addWidget(m_throatDiaUnits, 1, 2);
@@ -38,7 +38,7 @@ void OpenBurnDesignNozzle::SetupUI()
     m_exitDiaSpinBox->setSingleStep(0.25f);
     QLabel* label_2 = new QLabel(tr("Exit Diameter"), this);
     m_exitDiaUnits = new QComboBox(this);
-    m_exitDiaUnits->addItems(OpenBurnUtil::g_kLengthUnits);
+    m_exitDiaUnits->addItems(OpenBurnUnits::g_kLengthUnits);
     layout->addWidget(label_2, 2, 0);
     layout->addWidget(m_exitDiaSpinBox, 2, 1);
     layout->addWidget(m_exitDiaUnits, 2, 2);
@@ -85,7 +85,7 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     QLabel* label_3 = new QLabel(tr("Divergent Half Angle"), this);
     m_halfAngleUnits = new QComboBox(this);
     m_halfAngleUnits->setLayoutDirection(Qt::LeftToRight);
-    m_halfAngleUnits->addItems(OpenBurnUtil::g_kAngleUnits);
+    m_halfAngleUnits->addItems(OpenBurnUnits::g_kAngleUnits);
 
     AddNewControls(label_3, 0, 0);
     AddNewControls(m_halfAngleSpinBox, 0, 1);

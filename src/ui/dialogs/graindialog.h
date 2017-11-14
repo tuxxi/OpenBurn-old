@@ -12,7 +12,6 @@
 #include <QList>
 
 #include "src/grain.h"
-#include "src/util.h"
 #include "graindesigntypes.h"
 #include "src/ui/graphics/graingraphicsitem.h"
 

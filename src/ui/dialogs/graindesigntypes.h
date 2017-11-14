@@ -11,7 +11,6 @@
 
 #include "src/grain.h"
 #include "src/propellant.h"
-
 //This class represents the "default" parameters for grain design:
 //Length, Diameter, TYPE, propellant, and inhibited faces. 
 //The QGridLayout lays out the following:
@@ -32,12 +31,12 @@ public:
     double GetLength();
     double GetDiameter();
     int GetInhibitedFaces();
-    OpenBurnPropellant& GetPropellant();
+    OpenBurnPropellant GetPropellant();
     GRAINTYPE GetGrainType();
 
 private slots:
     void on_grainType_changed(int);
-    
+    void on_units_changed(int);
 signals:
     void SIG_GrainType_Changed(GRAINTYPE type);
     void SIG_GrainDesign_Changed();

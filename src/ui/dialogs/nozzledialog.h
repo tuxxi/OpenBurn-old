@@ -7,7 +7,6 @@
 #include <QPushButton>
 #include <QComboBox>
 
-#include "src/util.h"
 #include "src/nozzle.h"
 #include "nozzledesigntypes.h"
 #include "src/ui/graphics/nozzlegraphicsitem.h"

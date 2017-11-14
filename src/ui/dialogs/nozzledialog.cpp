@@ -5,7 +5,6 @@
 #include <QFrame>
 
 #include "src/ui/dialogs/nozzledialog.h"
-
 NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed)
     : QDialog(parent), m_Nozzle(seed), m_gfxNozzle(nullptr)
 {
