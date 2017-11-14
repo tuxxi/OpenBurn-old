@@ -25,26 +25,35 @@ void SimSettingsDialog::SetupUI()
     m_sb_ambientPressure->setValue(14.7);
     m_sb_ambientPressure->setSingleStep(0.1f);
     m_sb_ambientPressure->setMinimum(0.0f);
-
     m_cb_ambientPressureUnits = new QComboBox;
     m_cb_ambientPressureUnits->addItems(OpenBurnUtil::g_kPressureUnits);
     layout->addWidget(m_cb_ambientPressureUnits, 0, 2);
 
-    layout->addWidget(new QLabel(tr("Two-phase flow efficiency (%)")), 1, 0);
-    layout->addWidget(m_sb_twoPhaseFlow = new QDoubleSpinBox, 1, 1);
+    layout->addWidget(new QLabel(tr("Ambient Temperature")), 1, 0);
+    layout->addWidget(m_sb_ambientTemp = new QDoubleSpinBox, 1, 1);
+    m_sb_ambientTemp->setValue(70.0f);
+    m_sb_ambientTemp->setSingleStep(0.1f);
+    m_sb_ambientTemp->setMinimum(0.0f);
+    m_cb_ambientTempUnits = new QComboBox;
+    m_cb_ambientTempUnits->addItems(OpenBurnUtil::g_kTemperatureUnits);
+    layout->addWidget(m_cb_ambientTempUnits, 1, 2);
+
+    layout->addWidget(new QLabel(tr("Two-phase flow efficiency (%)")), 2, 0);
+    layout->addWidget(m_sb_twoPhaseFlow = new QDoubleSpinBox, 2, 1);
     m_sb_twoPhaseFlow->setValue(85.0f);
     m_sb_twoPhaseFlow->setMaximum(100.0f);
     m_sb_twoPhaseFlow->setMinimum(0.0f);
     m_sb_twoPhaseFlow->setSingleStep(0.25f);
 
-    layout->addWidget(new QLabel(tr("Nozzle skin friction efficiency")), 2, 0);
-    layout->addWidget(m_sb_skinFriction = new QDoubleSpinBox, 2, 1);
+    layout->addWidget(new QLabel(tr("Nozzle skin friction efficiency (%)")), 3, 0);
+    layout->addWidget(m_sb_skinFriction = new QDoubleSpinBox, 3, 1);
     m_sb_skinFriction->setValue(98.0f);
     m_sb_skinFriction->setMaximum(100.0f);
     m_sb_skinFriction->setMinimum(0.0f);
     m_sb_skinFriction->setSingleStep(0.1f);
-    layout->addWidget(new QLabel(tr("Simulation time step")), 3, 0);
-    layout->addWidget(m_sb_timeStep = new QDoubleSpinBox, 3, 1);
+
+    layout->addWidget(new QLabel(tr("Simulation time step")), 4, 0);
+    layout->addWidget(m_sb_timeStep = new QDoubleSpinBox, 4, 1);
     m_sb_timeStep->setValue(0.01f);
     m_sb_timeStep->setDecimals(4);
     m_sb_timeStep->setMaximum(0.25);
@@ -66,6 +75,7 @@ void SimSettingsDialog::ApplySettings()
     if (m_Settings)
     {
         m_Settings->ambientPressure = m_sb_ambientPressure->value();
+        m_Settings->ambientTemp = m_sb_ambientTemp->value();
         m_Settings->twoPhaseFlowEfficency = m_sb_twoPhaseFlow->value() * 0.01f; //precent
         m_Settings->skinFrictionEfficency = m_sb_skinFriction->value() * 0.01f; //percent
         m_Settings->timeStep = m_sb_timeStep->value();

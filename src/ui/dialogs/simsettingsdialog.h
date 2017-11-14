@@ -20,7 +20,7 @@ private:
     void SetupUI();
     void ApplySettings();
     QPushButton* m_applyButton, *m_cancelButton;
-    QDoubleSpinBox* m_sb_ambientPressure, *m_sb_twoPhaseFlow, *m_sb_skinFriction, *m_sb_timeStep;
-    QComboBox* m_cb_ambientPressureUnits;
+    QDoubleSpinBox* m_sb_ambientPressure, *m_sb_ambientTemp, *m_sb_twoPhaseFlow, *m_sb_skinFriction, *m_sb_timeStep;
+    QComboBox* m_cb_ambientPressureUnits, *m_cb_ambientTempUnits;
     MotorSimSettings* m_Settings;
 };

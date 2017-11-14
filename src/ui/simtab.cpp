@@ -27,9 +27,9 @@ void SimulationTab::SetupUI()
     m_Plotter->xAxis->setRange(-.2f, 2.f);
     m_Plotter->yAxis->setRange(0.f, 1200.f);
     
-    m_RunSimulationButton = new QPushButton(tr("Run Sim"));
+    m_RunSimulationButton = new QPushButton(tr("Run Simulation"));
     m_RunSimulationButton->setEnabled(false);    
-    m_SimSettingsButton = new QPushButton(tr("Parameters"));
+    m_SimSettingsButton = new QPushButton(tr("Simulation Settings"));
 
     QGroupBox* gb_Simulate = new QGroupBox(tr("Motor Simulation"));
     QGroupBox* gb_Controls = new QGroupBox(tr("Controls"));    

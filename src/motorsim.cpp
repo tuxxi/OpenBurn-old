@@ -188,7 +188,7 @@ double MotorSim::CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* gr
     OpenBurnPropellant prop = grain->GetPropellantType();
     return prop.GetBurnRateCoef() * qPow(CalcChamberPressure(motor), prop.GetBurnRateExp());
 }
-double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, double machNumber)
+double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, MotorSimSettings* settings, double machNumber)
 {
     OpenBurnPropellant prop = grain->GetPropellantType();
     double k = prop.GetSpecificHeatRatio();
@@ -217,8 +217,8 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double mu = prop.GetGasViscosity(); //viscoisty of combustion products
     double Pr = prop.GetPrandtlNumber(); //prandtl number
 
-    double T_s = OpenBurnUtil::g_kSurfaceTemperature; //Temperature of burning propellant surface
-    double T_i = OpenBurnUtil::g_kAmbientTemperature; //Base temperature of propellant (degrees K)
+    double T_s = T_0 / 2.0f;            //Temperature of burning propellant surface
+    double T_i = settings->ambientTemp; //Base temperature of propellant (degrees K)
     /*
     Now we calculate erosive burning from the given equation:
     R_e = (alpha * G^0.8 ) / [D^0.2 * e^( (beta * R_ttl * rho)/G )]

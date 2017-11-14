@@ -23,17 +23,21 @@ struct MotorSimDataPoint
 struct MotorSimSettings
 {
     double ambientPressure;
+    double ambientTemp;
+
     double twoPhaseFlowEfficency; //% of combustion that is gaseous. Burnsim assumes 85% by default.
     double skinFrictionEfficency; //99% is typical for this value
     double timeStep;
 
     //default settings
     MotorSimSettings()
-        : MotorSimSettings(14.7f, 0.85f, 0.98f)
+        : MotorSimSettings(14.7f, 70, 0.85f, 0.98f)
     {}
-    MotorSimSettings(double ambient, double twophase, double skinfriction, double timestep = 0.01f)
-        : ambientPressure(ambient), twoPhaseFlowEfficency(twophase), 
-        skinFrictionEfficency(skinfriction), timeStep(timestep)
+    MotorSimSettings(double ambientPress, double ambientTemperature, double twophase, double skinfriction, double timestep = 0.01f)
+        : ambientPressure(ambientPress), ambientTemp(ambientTemperature), 
+        twoPhaseFlowEfficency(twophase), 
+        skinFrictionEfficency(skinfriction), 
+        timeStep(timestep)
     {}
 };
 class MotorSim : public QObject
@@ -50,7 +54,7 @@ public:
     //per grain:
     //calculates linear burn rate for a given grain
     double CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain); //based on saint robert's law. No erosive burning
-    double CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, double machNumber);
+    double CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, MotorSimSettings* settings, double machNumber);
 
     //whole chamber:
     double CalcChamberPressure(OpenBurnMotor* motor);
