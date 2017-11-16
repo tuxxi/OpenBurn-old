@@ -11,6 +11,8 @@
 
 #include "src/grain.h"
 #include "src/propellant.h"
+#include "src/ui/widgets/unitscombobox.h"
+
 //This class represents the "default" parameters for grain design:
 //Length, Diameter, TYPE, propellant, and inhibited faces. 
 //The QGridLayout lays out the following:
@@ -36,7 +38,6 @@ public:
 
 private slots:
     void on_grainType_changed(int);
-    void on_units_changed(int);
 signals:
     void SIG_GrainType_Changed(GRAINTYPE type);
     void SIG_GrainDesign_Changed();
@@ -51,7 +52,7 @@ protected:
 
     QComboBox *m_grainTypeComboBox;
     QComboBox *m_propellantComboBox;
-    QComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox;
+    LengthUnitsComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox;
 
     QToolButton *m_modifyPropellantDatabase;
 private:
@@ -75,10 +76,9 @@ public:
     virtual ~BatesGrainDesign();
 
     double GetCoreDiameter();
-    
 protected:
     virtual void SeedValues() override;
     
     QDoubleSpinBox* m_grainCoreDiameterSpinBox;
-    QComboBox* m_grainCoreDiaUnitsComboBox;
+    LengthUnitsComboBox* m_grainCoreDiaUnitsComboBox;
 };

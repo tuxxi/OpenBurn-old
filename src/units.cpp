@@ -2,115 +2,205 @@
 
 namespace OpenBurnUnits
 {
-//LENGTH
-    double LengthUnitsToInches(LengthUnits_T units, double value)
+    double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
     {
-        switch(units)
+        switch(newUnits)
         {
-        default:
-        case LengthUnits_T::inches:
-            return value;
-            break;
-        case LengthUnits_T::millimeters:
-            return MM_PER_INCH * value;
-            break;
-        case LengthUnits_T::centimeters:
-            return MM_PER_INCH * 10.f * value;
-            break;
-        case LengthUnits_T::meters:
-            return MM_PER_INCH * 1000.f * value;
-            break;
-        case LengthUnits_T::feet:
-            return FEET_PER_INCH * value;
-            break;
+            default:
+            case LengthUnits_T::inches:
+            {
+                switch(prevUnits)
+                {
+                default:
+                case LengthUnits_T::inches:
+                    return value;
+                    break;
+                case LengthUnits_T::millimeters:
+                    return INCHES_PER_MM * value;
+                    break;
+                case LengthUnits_T::centimeters:
+                    return INCHES_PER_MM * 10.f * value;
+                    break;
+                case LengthUnits_T::meters:
+                    return INCHES_PER_MM * 1000.f * value;
+                    break;
+                case LengthUnits_T::feet:
+                    return INCHES_PER_FOOT * value;
+                    break;
+                }
+                break;
+            }
+            case LengthUnits_T::millimeters:
+            {
+                switch(prevUnits)
+                {
+                default:
+                case LengthUnits_T::inches:
+                    return MM_PER_INCH * value;
+                    break;
+                case LengthUnits_T::millimeters:
+                    return value;
+                    break;
+                case LengthUnits_T::centimeters:
+                    return value / 10.0;
+                    break;
+                case LengthUnits_T::meters:
+                    return value / 1000.0;
+                    break;
+                case LengthUnits_T::feet:
+                    return MM_PER_INCH * FEET_PER_INCH * value;
+                    break;
+                }
+                break;
+            }
+            case LengthUnits_T::centimeters:
+            {
+                switch(prevUnits)
+                {
+                default:
+                case LengthUnits_T::inches:
+                    return MM_PER_INCH / 10.0 * value;
+                    break;
+                case LengthUnits_T::millimeters:
+                    return value / 10.0;
+                    break;
+                case LengthUnits_T::centimeters:
+                    return value;
+                    break;
+                case LengthUnits_T::meters:
+                    return value / 100.0;
+                    break;
+                case LengthUnits_T::feet:
+                    return MM_PER_INCH * FEET_PER_INCH / 10.0 * value;
+                    break;
+                }
+                break;
+            }
+            case LengthUnits_T::meters:
+            {
+                switch(prevUnits)
+                {
+                default:
+                case LengthUnits_T::inches:
+                    return MM_PER_INCH / 1000.0;
+                    break;
+                case LengthUnits_T::millimeters:
+                    return value / 1000.0;
+                    break;
+                case LengthUnits_T::centimeters:
+                    return value / 100.0;
+                    break;
+                case LengthUnits_T::meters:
+                    return value;
+                    break;
+                case LengthUnits_T::feet:
+                    return MM_PER_INCH / 1000.0 * FEET_PER_INCH * value;
+                    break;
+                }
+                break;
+            }
+            case LengthUnits_T::feet:
+            {
+                switch(prevUnits)
+                {
+                default:
+                case LengthUnits_T::inches:
+                    return FEET_PER_INCH * value;
+                    break;
+                case LengthUnits_T::millimeters:
+                    return MM_PER_INCH * INCHES_PER_FOOT * value;
+                    break;
+                case LengthUnits_T::centimeters:
+                    return MM_PER_INCH / 10.0 * INCHES_PER_FOOT* value;
+                    break;
+                case LengthUnits_T::meters:
+                    return MM_PER_INCH / 1000.0 * INCHES_PER_FOOT * value;
+                    break;
+                case LengthUnits_T::feet:
+                    return value;
+                    break;
+                }
+                break;
+            }
         }
     }
-    double LengthUnitsToMillimeters(LengthUnits_T units, double value);
-    double LengthUnitsToCentimeters(LengthUnits_T units, double value);
-    double LengthUnitsToMeters(LengthUnits_T units, double value);
-    double LengthUnitsToFeet(LengthUnits_T units, double value);
 //PRESSURE
-    double PressureUnitsToPsi(PressureUnits_T units, double value);
-    double PressureUnitsToAtm(PressureUnits_T units, double value);
-    double PressureUnitsToMpa(PressureUnits_T units, double value);
-//TEMPERATURE
-    double TemperatureUnitsToF(TemperatureUnits_T units, double value);
-    double TemperatureUnitsToC(TemperatureUnits_T units, double value);
-    double TemperatureUnitsToK(TemperatureUnits_T units, double value);
-//FORCE
-    double ForceUnitsToPounds(ForceUnits_T units, double value)
+    double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
     {
-        switch(units)
-        {
-        default:
-        case ForceUnits_T::pounds_force:
-            return value;
-            break;
-        case ForceUnits_T::newtons:
-            return POUNDS_PER_NEWTON * value;
-            break;
-        }
+        //TODO
     }
-    double ForceUnitsToNewtons(ForceUnits_T units, double value)
+//TEMPERATURE
+    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
     {
-        switch (units)
-        {
-        default:
-        case ForceUnits_T::newtons:
-            return value;
-            break;
-        case ForceUnits_T::pounds_force:
-            return NEWTONS_PER_POUND * value;
-            break;
-        }
+        //TODO
+    }
+//FORCE
+    double NewtonsToPounds(double value)
+    {
+        return POUNDS_PER_NEWTON * value;
+    }
+    double PoundsToNewtons(double value)
+    {
+        return NEWTONS_PER_POUND * value;
     }
 //MASS
-    double MassUnitsToPoundsMass(MassUnits_T units, double value)
+    double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
     {
-        switch(units)
+        switch(oldUnits)
         {
-        default:
-        case MassUnits_T::pounds_mass:
-            return value;
-            break;
-        case MassUnits_T::kilograms:
-            return POUNDS_PER_KILOGRAM * value;
-            break;
-        case MassUnits_T::slugs:
-            return POUNDS_PER_SLUG * value;
-            break;
-        }
-    }
-    double MassUnitsToKilograms(MassUnits_T units, double value)
-    {
-        switch(units)
-        {
-        default:
-        case MassUnits_T::kilograms:
-            return value;
-            break;
-        case MassUnits_T::pounds_mass:
-            return KILOGRAMS_PER_POUND * value;
-            break;
-        case MassUnits_T::slugs:
-            return KILOGRAMS_PER_SLUG * value;
-            break;
-        }
-    }
-    double MassUnitsToSlugs(MassUnits_T units, double value)
-    {
-        switch(units)
-        {
-        default:
-        case MassUnits_T::slugs:
-            return value;
-            break;
-        case MassUnits_T::kilograms:
-            return SLUGS_PER_KILOGRAM * value;
-            break;
-        case MassUnits_T::pounds_mass:
-            return SLUGS_PER_POUND * value;
-            break;
+            default:
+            case MassUnits_T::pounds_mass:
+            {
+                switch(newUnits)
+                {
+                default:
+                case MassUnits_T::pounds_mass:
+                    return value;
+                    break;
+                case MassUnits_T::kilograms:
+                    return KILOGRAMS_PER_POUND * value;
+                    break;
+                case MassUnits_T::slugs:
+                    return SLUGS_PER_POUND * value;
+                    break;
+                }
+                break;
+            }
+            case MassUnits_T::kilograms:
+            {
+                switch(newUnits)
+                {
+                default:
+                case MassUnits_T::kilograms:
+                    return value;
+                    break;
+                case MassUnits_T::pounds_mass:
+                    return POUNDS_PER_KILOGRAM * value;
+                    break;
+                case MassUnits_T::slugs:
+                    return SLUGS_PER_KILOGRAM * value;
+                    break;
+                }
+                break;
+            }
+                
+            case MassUnits_T::slugs:
+            {
+                switch(newUnits)
+                {
+                default:
+                case MassUnits_T::slugs:
+                    return value;
+                    break;
+                case MassUnits_T::kilograms:
+                    return KILOGRAMS_PER_SLUG * value;
+                    break;
+                case MassUnits_T::pounds_mass:
+                    return POUNDS_PER_SLUG * value;
+                    break;
+                }
+                break;
+            }
         }
     }
 }

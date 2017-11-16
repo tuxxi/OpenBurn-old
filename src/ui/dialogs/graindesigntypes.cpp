@@ -17,7 +17,6 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(
     connect(m_grainLengthSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
     connect(m_grainInhibitedFacesSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(SIG_GrainDesign_Changed()));
     
-    connect(m_grainDiaUnitsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_units_changed(int)));
     SeedValues();
 }
 void OpenBurnDesignGrain::SetupUI()
@@ -50,12 +49,11 @@ void OpenBurnDesignGrain::SetupUI()
     //Grain Length 
     m_grainLengthSpinBox = new QDoubleSpinBox(this);
     m_grainLengthSpinBox->setDecimals(3);
-    m_grainLengthSpinBox->setSingleStep(0.25);    
+    m_grainLengthSpinBox->setSingleStep(0.25);
+    m_grainLengthSpinBox->setMaximum(1000.0);  
     QLabel* label_2 = new QLabel(tr("Grain Length"), this);
-    m_grainLenUnitsComboBox = new QComboBox(this);
+    m_grainLenUnitsComboBox = new LengthUnitsComboBox(this, m_grainLengthSpinBox);
     m_grainLenUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainLenUnitsComboBox->addItems(OpenBurnUnits::g_kLengthUnits);
-
     controlsLayout->addWidget(label_2, 2, 0);
     controlsLayout->addWidget(m_grainLengthSpinBox, 2, 1);
     controlsLayout->addWidget(m_grainLenUnitsComboBox, 2, 2);
@@ -63,11 +61,11 @@ void OpenBurnDesignGrain::SetupUI()
     //Grain Diameter
     m_grainDiameterSpinBox = new QDoubleSpinBox(this);
     m_grainDiameterSpinBox->setDecimals(3);
-    m_grainDiameterSpinBox->setSingleStep(0.25);    
+    m_grainDiameterSpinBox->setSingleStep(0.25);
+    m_grainDiameterSpinBox->setMaximum(1000.0);  
     QLabel* label_3 = new QLabel(tr("Grain Diameter"), this);
-    m_grainDiaUnitsComboBox = new QComboBox(this);
+    m_grainDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainDiameterSpinBox);
     m_grainDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainDiaUnitsComboBox->addItems(OpenBurnUnits::g_kLengthUnits);
     controlsLayout->addWidget(label_3, 3, 0);
     controlsLayout->addWidget(m_grainDiameterSpinBox, 3, 1);
     controlsLayout->addWidget(m_grainDiaUnitsComboBox, 3, 2);
@@ -104,14 +102,16 @@ void OpenBurnDesignGrain::SeedValues()
 }
 double OpenBurnDesignGrain::GetLength()
 {
-    return OpenBurnUnits::LengthUnitsToInches(
-        OpenBurnUnits::LengthUnits_T(m_grainLenUnitsComboBox->currentIndex()), 
+    return OpenBurnUnits::ConvertLength(
+        m_grainLenUnitsComboBox->GetCurrentUnits(),
+        OpenBurnUnits::LengthUnits_T::inches, 
         m_grainLengthSpinBox->value());
 }
 double OpenBurnDesignGrain::GetDiameter()
 {
-    return OpenBurnUnits::LengthUnitsToInches(
-        OpenBurnUnits::LengthUnits_T(m_grainDiaUnitsComboBox->currentIndex()),
+    return OpenBurnUnits::ConvertLength(
+        m_grainDiaUnitsComboBox->GetCurrentUnits(),
+        OpenBurnUnits::LengthUnits_T::inches, 
         m_grainDiameterSpinBox->value());
 }
 int OpenBurnDesignGrain::GetInhibitedFaces()
@@ -141,11 +141,6 @@ void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 {
     controlsLayout->addWidget(widet, row+4, col);
 }
-void OpenBurnDesignGrain::on_units_changed(int idx)
-{
-    qDebug() << "units changed.";
-    OpenBurnUnits::LengthUnits_T units = OpenBurnUnits::LengthUnits_T(idx);
-}
 //BATES
 BatesGrainDesign::BatesGrainDesign(
     PropellantList* prop, 
@@ -157,10 +152,10 @@ BatesGrainDesign::BatesGrainDesign(
     m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);
     m_grainCoreDiameterSpinBox->setDecimals(3);
     m_grainCoreDiameterSpinBox->setSingleStep(0.25);
+    m_grainCoreDiameterSpinBox->setMaximum(1000.0);
     QLabel* label_4 = new QLabel(tr("Grain Core Diameter"), this);
-    m_grainCoreDiaUnitsComboBox = new QComboBox(this);
+    m_grainCoreDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainCoreDiameterSpinBox);
     m_grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    m_grainCoreDiaUnitsComboBox->addItems(OpenBurnUnits::g_kLengthUnits);
 
     AddNewControls(label_4, 0, 0);
     AddNewControls(m_grainCoreDiameterSpinBox, 0, 1);
@@ -178,8 +173,9 @@ BatesGrainDesign::~BatesGrainDesign()
 }
 double BatesGrainDesign::GetCoreDiameter()
 {
-    return OpenBurnUnits::LengthUnitsToInches(
-        OpenBurnUnits::LengthUnits_T(m_grainCoreDiaUnitsComboBox->currentIndex()), 
+    return OpenBurnUnits::ConvertLength(
+        m_grainCoreDiaUnitsComboBox->GetCurrentUnits(),
+        OpenBurnUnits::LengthUnits_T::inches, 
         m_grainCoreDiameterSpinBox->value());
 }
 void BatesGrainDesign::SeedValues()

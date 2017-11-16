@@ -1,10 +1,12 @@
+#pragma once
 #include <QObject>
 #include <QStringList>
 
 namespace OpenBurnUnits
 {
 //length
-    static const double MM_PER_INCH = 0.0393701;
+    static const double MM_PER_INCH = 25.4;
+    static const double INCHES_PER_MM = 1 / MM_PER_INCH;
     static const double INCHES_PER_FOOT = 12.0;
     static const double FEET_PER_INCH = 1.0 / INCHES_PER_FOOT;
     enum class LengthUnits_T
@@ -22,11 +24,7 @@ namespace OpenBurnUnits
         QObject::tr("Feet (ft)") <<
         QObject::tr("Meters (m)"));
 
-    double LengthUnitsToInches(LengthUnits_T units, double value);
-    double LengthUnitsToMillimeters(LengthUnits_T units, double value);
-    double LengthUnitsToCentimeters(LengthUnits_T units, double value);
-    double LengthUnitsToMeters(LengthUnits_T units, double value);
-    double LengthUnitsToFeet(LengthUnits_T units, double value);
+    double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value);
 //angle
     enum class AngleUnits_T
     {
@@ -47,9 +45,7 @@ namespace OpenBurnUnits
         QObject::tr("Pounds / sq-inch (psi)") <<
         QObject::tr("Atmospheres (atm)") <<
         QObject::tr("Megapascals (mPa)"));
-    double PressureUnitsToPsi(PressureUnits_T units, double value);
-    double PressureUnitsToAtm(PressureUnits_T units, double value);
-    double PressureUnitsToMpa(PressureUnits_T units, double value);
+    double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value);
 //TEMPERATURE
     enum class TemperatureUnits_T
     {
@@ -61,10 +57,7 @@ namespace OpenBurnUnits
         QObject::tr("Fahrenheit (F)") <<
         QObject::tr("Celsius (C)") <<
         QObject::tr("Kelvin (K)"));
-    double TemperatureUnitsToF(TemperatureUnits_T units, double value);
-    double TemperatureUnitsToC(TemperatureUnits_T units, double value);
-    double TemperatureUnitsToK(TemperatureUnits_T units, double value);
-
+    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value);
 //FORCE
     static const double NEWTONS_PER_POUND = 4.44822;
     static const double POUNDS_PER_NEWTON = 1.0 / NEWTONS_PER_POUND;
@@ -76,8 +69,8 @@ namespace OpenBurnUnits
     static const QStringList g_kForceUnits = (QStringList() << 
         QObject::tr("Pounds (lbs)") <<
         QObject::tr("Newtons (N)"));
-    double ForceUnitsToPounds(ForceUnits_T units, double value);
-    double ForceUnitsToNewtons(ForceUnits_T units, double value);
+    double NewtonsToPounds(double value);
+    double PoundsToNewtons(double value);
 
 //MASS
     static const double POUNDS_PER_KILOGRAM = 2.20462;
@@ -96,7 +89,5 @@ namespace OpenBurnUnits
         QObject::tr("Pounds-mass (lbm)") <<
         QObject::tr("Kilograms (kg)") << 
         QObject::tr("Slugs (slug)"));
-    double MassUnitsToPoundsMass(MassUnits_T units, double value);
-    double MassUnitsToKilograms(MassUnits_T units, double value);
-    double MassUnitsToSlugs(MassUnits_T units, double value);
+    double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value);
 }

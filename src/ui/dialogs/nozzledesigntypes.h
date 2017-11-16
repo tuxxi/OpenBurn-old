@@ -11,7 +11,7 @@
 
 #include "src/nozzle.h"
 #include "src/units.h"
-
+#include "src/ui/widgets/unitscombobox.h"
 //this class represents the default design for a nozzle
 
 class OpenBurnDesignNozzle : public QWidget
@@ -31,7 +31,7 @@ protected:
     void AddNewControls(QWidget* widet, int row, int col);
 
     QDoubleSpinBox *m_throatDiaSpinBox, *m_exitDiaSpinBox;
-    QComboBox *m_throatDiaUnits, *m_exitDiaUnits;
+    LengthUnitsComboBox *m_throatDiaUnits, *m_exitDiaUnits;
     QComboBox *m_nozzleType;
 
     OpenBurnNozzle* m_seedNozzle;

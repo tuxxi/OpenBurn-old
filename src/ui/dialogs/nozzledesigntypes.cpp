@@ -26,8 +26,7 @@ void OpenBurnDesignNozzle::SetupUI()
     m_throatDiaSpinBox->setDecimals(3);
     m_throatDiaSpinBox->setSingleStep(0.25f);
     QLabel* label = new QLabel(tr("Throat Diameter"), this);
-    m_throatDiaUnits = new QComboBox(this);
-    m_throatDiaUnits->addItems(OpenBurnUnits::g_kLengthUnits);
+    m_throatDiaUnits = new LengthUnitsComboBox(this, m_throatDiaSpinBox);
     layout->addWidget(label, 1, 0);
     layout->addWidget(m_throatDiaSpinBox, 1, 1);
     layout->addWidget(m_throatDiaUnits, 1, 2);
@@ -37,8 +36,7 @@ void OpenBurnDesignNozzle::SetupUI()
     m_exitDiaSpinBox->setDecimals(3);
     m_exitDiaSpinBox->setSingleStep(0.25f);
     QLabel* label_2 = new QLabel(tr("Exit Diameter"), this);
-    m_exitDiaUnits = new QComboBox(this);
-    m_exitDiaUnits->addItems(OpenBurnUnits::g_kLengthUnits);
+    m_exitDiaUnits = new LengthUnitsComboBox(this, m_exitDiaSpinBox);
     layout->addWidget(label_2, 2, 0);
     layout->addWidget(m_exitDiaSpinBox, 2, 1);
     layout->addWidget(m_exitDiaUnits, 2, 2);
@@ -60,11 +58,17 @@ void OpenBurnDesignNozzle::SeedValues()
 }
 double OpenBurnDesignNozzle::GetThroatDiameter()
 {
-    return m_throatDiaSpinBox->value();
+    return OpenBurnUnits::ConvertLength(
+        m_throatDiaUnits->GetCurrentUnits(),
+        OpenBurnUnits::LengthUnits_T::inches,
+        m_throatDiaSpinBox->value());
 }
 double OpenBurnDesignNozzle::GetExitDiameter()
 {
-    return m_exitDiaSpinBox->value();
+    return OpenBurnUnits::ConvertLength(
+        m_exitDiaUnits->GetCurrentUnits(),
+        OpenBurnUnits::LengthUnits_T::inches,
+        m_exitDiaSpinBox->value());
 }
 OpenBurnNozzle* OpenBurnDesignNozzle::GetNozzle()
 {
