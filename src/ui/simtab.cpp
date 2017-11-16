@@ -82,13 +82,20 @@ void SimulationTab::UpdateSimulation()
     m_Plotter->replot();
 
     //set results labels
-    double nsec = OpenBurnUnits::PoundsToNewtons(m_Simulator->GetTotalImpulse());
+    double nsec = OpenBurnUnits::ConvertForce(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        m_Simulator->GetTotalImpulse());
     
     m_maxPressureLabel->setText(QString::number(round(maxPressure)));
     m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3));
     m_totalImpulseLabel->setText(QString::number(round(nsec)));
 
-    double thrustN = OpenBurnUnits::PoundsToNewtons(m_Simulator->GetAvgThrust());
+    double thrustN = OpenBurnUnits::ConvertForce(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        m_Simulator->GetAvgThrust());
+        
     QString designation(OpenBurnUtil::GetMotorClass(nsec));
     QString thrust(QString::number(round(thrustN)));
     QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(nsec), 'g', 2));

@@ -38,45 +38,75 @@ private:
     OpenBurnUnits::LengthUnits_T currentUnits;
 };
 
-/*
-class AngleUnitsComboBox : public QComboBox
+class AngleUnitsComboBox : public UnitsComboBox
 {
     Q_OBJECT
 public:
-    explicit AngleUnitsComboBox(QWidget* parent = nullptr);
-    ~AngleUnitsComboBox();
-
-signals:
-
+    explicit AngleUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    virtual ~AngleUnitsComboBox();
+    OpenBurnUnits::AngleUnits_T GetCurrentUnits();
+    OpenBurnUnits::AngleUnits_T GetPrevUnits();
+protected slots:
+    virtual void UpdateUnits(int newIdx) override;
+private:
+    OpenBurnUnits::AngleUnits_T prevUnits;
+    OpenBurnUnits::AngleUnits_T currentUnits;
 };
-class TemperatureUnitsComboBox : public QComboBox
+
+class PressureUnitsComboBox : public UnitsComboBox
 {
     Q_OBJECT
 public:
-    explicit TemperatureUnitsComboBox(QWidget* parent = nullptr);
-    ~TemperatureUnitsComboBox();
-
-signals:
-
+    explicit PressureUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    virtual ~PressureUnitsComboBox();
+    OpenBurnUnits::PressureUnits_T GetCurrentUnits();
+    OpenBurnUnits::PressureUnits_T GetPrevUnits();
+protected slots:
+    virtual void UpdateUnits(int newIdx) override;
+private:
+    OpenBurnUnits::PressureUnits_T prevUnits;
+    OpenBurnUnits::PressureUnits_T currentUnits;
 };
-class ForceUnitsComboBox : public QComboBox
+
+class TemperatureUnitsComboBox : public UnitsComboBox
 {
     Q_OBJECT
 public:
-    explicit ForceUnitsComboBox(QWidget* parent = nullptr);
-    ~ForceUnitsComboBox();
-
-signals:
-
+    explicit TemperatureUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    virtual ~TemperatureUnitsComboBox();
+    OpenBurnUnits::TemperatureUnits_T GetCurrentUnits();
+    OpenBurnUnits::TemperatureUnits_T GetPrevUnits();
+protected slots:
+    virtual void UpdateUnits(int newIdx) override;
+private:
+    OpenBurnUnits::TemperatureUnits_T prevUnits;
+    OpenBurnUnits::TemperatureUnits_T currentUnits;
 };
-class MassUnitsComboBox : public QComboBox
+class ForceUnitsComboBox : public UnitsComboBox
 {
     Q_OBJECT
 public:
-    explicit MassUnitsComboBox(QWidget* parent = nullptr);
-    ~MassUnitsComboBox();
-
-signals:
-
+    explicit ForceUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    virtual ~ForceUnitsComboBox();
+    OpenBurnUnits::ForceUnits_T GetCurrentUnits();
+    OpenBurnUnits::ForceUnits_T GetPrevUnits();
+protected slots:
+    virtual void UpdateUnits(int newIdx) override;
+private:
+    OpenBurnUnits::ForceUnits_T prevUnits;
+    OpenBurnUnits::ForceUnits_T currentUnits;
 };
-*/
+class MassUnitsComboBox : public UnitsComboBox
+{
+    Q_OBJECT
+public:
+    explicit MassUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    virtual ~MassUnitsComboBox();
+    OpenBurnUnits::MassUnits_T GetCurrentUnits();
+    OpenBurnUnits::MassUnits_T GetPrevUnits();
+protected slots:
+    virtual void UpdateUnits(int newIdx) override;
+private:
+    OpenBurnUnits::MassUnits_T prevUnits;
+    OpenBurnUnits::MassUnits_T currentUnits;
+};
