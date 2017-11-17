@@ -32,55 +32,65 @@ void MainWindow::SetupUI()
     setStatusBar(m_statusBar);
     
     menuFile = new QMenu(menuBar);
-    menuEdit = new QMenu(menuBar);
-    menuTools = new QMenu(menuBar);
-    menuHelp = new QMenu(menuBar);
-    
     menuFile->setTitle(tr("File"));
-    menuEdit->setTitle(tr("Edit"));
-    menuTools->setTitle(tr("Tools"));    
-    menuHelp->setTitle(tr("Help"));
+    menuBar->addAction(menuFile->menuAction());
 
     actionNew = new QAction(this);
     actionNew->setText(tr("New"));
     actionNew->setShortcuts(QKeySequence::New);    
-    //connect(actionNew, &QAction::triggered, this, &MainWindow::menuNew);
-    
+    connect(actionNew, &QAction::triggered, this, &MainWindow::menuNew);
+    menuFile->addAction(actionNew);
+
     actionOpen = new QAction(this);
     actionOpen->setText(tr("Open"));
     actionOpen->setShortcuts(QKeySequence::Open);    
     connect(actionOpen, &QAction::triggered, this, &MainWindow::menuOpen);
+    menuFile->addAction(actionOpen);
 
     actionSave = new QAction(this);
     actionSave->setText(tr("Save"));
     actionSave->setShortcuts(QKeySequence::Save);
     connect(actionSave, &QAction::triggered, this, &MainWindow::menuSave);
+    menuFile->addAction(actionSave);
 
     actionSave_As = new QAction(this);
     actionSave_As->setText(tr("Save As..."));
     actionSave_As->setShortcuts(QKeySequence::SaveAs);
     connect(actionSave_As, &QAction::triggered, this, &MainWindow::menuSaveAs);
-    
+    menuFile->addAction(actionSave_As);
+
     actionExport = new QAction(this);
     actionExport->setText(tr("Export"));    
     //connect(actionExport, &QAction::triggered, this, &MainWindow::menuExport);
+    menuFile->addAction(actionExport);
+
+    menuFile->addSeparator();
 
     actionQuit = new QAction(this);
     actionQuit->setText(tr("Quit"));
     actionQuit->setShortcuts(QKeySequence::Quit);
     connect(actionQuit, &QAction::triggered, this, &MainWindow::menuQuit);
-
-    menuBar->addAction(menuFile->menuAction());
-    menuBar->addAction(menuEdit->menuAction());
-    menuBar->addAction(menuTools->menuAction());
-    menuBar->addAction(menuHelp->menuAction());
-    menuFile->addAction(actionNew);
-    menuFile->addAction(actionOpen);
-    menuFile->addAction(actionSave);
-    menuFile->addAction(actionSave_As);
-    menuFile->addAction(actionExport);
-    menuFile->addSeparator();
     menuFile->addAction(actionQuit);
+
+
+
+    menuEdit = new QMenu(menuBar);
+    menuEdit->setTitle(tr("Edit"));
+    menuBar->addAction(menuEdit->menuAction());
+
+    menuTools = new QMenu(menuBar);
+    menuTools->setTitle(tr("Tools"));    
+    menuBar->addAction(menuTools->menuAction());
+
+    actionSettings = new QAction(this);
+    actionSettings->setText(tr("Settings"));
+    actionSettings->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+    connect(actionSettings, &QAction::triggered, this, &MainWindow::menuSettings);
+    menuTools->addAction(actionSettings);
+
+    menuHelp = new QMenu(menuBar);
+    menuHelp->setTitle(tr("Help"));
+    menuBar->addAction(menuHelp->menuAction());
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
@@ -114,19 +124,20 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
     }
 }
-void MainWindow::menuQuit()
+void MainWindow::menuNew()
 {
-    QMessageBox::StandardButton resBtn =
-    QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
-        QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
-    if (resBtn == QMessageBox::Yes)
+    if (m_DesignMotor)
     {
-        QCoreApplication::quit();
+        delete m_DesignMotor;
     }
-    else
+    if (m_designTab)
     {
-        return;
+        delete m_designTab;
     }
+    m_DesignMotor = new OpenBurnMotor;
+    m_designTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
+    tabWidget->insertTab(0, m_designTab, tr("Design"));
+    tabWidget->setCurrentIndex(0);
 }
 void MainWindow::menuOpen()
 {
@@ -151,13 +162,6 @@ void MainWindow::menuOpen()
     m_designTab->UpdateDesign();
     m_statusBar->showMessage(tr("Opened file ") + m_CurrentFilename, 3000);    
 }
-
-void MainWindow::menuSaveAs()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
-            tr("OpenBurn File (*.obm)"));
-    SaveFile(fileName);
-}
 void MainWindow::menuSave()
 {
     if (!m_CurrentFilename.isEmpty())
@@ -168,6 +172,34 @@ void MainWindow::menuSave()
     {
         menuSaveAs();
     }
+}
+void MainWindow::menuSaveAs()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
+            tr("OpenBurn File (*.obm)"));
+    SaveFile(fileName);
+}
+void MainWindow::menuQuit()
+{
+    QMessageBox::StandardButton resBtn =
+    QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes)
+    {
+        QCoreApplication::quit();
+    }
+    else
+    {
+        return;
+    }
+}
+void MainWindow::menuSettings()
+{
+    //we don't have to worry about memory managment because of WA_DeleteOnClose
+    GlobalSettingsDialog* dialog = new GlobalSettingsDialog(m_GlobalSettings);
+    dialog->activateWindow();
+    dialog->show();
+    dialog->raise();
 }
 void MainWindow::SaveFile(QString fileName)
 {

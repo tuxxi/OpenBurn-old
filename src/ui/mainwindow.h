@@ -21,6 +21,7 @@
 #include "src/ui/designtab.h"
 #include "src/ui/simtab.h"
 #include "src/ui/propellanttab.h"
+#include "src/ui/dialogs/globalsettingsdialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -35,7 +36,9 @@ private slots:
     void menuOpen();
     void menuSave();
     void menuSaveAs();
-
+    void menuNew();
+    
+    void menuSettings();
     void SLOT_SimulationStarted();
     void SLOT_SimulationFinished(bool success);
     void SLOT_PropellantsUpdated();
@@ -50,7 +53,7 @@ private:
     QMenu *menuFile, *menuEdit, *menuTools, *menuHelp;
 
     QAction *actionOpen, *actionSave, *actionSave_As, *actionQuit, *actionNew, *actionExport;
-
+    QAction *actionSettings;
     QStatusBar *m_statusBar;
     QTabWidget *tabWidget;
     DesignTab *m_designTab;
@@ -61,6 +64,5 @@ private:
     PropellantList* m_Propellants;
     MotorSim* m_Simulator;
     OpenBurnSettings* m_GlobalSettings;
-    
     QString m_CurrentFilename;
 };

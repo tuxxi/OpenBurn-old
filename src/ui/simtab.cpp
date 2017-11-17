@@ -116,6 +116,10 @@ void SimulationTab::UpdateSimulation()
 }
 void SimulationTab::SLOT_DesignReady()
 {
+    if (m_GlobalSettings->m_redrawOnChanges)
+    {
+        UpdateSimulation();
+    }
     m_RunSimulationButton->setEnabled(true);
 }
 void SimulationTab::SimSettingsButton_Clicked()
