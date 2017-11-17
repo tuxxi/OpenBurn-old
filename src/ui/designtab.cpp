@@ -27,6 +27,7 @@ DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, Open
     //Double clicking on a row edits that grain
     connect(m_grainTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(EditGrainButton_Clicked()));
     connect(m_Motor, SIGNAL(SIG_DesignUpdated()), m_grainTable, SLOT(Update()));
+
     UpdateDesign();
 }
 DesignTab::~DesignTab() 
@@ -292,7 +293,9 @@ void DesignTab::NewGrainButton_Clicked()
 {
     if (!m_grainDialog) //only make one!!
     {
-        m_grainDialog = new GrainDialog(m_Propellants, m_seed_grain);
+        m_grainDialog = new GrainDialog(m_Propellants,
+                    m_seed_grain,
+                    m_GlobalSettings);
         connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_NewGrain(OpenBurnGrain*)));
         connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
     }
@@ -308,7 +311,10 @@ void DesignTab::EditGrainButton_Clicked()
     {
         m_grainDialog->deleteLater();
     }
-    m_grainDialog = new GrainDialog(m_Propellants, m_grainTable->GetSelectedGrains()[0], m_grainTable->GetSelectedGrains());
+    m_grainDialog = new GrainDialog(m_Propellants,
+            m_grainTable->GetSelectedGrains()[0],
+            m_GlobalSettings,
+            m_grainTable->GetSelectedGrains());
     connect(m_grainDialog, SIGNAL(SIG_DIALOG_NewGrain(OpenBurnGrain*)), this, SLOT(SLOT_ModifyGrain(OpenBurnGrain*)));
     connect(m_grainDialog, SIGNAL(destroyed()), this, SLOT(SLOT_GrainDialogClosed()));
 
@@ -334,7 +340,7 @@ void DesignTab::NozzleButton_Clicked()
 {
     if (!m_nozzleDialog) //only make one!!
     {
-        m_nozzleDialog = new NozzleDialog(nullptr, m_Motor->GetNozzle());
+        m_nozzleDialog = new NozzleDialog(nullptr, m_Motor->GetNozzle(), m_GlobalSettings);
         connect(m_nozzleDialog, SIGNAL(SIG_NozzleChanged(OpenBurnNozzle*)), this, SLOT(SLOT_NozzleUpdated(OpenBurnNozzle*)));
         connect(m_nozzleDialog, SIGNAL(destroyed()), this, SLOT(SLOT_NozzDialogClosed()));
     }

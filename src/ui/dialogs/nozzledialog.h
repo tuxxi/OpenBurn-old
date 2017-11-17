@@ -8,6 +8,7 @@
 #include <QComboBox>
 
 #include "src/nozzle.h"
+#include "src/settings.h"
 #include "nozzledesigntypes.h"
 #include "src/ui/graphics/nozzlegraphicsitem.h"
 
@@ -15,7 +16,7 @@ class NozzleDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit NozzleDialog(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr);
+    explicit NozzleDialog(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr, OpenBurnSettings* settings = nullptr);
     ~NozzleDialog();
 signals:
     void SIG_NozzleChanged(OpenBurnNozzle*);
@@ -35,5 +36,6 @@ private:
     OpenBurnDesignNozzle* m_NozzleDesign;
     OpenBurnNozzle* m_Nozzle;
     NozzleGraphicsItem* m_gfxNozzle;
+    OpenBurnSettings* m_GlobalSettings;
     QPushButton *m_applyButton, *m_OKButton, *m_cancelButton;   
 };

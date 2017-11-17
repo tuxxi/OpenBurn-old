@@ -5,8 +5,8 @@
 #include <QFrame>
 
 #include "src/ui/dialogs/nozzledialog.h"
-NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed)
-    : QDialog(parent), m_Nozzle(seed), m_gfxNozzle(nullptr)
+NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettings* settings)
+    : QDialog(parent), m_Nozzle(seed), m_gfxNozzle(nullptr), m_GlobalSettings(settings)
 {
     SetupUI();
     connect(m_OKButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -31,7 +31,7 @@ void NozzleDialog::SetupUI()
     m_frame->setFrameShadow(QFrame::Raised);
 
     ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);
-    m_NozzleDesign = new ConicalNozzleDesign(this, nozz);        
+    m_NozzleDesign = new ConicalNozzleDesign(this, nozz, m_GlobalSettings);
     m_OKButton = new QPushButton(tr("OK"), this);
     m_cancelButton = new QPushButton(tr("Cancel"), this);
     m_applyButton = new QPushButton(tr("Apply"), this);

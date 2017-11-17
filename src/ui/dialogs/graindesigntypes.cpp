@@ -7,8 +7,9 @@
 OpenBurnDesignGrain::OpenBurnDesignGrain(
     PropellantList* prop,
     OpenBurnGrain* seed,
+    OpenBurnSettings* settings,
     QWidget* parent)
-    : QWidget(parent), m_seedGrain(seed), m_Propellants(prop)
+    : QWidget(parent), m_seedGrain(seed), m_GlobalSettings(settings), m_Propellants(prop)
 {
     SetupUI();
     connect(m_grainTypeComboBox, SIGNAL(currentIndexChanged(int)), 
@@ -67,6 +68,12 @@ void OpenBurnDesignGrain::SetupUI()
     controlsLayout->addWidget(label_3, 3, 0);
     controlsLayout->addWidget(m_grainDiameterSpinBox, 3, 1);
     controlsLayout->addWidget(m_grainDiaUnitsComboBox, 3, 2);
+
+    if (m_GlobalSettings)
+    {
+        m_grainDiaUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_grainLenUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
+    }
 
     //Inhibited Faces
     m_grainInhibitedFacesSpinBox = new QSpinBox(this);
@@ -143,8 +150,9 @@ void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 BatesGrainDesign::BatesGrainDesign(
     PropellantList* prop, 
     OpenBurnGrain* seed , 
+    OpenBurnSettings* settings,
     QWidget* parent)
-    : OpenBurnDesignGrain(prop, seed, parent)
+    : OpenBurnDesignGrain(prop, seed, settings, parent)
 {
     //Grain Core Diameter
     m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);
@@ -153,6 +161,10 @@ BatesGrainDesign::BatesGrainDesign(
     QLabel* label_4 = new QLabel(tr("Grain Core Diameter"), this);
     m_grainCoreDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainCoreDiameterSpinBox);
     m_grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
+    if (m_GlobalSettings)
+    {
+        m_grainCoreDiaUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
+    }
 
     AddNewControls(label_4, 0, 0);
     AddNewControls(m_grainCoreDiameterSpinBox, 0, 1);

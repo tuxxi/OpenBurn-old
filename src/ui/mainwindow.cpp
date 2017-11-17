@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(SLOT_SimulationStarted()));
     connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool))); 
     connect(m_PropellantTab, SIGNAL(PropellantsUpdated()), this, SLOT(SLOT_PropellantsUpdated()));
+    connect(m_GlobalSettings, SIGNAL(SettingsChanged()), this, SLOT(SLOT_SettingsChanged()));
 }
 void MainWindow::SetupUI()
 {
@@ -257,4 +258,11 @@ void MainWindow::SLOT_PropellantsUpdated()
             }
         }    
     }
+}
+void MainWindow::SLOT_SettingsChanged()
+{
+    m_statusBar->showMessage(tr("Settings updated."), 5000);
+
+    emit m_DesignMotor->SIG_DesignUpdated();
+    m_SimTab->UpdateResults();
 }

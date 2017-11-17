@@ -21,10 +21,11 @@ public:
     ~GlobalSettingsDialog();
 private slots:
     void ApplyButton_Clicked();
+    void CancelButton_Clicked();
+
     void DefaultUnitsButton_Clicked();
     void MetricUnitsButton_Clicked();
     void ImperialUnitsButton_Clicked();
-    void CancelButton_Clicked();
 
 private:
     void SetupUI();

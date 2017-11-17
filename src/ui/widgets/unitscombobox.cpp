@@ -44,6 +44,10 @@ void LengthUnitsComboBox::UpdateUnits(int newIdx)
     }
     emit UnitsChanged(this);
 }
+void LengthUnitsComboBox::SetUnits(OpenBurnUnits::LengthUnits_T units)
+{
+    setCurrentIndex(int(units));
+}
 OpenBurnUnits::LengthUnits_T LengthUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::LengthUnits_T LengthUnitsComboBox::GetPrevUnits() { return prevUnits; }
 
@@ -71,6 +75,10 @@ void AngleUnitsComboBox::UpdateUnits(int newIdx)
                 m_buddyBox->value()));
     }
     emit UnitsChanged(this);
+}
+void AngleUnitsComboBox::SetUnits(OpenBurnUnits::AngleUnits_T units)
+{
+    setCurrentIndex(int(units));
 }
 OpenBurnUnits::AngleUnits_T AngleUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::AngleUnits_T AngleUnitsComboBox::GetPrevUnits() { return prevUnits; }
@@ -100,6 +108,10 @@ void PressureUnitsComboBox::UpdateUnits(int newIdx)
     }
     emit UnitsChanged(this);
 }
+void PressureUnitsComboBox::SetUnits(OpenBurnUnits::PressureUnits_T units)
+{
+    setCurrentIndex(int(units));
+}
 OpenBurnUnits::PressureUnits_T PressureUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::PressureUnits_T PressureUnitsComboBox::GetPrevUnits() { return prevUnits; }
 
@@ -127,6 +139,10 @@ void TemperatureUnitsComboBox::UpdateUnits(int newIdx)
                 m_buddyBox->value()));
     }
     emit UnitsChanged(this);
+}
+void TemperatureUnitsComboBox::SetUnits(OpenBurnUnits::TemperatureUnits_T units)
+{
+    setCurrentIndex(int(units));
 }
 OpenBurnUnits::TemperatureUnits_T TemperatureUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::TemperatureUnits_T TemperatureUnitsComboBox::GetPrevUnits() { return prevUnits; }
@@ -156,6 +172,10 @@ void ForceUnitsComboBox::UpdateUnits(int newIdx)
     }
     emit UnitsChanged(this);
 }
+void ForceUnitsComboBox::SetUnits(OpenBurnUnits::ForceUnits_T units)
+{
+    setCurrentIndex(int(units));
+}
 OpenBurnUnits::ForceUnits_T ForceUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::ForceUnits_T ForceUnitsComboBox::GetPrevUnits() { return prevUnits; }
 
@@ -183,6 +203,10 @@ void MassUnitsComboBox::UpdateUnits(int newIdx)
                 m_buddyBox->value()));
     }
     emit UnitsChanged(this);
+}
+void MassUnitsComboBox::SetUnits(OpenBurnUnits::MassUnits_T units)
+{
+    setCurrentIndex(int(units));
 }
 OpenBurnUnits::MassUnits_T MassUnitsComboBox::GetCurrentUnits() { return currentUnits; }
 OpenBurnUnits::MassUnits_T MassUnitsComboBox::GetPrevUnits() { return prevUnits; }

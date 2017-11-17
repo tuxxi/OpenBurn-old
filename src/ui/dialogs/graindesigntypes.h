@@ -10,6 +10,7 @@
 #include <QToolButton>
 
 #include "src/grain.h"
+#include "src/settings.h"
 #include "src/propellant.h"
 #include "src/ui/widgets/unitscombobox.h"
 
@@ -26,6 +27,7 @@ public:
     explicit OpenBurnDesignGrain(
         PropellantList* prop, 
         OpenBurnGrain* seed = nullptr, 
+        OpenBurnSettings* settings = nullptr,
         QWidget* parent = nullptr);
 
     virtual ~OpenBurnDesignGrain();
@@ -55,10 +57,11 @@ protected:
     LengthUnitsComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox;
 
     QToolButton *m_modifyPropellantDatabase;
+    OpenBurnSettings* m_GlobalSettings;
+
 private:
     QGridLayout* controlsLayout;
     PropellantList* m_Propellants;
-    
     void SetupUI();
     
 };
@@ -70,7 +73,8 @@ class BatesGrainDesign : public OpenBurnDesignGrain
 public:
     explicit BatesGrainDesign(
         PropellantList* prop, 
-        OpenBurnGrain* seed = nullptr, 
+        OpenBurnGrain* seed = nullptr,
+        OpenBurnSettings* settings = nullptr,
         QWidget* parent = nullptr);
         
     virtual ~BatesGrainDesign();

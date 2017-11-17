@@ -3,8 +3,8 @@
 #include "nozzledesigntypes.h"
 #include "src/util.h"
 
-OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz)
-    : QWidget(parent), m_seedNozzle(nozz)
+OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz, OpenBurnSettings* settings)
+    : QWidget(parent), m_seedNozzle(nozz), m_GlobalSettings(settings)
 {
     SetupUI();
     connect(m_throatDiaSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
@@ -41,6 +41,11 @@ void OpenBurnDesignNozzle::SetupUI()
     layout->addWidget(m_exitDiaSpinBox, 2, 1);
     layout->addWidget(m_exitDiaUnits, 2, 2);
     
+    if (m_GlobalSettings)
+    {
+        m_throatDiaUnits->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_exitDiaUnits->SetUnits(m_GlobalSettings->m_LengthUnits);
+    }
     setTabOrder(m_throatDiaSpinBox, m_exitDiaSpinBox);
 
 }
@@ -79,8 +84,8 @@ void OpenBurnDesignNozzle::AddNewControls(QWidget* widget, int row, int col)
     layout->addWidget(widget, row+3, col);
 }
 
-ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
-    : OpenBurnDesignNozzle(parent, nozz)
+ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz, OpenBurnSettings *settings)
+    : OpenBurnDesignNozzle(parent, nozz, settings)
 {
     m_halfAngleSpinBox = new QDoubleSpinBox(this);
     m_halfAngleSpinBox->setDecimals(1);
@@ -89,6 +94,10 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz)
     QLabel* label_3 = new QLabel(tr("Divergent Half Angle"), this);
     m_halfAngleUnits = new AngleUnitsComboBox(this);
     m_halfAngleUnits->setLayoutDirection(Qt::LeftToRight);
+    if (m_GlobalSettings)
+    {
+        m_halfAngleUnits->SetUnits(m_GlobalSettings->m_AngleUnits);
+    }
 
     AddNewControls(label_3, 0, 0);
     AddNewControls(m_halfAngleSpinBox, 0, 1);
@@ -111,5 +120,7 @@ void ConicalNozzleDesign::SeedValues()
 }
 double ConicalNozzleDesign::GetDivergentHalfAngle()
 {
-    return m_halfAngleSpinBox->value();
+    return OpenBurnUnits::ConvertAngle(m_halfAngleUnits->GetCurrentUnits(),
+        OpenBurnUnits::AngleUnits_T::degrees,
+        m_halfAngleSpinBox->value());
 }

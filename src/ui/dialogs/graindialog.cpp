@@ -11,12 +11,13 @@
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(PropellantList* prop,
-     OpenBurnGrain* seedValues, 
-     QList<OpenBurnGrain*>grains, 
-     QWidget *parent) 
-     :
-    QDialog(parent), m_gfxGrain(nullptr), m_GrainsToEdit(grains), 
+    OpenBurnGrain* seedValues,
+    OpenBurnSettings *settings,
+    QList<OpenBurnGrain*>grains,
+    QWidget *parent)
+    : QDialog(parent), m_gfxGrain(nullptr), m_GrainsToEdit(grains),
     m_Propellants(prop),
+    m_GlobalSettings(settings),
     m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
 {
     SetupGraphics();
@@ -53,7 +54,7 @@ void GrainDialog::SetupUI(OpenBurnGrain* seed)
     BatesGrain* BatesSeed = dynamic_cast<BatesGrain*>(seed);
 
     //Default to BATES grain design mode
-    m_GrainDesign = new BatesGrainDesign(m_Propellants, BatesSeed, m_frame);        
+    m_GrainDesign = new BatesGrainDesign(m_Propellants, BatesSeed, m_GlobalSettings, m_frame);
 
     // OK and Cancel buttons
     m_applyButton = new QPushButton(m_frame);
@@ -93,6 +94,7 @@ void GrainDialog::RefreshUI(GRAINTYPE type)
         m_GrainDesign = new BatesGrainDesign(
             m_Propellants, 
             static_cast<BatesGrain*>(m_GrainsToEdit.first()), 
+            m_GlobalSettings,
             m_frame);
         m_controlsLayout->addWidget(m_GrainDesign, 1, 0, 3, 3);
         connect(m_GrainDesign, SIGNAL(SIG_GrainType_Changed(GRAINTYPE)), this, SLOT(RefreshUI(GRAINTYPE))); 

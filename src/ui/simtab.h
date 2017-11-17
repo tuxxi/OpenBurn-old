@@ -13,11 +13,13 @@ class SimulationTab : public QWidget
 public:
     explicit SimulationTab(OpenBurnMotor* design, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~SimulationTab();
+public slots:
+    void UpdateSimulation();
+    void UpdateResults();
 private slots:
     void RunSimButton_Clicked();
     void SimSettingsButton_Clicked();
     void SLOT_DesignReady();
-    void UpdateSimulation();    
 private:
     void SetupUI();
 

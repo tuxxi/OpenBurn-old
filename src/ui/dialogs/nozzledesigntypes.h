@@ -10,6 +10,7 @@
 #include <QToolButton>
 
 #include "src/nozzle.h"
+#include "src/settings.h"
 #include "src/units.h"
 #include "src/ui/widgets/unitscombobox.h"
 //this class represents the default design for a nozzle
@@ -18,7 +19,10 @@ class OpenBurnDesignNozzle : public QWidget
 {
     Q_OBJECT
 public:
-    explicit OpenBurnDesignNozzle(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr);
+    explicit OpenBurnDesignNozzle(
+        QWidget* parent = nullptr,
+        OpenBurnNozzle* seed = nullptr,
+        OpenBurnSettings* settings = nullptr);
     virtual ~OpenBurnDesignNozzle();
 
     double GetThroatDiameter();
@@ -35,6 +39,7 @@ protected:
     QComboBox *m_nozzleType;
 
     OpenBurnNozzle* m_seedNozzle;
+    OpenBurnSettings* m_GlobalSettings;
 private:
     void SetupUI();
     QGridLayout* layout;
@@ -44,12 +49,15 @@ class ConicalNozzleDesign : public OpenBurnDesignNozzle
 {
     Q_OBJECT
 public:
-    explicit ConicalNozzleDesign(QWidget* parent = nullptr, ConicalNozzle* seed = nullptr);
+    explicit ConicalNozzleDesign(
+        QWidget* parent = nullptr,
+        ConicalNozzle* seed = nullptr,
+        OpenBurnSettings* settings = nullptr);
     virtual ~ConicalNozzleDesign();
 
     double GetDivergentHalfAngle();
 protected:
     virtual void SeedValues() override;
     QDoubleSpinBox *m_halfAngleSpinBox;
-    QComboBox *m_halfAngleUnits;
+    AngleUnitsComboBox *m_halfAngleUnits;
 };

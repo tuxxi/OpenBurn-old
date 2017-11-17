@@ -28,6 +28,7 @@ class LengthUnitsComboBox : public UnitsComboBox
 public:
     explicit LengthUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~LengthUnitsComboBox();
+    void SetUnits(OpenBurnUnits::LengthUnits_T units);
     OpenBurnUnits::LengthUnits_T GetCurrentUnits();
     OpenBurnUnits::LengthUnits_T GetPrevUnits();
     //the units combo box is the "buddy" of this double spin box
@@ -44,6 +45,9 @@ class AngleUnitsComboBox : public UnitsComboBox
 public:
     explicit AngleUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~AngleUnitsComboBox();
+
+    void SetUnits(OpenBurnUnits::AngleUnits_T units);
+
     OpenBurnUnits::AngleUnits_T GetCurrentUnits();
     OpenBurnUnits::AngleUnits_T GetPrevUnits();
 protected slots:
@@ -59,6 +63,9 @@ class PressureUnitsComboBox : public UnitsComboBox
 public:
     explicit PressureUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~PressureUnitsComboBox();
+
+    void SetUnits(OpenBurnUnits::PressureUnits_T units);
+
     OpenBurnUnits::PressureUnits_T GetCurrentUnits();
     OpenBurnUnits::PressureUnits_T GetPrevUnits();
 protected slots:
@@ -74,6 +81,9 @@ class TemperatureUnitsComboBox : public UnitsComboBox
 public:
     explicit TemperatureUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~TemperatureUnitsComboBox();
+
+    void SetUnits(OpenBurnUnits::TemperatureUnits_T units);
+
     OpenBurnUnits::TemperatureUnits_T GetCurrentUnits();
     OpenBurnUnits::TemperatureUnits_T GetPrevUnits();
 protected slots:
@@ -88,6 +98,9 @@ class ForceUnitsComboBox : public UnitsComboBox
 public:
     explicit ForceUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~ForceUnitsComboBox();
+
+    void SetUnits(OpenBurnUnits::ForceUnits_T units);
+
     OpenBurnUnits::ForceUnits_T GetCurrentUnits();
     OpenBurnUnits::ForceUnits_T GetPrevUnits();
 protected slots:
@@ -102,6 +115,9 @@ class MassUnitsComboBox : public UnitsComboBox
 public:
     explicit MassUnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
     virtual ~MassUnitsComboBox();
+
+    void SetUnits(OpenBurnUnits::MassUnits_T units);
+
     OpenBurnUnits::MassUnits_T GetCurrentUnits();
     OpenBurnUnits::MassUnits_T GetPrevUnits();
 protected slots:

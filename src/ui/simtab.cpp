@@ -67,8 +67,15 @@ void SimulationTab::SetupUI()
 void SimulationTab::UpdateSimulation()
 {
     m_Simulator->RunSim(m_SimSettings);
+    UpdateResults();
+}
+void SimulationTab::UpdateResults()
+{
+    if (m_Simulator->GetResults().empty())
+    {
+        return;
+    }
     const int numPoints = m_Simulator->GetTotalBurnTime() / m_SimSettings->timeStep;
-
     double maxPressure = OpenBurnUnits::ConvertPressure(
         OpenBurnUnits::PressureUnits_T::psi,
         m_GlobalSettings->m_PressureUnits,
@@ -89,29 +96,40 @@ void SimulationTab::UpdateSimulation()
     m_Plotter->replot();
 
     //set results labels
-    double nsec = OpenBurnUnits::ConvertForce(
+    double totalImpulseN = OpenBurnUnits::ConvertForce(
         OpenBurnUnits::ForceUnits_T::pounds_force,
-        m_GlobalSettings->m_ForceUnits,
+        OpenBurnUnits::ForceUnits_T::newtons,
         m_Simulator->GetTotalImpulse());
-    
-    m_maxPressureLabel->setText(QString::number(round(maxPressure)) + 
-        " " + 
-        OpenBurnUnits::GetPressureUnitSymbol(m_GlobalSettings->m_PressureUnits));
+    double avgThrustN = OpenBurnUnits::ConvertForce(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        m_Simulator->GetAvgThrust());
 
-    m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3) + " s");
-    m_totalImpulseLabel->setText(QString::number(round(nsec)) + 
-        " " + 
-        OpenBurnUnits::GetForceUnitSymbol(m_GlobalSettings->m_ForceUnits) + 
-        "-"+ tr("sec"));
-
-    double thrustN = OpenBurnUnits::ConvertForce(
+    /*
+    double avgThrust = OpenBurnUnits::ConvertForce(
         OpenBurnUnits::ForceUnits_T::pounds_force,
         m_GlobalSettings->m_ForceUnits,
         m_Simulator->GetAvgThrust());
-        
-    QString designation(OpenBurnUtil::GetMotorClass(nsec));
-    QString thrust(QString::number(round(thrustN)));
-    QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(nsec), 'g', 2));
+    */
+    double totalImpulse = OpenBurnUnits::ConvertForce(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        m_GlobalSettings->m_ForceUnits,
+        m_Simulator->GetTotalImpulse());
+
+    m_maxPressureLabel->setText(QString::number(round(maxPressure)) +
+        " " +
+        OpenBurnUnits::GetPressureUnitSymbol(m_GlobalSettings->m_PressureUnits));
+
+    m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3) + " s");
+    m_totalImpulseLabel->setText(QString::number(round(totalImpulse)) +
+        " " +
+        OpenBurnUnits::GetForceUnitSymbol(m_GlobalSettings->m_ForceUnits) +
+        "-"+ tr("sec"));
+
+
+    QString designation(OpenBurnUtil::GetMotorClass(totalImpulseN));
+    QString thrust(QString::number(round(avgThrustN)));
+    QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
     m_motorDesignationLabel->setText(percent + "% " + designation + "-" + thrust);
 }
 void SimulationTab::SLOT_DesignReady()

@@ -12,6 +12,7 @@
 #include <QList>
 
 #include "src/grain.h"
+#include "src/settings.h"
 #include "graindesigntypes.h"
 #include "src/ui/graphics/graingraphicsitem.h"
 
@@ -28,6 +29,7 @@ public:
     //them all of all of them with the dialog's settings.
     explicit GrainDialog(PropellantList* propellants,
         OpenBurnGrain* seedValues = nullptr, 
+        OpenBurnSettings* settings = nullptr,
         QList<OpenBurnGrain*>m_GrainsToEdit = QList<OpenBurnGrain*>(),
         QWidget* parent = nullptr
         );
@@ -57,6 +59,6 @@ private:
     OpenBurnDesignGrain* m_GrainDesign;
     QList<OpenBurnGrain*>m_GrainsToEdit;
     PropellantList* m_Propellants;
-    
+    OpenBurnSettings* m_GlobalSettings;
     bool m_isNewGrainWindow;
 };
