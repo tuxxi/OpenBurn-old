@@ -19,15 +19,24 @@ namespace OpenBurnUnits
         feet,
         meters
     };
-    static const QStringList g_kLengthUnits = (QStringList() <<
-        QObject::tr("Inches (in)") <<
-        QObject::tr("Millimeters (mm)") <<
-        QObject::tr("Centimeters (cm)") <<
-        QObject::tr("Feet (ft)") <<
-        QObject::tr("Meters (m)"));
+    static const QStringList kLengthUnitSymbols = (QStringList() <<
+        QString("in") <<
+        QString("mm") <<
+        QString("cm") <<
+        QString("ft") <<
+        QString("m"));
+    static const QStringList kLengthUnitNames = (QStringList() <<
+        QObject::tr("Inches") <<
+        QObject::tr("Millimeters") <<
+        QObject::tr("Centimeters") <<
+        QObject::tr("Feet") <<
+        QObject::tr("Meters"));
 
     double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value);
-    
+    const QString GetLengthUnitName(LengthUnits_T units);
+    const QString GetLengthUnitSymbol(LengthUnits_T units);
+    const QStringList GetLengthUnits();
+
 //=============================================================================
 //*************ANGLE UNITS********************
 //=============================================================================
@@ -36,10 +45,16 @@ namespace OpenBurnUnits
         degrees,
         radians
     };
-    static const QStringList g_kAngleUnits = (QStringList() <<
-        QObject::tr("Degrees (°)") << 
-        QObject::tr("Radians (rad)"));
+    static const QStringList kAngleUnitSymbols = (QStringList() <<
+        QString("°") << 
+        QString("rad"));
+    static const QStringList kAngleUnitNames = (QStringList() <<
+        QObject::tr("Degrees") << 
+        QObject::tr("Radians"));
     double ConvertAngle(AngleUnits_T oldUnits, AngleUnits_T newAngle, double value);
+    const QString GetAngleUnitName(AngleUnits_T units);
+    const QString GetAngleUnitSymbol(AngleUnits_T units);
+    const QStringList GetAngleUnits();
 
 //=============================================================================
 //*************PRESSURE UNITS********************
@@ -65,13 +80,20 @@ namespace OpenBurnUnits
         kilopascals,
         torr
     };
-    static const QStringList g_kPressureUnits = (QStringList() <<
-        QObject::tr("Pounds / inch² (psi)") <<
-        QObject::tr("Atmospheres (atm)") <<
-        QObject::tr("Kilopascals (kPa)") <<
-        QObject::tr("Torr (Torr)"));
+    static const QStringList kPressureUnitSymbols = (QStringList() <<
+        QString("psi") <<
+        QString("atm") <<
+        QString("kPa") <<
+        QString("torr"));
+    static const QStringList kPressureUnitNames = (QStringList() <<
+        QObject::tr("Pounds / inch²") <<
+        QObject::tr("Atmospheres") <<
+        QObject::tr("Kilopascals") <<
+        QObject::tr("Torr"));
     double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value);
-
+    const QString GetPressureUnitName(PressureUnits_T units);
+    const QString GetPressureUnitSymbol(PressureUnits_T units);
+    const QStringList GetPressureUnits();
 //=============================================================================
 //*************TEMPERATURE UNITS********************
 //=============================================================================
@@ -85,11 +107,18 @@ namespace OpenBurnUnits
         celsius,
         kelvin
     };
-    static const QStringList g_kTemperatureUnits = (QStringList() << 
-        QObject::tr("Fahrenheit (F)") <<
-        QObject::tr("Celsius (C)") <<
-        QObject::tr("Kelvin (K)"));
+    static const QStringList kTemperatureUnitSymbols = (QStringList() << 
+        QString("°F") <<
+        QString("°C") <<
+        QString("°K"));
+    static const QStringList kTemperatureUnitNames = (QStringList() << 
+        QObject::tr("Fahrenheit") <<
+        QObject::tr("Celsius") <<
+        QObject::tr("Kelvin"));
     double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value);
+    const QString GetTemperatureUnitName(TemperatureUnits_T unit);
+    const QString GetTemperatureUnitSymbol(TemperatureUnits_T unit);
+    const QStringList GetTemperatureUnits();
 
 //=============================================================================
 //*************FORCE UNITS********************
@@ -101,11 +130,17 @@ namespace OpenBurnUnits
         pounds_force,
         newtons
     };
-    static const QStringList g_kForceUnits = (QStringList() << 
-        QObject::tr("Pounds (lbs)") <<
-        QObject::tr("Newtons (N)"));
+    static const QStringList kForceUnitSymbols = (QStringList() << 
+        QString("lbs") <<
+        QString("N"));
+    static const QStringList kForceUnitNames = (QStringList() << 
+        QObject::tr("Pounds") <<
+        QObject::tr("Newtons"));
+
     double ConvertForce(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value);
-    
+    const QString GetForceUnitName(ForceUnits_T unit);
+    const QString GetForceUnitSymbol(ForceUnits_T unit);
+    const QStringList GetForceUnits();
 //=============================================================================
 //*************MASS UNITS********************
 //=============================================================================
@@ -121,9 +156,16 @@ namespace OpenBurnUnits
         kilograms,
         slugs
     };
-    static const QStringList g_kMassUnits = (QStringList() << 
-        QObject::tr("Pounds-mass (lbm)") <<
-        QObject::tr("Kilograms (kg)") << 
-        QObject::tr("Slugs (slug)"));
+    static const QStringList kMassUnitSymbols = (QStringList() << 
+        QString("lbm") <<
+        QString("kg") << 
+        QString("slug"));
+    static const QStringList kMassUnitNames = (QStringList() << 
+        QObject::tr("Pounds-mass") <<
+        QObject::tr("Kilograms") << 
+        QObject::tr("Slugs"));
     double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value);
+    const QString GetMassUnitName(MassUnits_T unit);
+    const QString GetMassUnitSymbol(MassUnits_T unit);
+    const QStringList GetMassUnits();
 }

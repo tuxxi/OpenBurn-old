@@ -14,6 +14,7 @@
 #include <QStatusBar>
 
 #include "src/motor.h"
+#include "src/settings.h"
 
 #include "src/ui/widgets/graintablewidget.h"
 #include "src/ui/dialogs/graindialog.h"
@@ -59,5 +60,7 @@ private:
     OpenBurnMotor* m_DesignMotor;
     PropellantList* m_Propellants;
     MotorSim* m_Simulator;
+    OpenBurnSettings* m_GlobalSettings;
+    
     QString m_CurrentFilename;
 };

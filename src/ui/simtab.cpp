@@ -4,18 +4,18 @@
 #include "simtab.h"
 #include "src/units.h"
 
-SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, QWidget* parent)
-    : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SettingsDialog(nullptr)
+SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent)
+    : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SimSettingsDialog(nullptr), m_GlobalSettings(settings)
 {
     SetupUI();
     connect(m_Motor, SIGNAL(SIG_DesignReady()), this, SLOT(SLOT_DesignReady()));
     connect(m_RunSimulationButton, SIGNAL(clicked()), this, SLOT(RunSimButton_Clicked())); 
     connect(m_SimSettingsButton, SIGNAL(clicked()), this, SLOT(SimSettingsButton_Clicked()));
-    m_Settings = new MotorSimSettings;
+    m_SimSettings = new MotorSimSettings;
 }
 SimulationTab::~SimulationTab()
 {
-    delete m_Settings;
+    delete m_SimSettings;
 }
 void SimulationTab::SetupUI()
 {
@@ -42,11 +42,11 @@ void SimulationTab::SetupUI()
     gb_Controls->setLayout(controlsLayout);
 
     QGridLayout* resultsLayout = new QGridLayout;
-    resultsLayout->addWidget(new QLabel(tr("Max Pc: (psi)")), 0, 0);
+    resultsLayout->addWidget(new QLabel(tr("Max Pc:")), 0, 0);
     resultsLayout->addWidget(m_maxPressureLabel = new QLabel, 0, 1);
-    resultsLayout->addWidget(new QLabel(tr("Burn Time: (s)")), 1, 0);
+    resultsLayout->addWidget(new QLabel(tr("Burn Time:")), 1, 0);
     resultsLayout->addWidget(m_BurnTimeLabel = new QLabel, 1, 1);
-    resultsLayout->addWidget(new QLabel(tr("Total Impulse: (N*sec)")), 2, 0);
+    resultsLayout->addWidget(new QLabel(tr("Total Impulse:")), 2, 0);
     resultsLayout->addWidget(m_totalImpulseLabel = new QLabel, 2, 1);
     resultsLayout->addWidget(new QLabel(tr("Motor Designation:")), 3, 0);
     resultsLayout->addWidget(m_motorDesignationLabel = new QLabel, 3, 1);
@@ -66,15 +66,22 @@ void SimulationTab::SetupUI()
 }
 void SimulationTab::UpdateSimulation()
 {
-    m_Simulator->RunSim(m_Settings);
-    const int numPoints = m_Simulator->GetTotalBurnTime() / m_Settings->timeStep;
+    m_Simulator->RunSim(m_SimSettings);
+    const int numPoints = m_Simulator->GetTotalBurnTime() / m_SimSettings->timeStep;
 
-    double maxPressure = m_Simulator->GetMaxPressure();
+    double maxPressure = OpenBurnUnits::ConvertPressure(
+        OpenBurnUnits::PressureUnits_T::psi,
+        m_GlobalSettings->m_PressureUnits,
+        m_Simulator->GetMaxPressure());
+
     QVector<double> x(numPoints), y(numPoints);
     for (int i=0; i<numPoints; ++i)
     {
         x[i] = m_Simulator->GetResults()[i]->time;
-        y[i] = m_Simulator->GetResults()[i]->pressure;
+        y[i] = OpenBurnUnits::ConvertPressure(
+            OpenBurnUnits::PressureUnits_T::psi,
+            m_GlobalSettings->m_PressureUnits,
+            m_Simulator->GetResults()[i]->pressure);
     }
     m_Plotter->graph(0)->setData(x,y);
     m_Plotter->xAxis->setRange(0.f, m_Simulator->GetTotalBurnTime() + .2f);
@@ -84,16 +91,22 @@ void SimulationTab::UpdateSimulation()
     //set results labels
     double nsec = OpenBurnUnits::ConvertForce(
         OpenBurnUnits::ForceUnits_T::pounds_force,
-        OpenBurnUnits::ForceUnits_T::newtons,
+        m_GlobalSettings->m_ForceUnits,
         m_Simulator->GetTotalImpulse());
     
-    m_maxPressureLabel->setText(QString::number(round(maxPressure)));
-    m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3));
-    m_totalImpulseLabel->setText(QString::number(round(nsec)));
+    m_maxPressureLabel->setText(QString::number(round(maxPressure)) + 
+        " " + 
+        OpenBurnUnits::GetPressureUnitSymbol(m_GlobalSettings->m_PressureUnits));
+
+    m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3) + " s");
+    m_totalImpulseLabel->setText(QString::number(round(nsec)) + 
+        " " + 
+        OpenBurnUnits::GetForceUnitSymbol(m_GlobalSettings->m_ForceUnits) + 
+        "-"+ tr("sec"));
 
     double thrustN = OpenBurnUnits::ConvertForce(
         OpenBurnUnits::ForceUnits_T::pounds_force,
-        OpenBurnUnits::ForceUnits_T::newtons,
+        m_GlobalSettings->m_ForceUnits,
         m_Simulator->GetAvgThrust());
         
     QString designation(OpenBurnUtil::GetMotorClass(nsec));
@@ -107,13 +120,13 @@ void SimulationTab::SLOT_DesignReady()
 }
 void SimulationTab::SimSettingsButton_Clicked()
 {
-    if (m_SettingsDialog == nullptr)
+    if (m_SimSettingsDialog == nullptr)
     {
-        m_SettingsDialog = new SimSettingsDialog(m_Settings);
+        m_SimSettingsDialog = new SimSettingsDialog(m_SimSettings);
     }
-    m_SettingsDialog->show();
-    m_SettingsDialog->activateWindow();
-    m_SettingsDialog->raise();
+    m_SimSettingsDialog->show();
+    m_SimSettingsDialog->activateWindow();
+    m_SimSettingsDialog->raise();
 }
 void SimulationTab::RunSimButton_Clicked()
 {

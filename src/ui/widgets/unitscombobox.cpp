@@ -5,6 +5,10 @@
 UnitsComboBox::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : QComboBox(parent), m_buddyBox(buddy)
 {
+    if (buddy)
+    {
+        buddy->setMaximum(99999.0);
+    }
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateUnits(int)));
 }
 UnitsComboBox::~UnitsComboBox() {}
@@ -21,7 +25,7 @@ QDoubleSpinBox* UnitsComboBox::GetBuddyDoubleSpinBox() { return m_buddyBox; }
 LengthUnitsComboBox::LengthUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kLengthUnits);
+    addItems(OpenBurnUnits::GetLengthUnits());
     prevUnits = OpenBurnUnits::LengthUnits_T(currentIndex());
     currentUnits = prevUnits;
 }
@@ -49,7 +53,7 @@ OpenBurnUnits::LengthUnits_T LengthUnitsComboBox::GetPrevUnits() { return prevUn
 AngleUnitsComboBox::AngleUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kAngleUnits);
+    addItems(OpenBurnUnits::GetAngleUnits());
     prevUnits = OpenBurnUnits::AngleUnits_T(currentIndex());
     currentUnits = prevUnits;
 }
@@ -77,7 +81,7 @@ OpenBurnUnits::AngleUnits_T AngleUnitsComboBox::GetPrevUnits() { return prevUnit
 PressureUnitsComboBox::PressureUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kPressureUnits);
+    addItems(OpenBurnUnits::GetPressureUnits());
     prevUnits = OpenBurnUnits::PressureUnits_T(currentIndex());
     currentUnits = prevUnits;
 }
@@ -105,7 +109,7 @@ OpenBurnUnits::PressureUnits_T PressureUnitsComboBox::GetPrevUnits() { return pr
 TemperatureUnitsComboBox::TemperatureUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kTemperatureUnits);
+    addItems(OpenBurnUnits::GetTemperatureUnits());
     prevUnits = OpenBurnUnits::TemperatureUnits_T(currentIndex());
     currentUnits = prevUnits;
 }
@@ -133,7 +137,7 @@ OpenBurnUnits::TemperatureUnits_T TemperatureUnitsComboBox::GetPrevUnits() { ret
 ForceUnitsComboBox::ForceUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kForceUnits);
+    addItems(OpenBurnUnits::GetForceUnits());
     prevUnits = OpenBurnUnits::ForceUnits_T(currentIndex());
     currentUnits = prevUnits;
 }
@@ -161,7 +165,7 @@ OpenBurnUnits::ForceUnits_T ForceUnitsComboBox::GetPrevUnits() { return prevUnit
 MassUnitsComboBox::MassUnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBox(parent, buddy)
 {
-    addItems(OpenBurnUnits::g_kMassUnits);
+    addItems(OpenBurnUnits::GetMassUnits());
     prevUnits = OpenBurnUnits::MassUnits_T(currentIndex());
     currentUnits = prevUnits;
 }

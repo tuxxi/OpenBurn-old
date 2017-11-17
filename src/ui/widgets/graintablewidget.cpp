@@ -1,7 +1,8 @@
 #include "graintablewidget.h"
+#include "src/units.h"
 
-GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, QWidget *parent) 
-    : QTableWidget(parent), m_Motor(motor)
+GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent) 
+    : QTableWidget(parent), m_Motor(motor), m_Settings(settings)
 {
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setColumnCount(5); //propellant, len, core dia, dia, inhibited face
@@ -48,14 +49,35 @@ void GrainTableWidget::Update()
         int numItems = rowCount();
         setRowCount(numItems+1);
     
-        setItem(numItems, 0, new QTableWidgetItem(QString::number(grain->GetLength())));
-        setItem(numItems, 1, new QTableWidgetItem(QString::number(grain->GetDiameter())));
+        setItem(numItems, 0, new QTableWidgetItem(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_Settings->m_LengthUnits,
+                grain->GetLength())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
+        
+        setItem(numItems, 1, new QTableWidgetItem(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_Settings->m_LengthUnits,
+                grain->GetDiameter())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
+
+        
         setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
         setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
     
         if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
         {
-            setItem(numItems, 2, new QTableWidgetItem(QString::number(bates->GetCoreDiameter())));
+            setItem(numItems, 2, new QTableWidgetItem(QString::number(
+                            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_Settings->m_LengthUnits,
+                bates->GetCoreDiameter())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
         }    
     }
 }

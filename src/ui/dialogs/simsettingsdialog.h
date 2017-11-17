@@ -7,6 +7,7 @@
 #include <QComboBox>
 
 #include "src/motorsim.h"
+#include "src/ui/widgets/unitscombobox.h"
 class SimSettingsDialog : public QDialog
 {
     Q_OBJECT
@@ -21,6 +22,7 @@ private:
     void ApplySettings();
     QPushButton* m_applyButton, *m_cancelButton;
     QDoubleSpinBox* m_sb_ambientPressure, *m_sb_ambientTemp, *m_sb_twoPhaseFlow, *m_sb_skinFriction, *m_sb_timeStep;
-    QComboBox* m_cb_ambientPressureUnits, *m_cb_ambientTempUnits;
+    PressureUnitsComboBox* m_cb_ambientPressureUnits;
+    TemperatureUnitsComboBox* m_cb_ambientTempUnits;
     MotorSimSettings* m_Settings;
 };

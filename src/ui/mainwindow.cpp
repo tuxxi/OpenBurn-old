@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_DesignMotor = new OpenBurnMotor();
     m_Propellants = new PropellantList();
     m_Simulator = new MotorSim(m_DesignMotor);
+    m_GlobalSettings = new OpenBurnSettings();
     SetupUI();
     connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(SLOT_SimulationStarted()));
     connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool))); 
@@ -85,8 +86,8 @@ void MainWindow::SetupUI()
     setSizePolicy(sizePolicy);
     
     tabWidget = new QTabWidget(this);
-    m_designTab = new DesignTab(m_DesignMotor, m_Propellants);
-    m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator);
+    m_designTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
+    m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator, m_GlobalSettings);
     m_PropellantTab = new PropellantTab(m_Propellants);
     tabWidget->addTab(m_designTab, tr("Design"));
     tabWidget->addTab(m_SimTab, tr("Simulation"));

@@ -11,9 +11,9 @@
 #include <Windows.h>
 #endif
 
-DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, QWidget* parent)
+DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, OpenBurnSettings* settings, QWidget* parent)
     : QWidget(parent), m_seed_grain(nullptr), m_grainDialog(nullptr), m_nozzleDialog(nullptr), m_motorObject(nullptr),
-    m_Motor(motor), m_Propellants(propellantTypes)
+    m_Motor(motor), m_Propellants(propellantTypes), m_GlobalSettings(settings)
 {   
     SetupUI();
     connect(m_newGrainButton, SIGNAL(clicked()), this, SLOT(NewGrainButton_Clicked()));
@@ -45,7 +45,7 @@ void DesignTab::SetupUI()
     sizePolicy.setVerticalStretch(0);
     setSizePolicy(sizePolicy);    
 
-    m_grainTable = new GrainTableWidget(m_Motor, this);
+    m_grainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this);
     //grain buttons
     m_newGrainButton = new QPushButton(tr("New Grain"));
     m_deleteGrainButton = new QPushButton(tr("Delete"));
@@ -151,10 +151,28 @@ void DesignTab::UpdateDesign()
 {
     if (m_Motor->HasGrains())
     {        
-        m_motorLenLabel->setText(QString::number(m_Motor->GetMotorLength()));
-        m_motorMajorDiaLabel->setText(QString::number(m_Motor->GetMotorMajorDiameter()));
+        m_motorLenLabel->setText(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_GlobalSettings->m_LengthUnits,
+                m_Motor->GetMotorLength())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+        m_motorMajorDiaLabel->setText(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_GlobalSettings->m_LengthUnits,
+                m_Motor->GetMotorMajorDiameter())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
         m_numGrainsLabel->setText(QString::number(m_Motor->GetNumGrains()));
-        m_propellantMassLabel->setText(QString::number(m_Motor->GetMotorPropellantMass(), 'g', 2));
+        m_propellantMassLabel->setText(QString::number(
+            OpenBurnUnits::ConvertMass(
+                OpenBurnUnits::MassUnits_T::pounds_mass,
+                m_GlobalSettings->m_MassUnits,
+                m_Motor->GetMotorPropellantMass() ), 'g', 2) +
+            " " +
+            OpenBurnUnits::GetMassUnitSymbol(m_GlobalSettings->m_MassUnits));
         m_VolumeLoadingLabel->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'g', 2) + '%');
         if (m_Motor->HasNozzle())
         {
@@ -169,8 +187,20 @@ void DesignTab::UpdateDesign()
     }
     if (m_Motor->HasNozzle())
     {
-        m_nozzleDiaLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleThroat()));
-        m_nozzleExitLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExit()));
+        m_nozzleDiaLabel->setText(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_GlobalSettings->m_LengthUnits,
+                m_Motor->GetNozzle()->GetNozzleThroat())) +
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+        m_nozzleExitLabel->setText(QString::number(
+            OpenBurnUnits::ConvertLength(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_GlobalSettings->m_LengthUnits,
+                m_Motor->GetNozzle()->GetNozzleExit()))+
+            " " +
+            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
         m_expansionRatioLabel->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'g', 3));
     }
     UpdateGraphics(); 

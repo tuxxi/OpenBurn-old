@@ -3,6 +3,7 @@
 #include <QLabel>
 
 #include "src/motorsim.h"
+#include "src/settings.h"
 #include "src/ui/widgets/qcustomplot.h"
 #include "src/ui/dialogs/simsettingsdialog.h"
 
@@ -10,7 +11,7 @@ class SimulationTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SimulationTab(OpenBurnMotor* design, MotorSim* sim, QWidget* parent = nullptr);
+    explicit SimulationTab(OpenBurnMotor* design, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~SimulationTab();
 private slots:
     void RunSimButton_Clicked();
@@ -25,6 +26,7 @@ private:
     QPushButton* m_RunSimulationButton, *m_SimSettingsButton;
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
-    MotorSimSettings* m_Settings;
-    SimSettingsDialog* m_SettingsDialog;
+    MotorSimSettings* m_SimSettings;
+    SimSettingsDialog* m_SimSettingsDialog;
+    OpenBurnSettings* m_GlobalSettings;
 };

@@ -6,13 +6,13 @@
 #include <QList>
 
 #include "src/motor.h"
-
+#include "src/settings.h"
 //This class manages the table of grains displayed in the design window.
 class GrainTableWidget : public QTableWidget
 {
     Q_OBJECT
 public:
-    explicit GrainTableWidget(OpenBurnMotor* motor, QWidget *parent = nullptr);
+    explicit GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent = nullptr);
     ~GrainTableWidget();
 
     virtual void dropEvent(QDropEvent* event) override;
@@ -28,5 +28,6 @@ public slots:
 
 private:
     OpenBurnMotor* m_Motor;
+    OpenBurnSettings* m_Settings;
 };
 

@@ -128,6 +128,24 @@ namespace OpenBurnUnits
             }
         }
     }
+    const QString GetLengthUnitName(LengthUnits_T unit)
+    {
+        return kLengthUnitNames.at(int(unit));
+    }
+    const QString GetLengthUnitSymbol(LengthUnits_T unit)
+    {
+        return kLengthUnitSymbols.at(int(unit));
+    }
+    const QStringList GetLengthUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kLengthUnitNames.size(); i++)
+        {
+            list << kLengthUnitNames[i] + "(" + kLengthUnitSymbols[i] + ")";
+        }
+        return list;
+    }
+
 //=============================================================================
 //*************ANGLE UNITS********************
 //=============================================================================
@@ -165,8 +183,25 @@ namespace OpenBurnUnits
                 break;
             }
         }
-
     }
+    const QString GetAngleUnitName(AngleUnits_T units)
+    {
+        return kAngleUnitNames.at(int(units));
+    }
+    const QString GetAngleUnitSymbol(AngleUnits_T units)
+    {
+        return kAngleUnitSymbols.at(int(units));
+    }
+    const QStringList GetAngleUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kAngleUnitNames.size(); i++)
+        {
+            list << kAngleUnitNames[i] + "(" + kAngleUnitSymbols[i] + ")";
+        }
+        return list;
+    }
+
 //=============================================================================
 //*************PRESSURE UNITS********************
 //=============================================================================
@@ -255,8 +290,24 @@ namespace OpenBurnUnits
                 }
                 break;
             }
-
         }
+    }
+    const QString GetPressureUnitName(PressureUnits_T units)
+    {
+        return kPressureUnitNames.at(int(units));
+    }
+    const QString GetPressureUnitSymbol(PressureUnits_T units)
+    {
+        return kPressureUnitSymbols.at(int(units));
+    }
+    const QStringList GetPressureUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kPressureUnitNames.size(); i++)
+        {
+            list << kPressureUnitNames[i] + "(" + kPressureUnitSymbols[i] + ")";
+        }
+        return list;
     }
 //=============================================================================
 //*************TEMPERATURE UNITS********************
@@ -278,7 +329,7 @@ namespace OpenBurnUnits
                     return FAHRENHEIT_TO_CELSIUS * (value - FAHRENHEIT_CELSIUS_OFFSET);
                     break;
                 case TemperatureUnits_T::kelvin:
-                    return CELSIUS_KELVIN_OFFSET - (FAHRENHEIT_TO_CELSIUS * (value - FAHRENHEIT_CELSIUS_OFFSET));
+                    return (FAHRENHEIT_TO_CELSIUS * (value - FAHRENHEIT_CELSIUS_OFFSET)) + CELSIUS_KELVIN_OFFSET;
                     break;
                 }
                 break;
@@ -292,7 +343,7 @@ namespace OpenBurnUnits
                     return value;
                     break;
                 case TemperatureUnits_T::fahrenheit:
-                    return CELSIUS_TO_FAHRENHEIT * (value + FAHRENHEIT_CELSIUS_OFFSET);
+                    return CELSIUS_TO_FAHRENHEIT * value + FAHRENHEIT_CELSIUS_OFFSET;
                     break;
                 case TemperatureUnits_T::kelvin:
                     return value + CELSIUS_KELVIN_OFFSET;
@@ -319,6 +370,25 @@ namespace OpenBurnUnits
             }
         }
     }
+    const QString GetTemperatureUnitName(TemperatureUnits_T unit)
+    {
+        return kTemperatureUnitNames.at(int(unit));
+    }
+    const QString GetTemperatureUnitSymbol(TemperatureUnits_T unit)
+    {
+        return kTemperatureUnitSymbols.at(int(unit));
+    }
+    const QStringList GetTemperatureUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kTemperatureUnitNames.size(); i++)
+        {
+            list << kTemperatureUnitNames[i] + "(" + kTemperatureUnitSymbols[i] + ")";
+        }
+        return list;
+
+    }
+
 //=============================================================================
 //*************FORCE UNITS********************
 //=============================================================================
@@ -356,6 +426,23 @@ namespace OpenBurnUnits
                 break;
             }
         }
+    }
+    const QString GetForceUnitName(ForceUnits_T unit)
+    {
+        return kForceUnitNames.at(int(unit));
+    }
+    const QString GetForceUnitSymbol(ForceUnits_T unit)
+    {
+        return kForceUnitSymbols.at(int(unit));
+    }
+    const QStringList GetForceUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kForceUnitNames.size(); i++)
+        {
+            list << kForceUnitNames[i] + "(" + kForceUnitSymbols[i] + ")";
+        }
+        return list;
     }
 //=============================================================================
 //*************MASS UNITS********************
@@ -418,6 +505,23 @@ namespace OpenBurnUnits
                 break;
             }
         }
+    }
+    const QString GetMassUnitName(MassUnits_T unit)
+    {
+        return kMassUnitNames.at(int(unit));
+    }
+    const QString GetMassUnitSymbol(MassUnits_T unit)
+    {
+        return kMassUnitSymbols.at(int(unit));
+    }
+    const QStringList GetMassUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < kMassUnitNames.size(); i++)
+        {
+            list << kMassUnitNames[i] + "(" + kMassUnitSymbols[i] + ")";
+        }
+        return list;
     }
 }
 

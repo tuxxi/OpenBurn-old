@@ -12,12 +12,13 @@
 #include "src/util.h"
 #include "src/motor.h"
 #include "src/motorsim.h"
+#include "src/settings.h"
 
 class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, QWidget* parent = nullptr);
+    explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;
     void UpdateDesign();  
@@ -70,4 +71,5 @@ private:
     QGraphicsScene* m_motorDisplayScene;
     OpenBurnMotor* m_Motor; //The initial design  
     PropellantList* m_Propellants;
+    OpenBurnSettings* m_GlobalSettings;
 };

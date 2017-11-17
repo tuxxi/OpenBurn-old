@@ -50,7 +50,6 @@ void OpenBurnDesignGrain::SetupUI()
     m_grainLengthSpinBox = new QDoubleSpinBox(this);
     m_grainLengthSpinBox->setDecimals(3);
     m_grainLengthSpinBox->setSingleStep(0.25);
-    m_grainLengthSpinBox->setMaximum(1000.0);  
     QLabel* label_2 = new QLabel(tr("Grain Length"), this);
     m_grainLenUnitsComboBox = new LengthUnitsComboBox(this, m_grainLengthSpinBox);
     m_grainLenUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
@@ -62,7 +61,6 @@ void OpenBurnDesignGrain::SetupUI()
     m_grainDiameterSpinBox = new QDoubleSpinBox(this);
     m_grainDiameterSpinBox->setDecimals(3);
     m_grainDiameterSpinBox->setSingleStep(0.25);
-    m_grainDiameterSpinBox->setMaximum(1000.0);  
     QLabel* label_3 = new QLabel(tr("Grain Diameter"), this);
     m_grainDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainDiameterSpinBox);
     m_grainDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
@@ -152,7 +150,6 @@ BatesGrainDesign::BatesGrainDesign(
     m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);
     m_grainCoreDiameterSpinBox->setDecimals(3);
     m_grainCoreDiameterSpinBox->setSingleStep(0.25);
-    m_grainCoreDiameterSpinBox->setMaximum(1000.0);
     QLabel* label_4 = new QLabel(tr("Grain Core Diameter"), this);
     m_grainCoreDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainCoreDiameterSpinBox);
     m_grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
