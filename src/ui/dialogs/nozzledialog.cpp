@@ -9,11 +9,15 @@ NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettin
     : QDialog(parent), m_Nozzle(seed), m_gfxNozzle(nullptr), m_GlobalSettings(settings)
 {
     SetupUI();
-    connect(m_btnOK, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(m_btnClose, SIGNAL(clicked()), this, SLOT(OnCloseButtonClicked()));        
-    connect(m_btnApply, SIGNAL(clicked()), this, SLOT(OnApplyButtonClicked()));  
+    connect(m_btnOK, &QPushButton::clicked,
+            this, &NozzleDialog::accept);
+    connect(m_btnClose, &QPushButton::clicked,
+            this, &NozzleDialog::OnCloseButtonClicked);
+    connect(m_btnApply, &QPushButton::clicked,
+            this, &NozzleDialog::OnApplyButtonClicked);
     
-    connect(m_NozzleDesign, SIGNAL(DesignUpdated()), this, SLOT(OnDesignUpdated()));
+    connect(m_NozzleDesign, &OpenBurnDesignNozzle::DesignUpdated,
+            this, &NozzleDialog::OnDesignUpdated);
     setAttribute(Qt::WA_DeleteOnClose);
 }
 void NozzleDialog::SetupUI()

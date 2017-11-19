@@ -12,11 +12,15 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(
     : QWidget(parent), m_grainSeed(seed), m_GlobalSettings(settings), m_Propellants(prop)
 {
     SetupUI();
-    connect(m_cbGrainType, SIGNAL(currentIndexChanged(int)), 
-        this, SLOT(OnGrainTypeChanged(int)));
-    connect(m_sbGrainDia, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
-    connect(m_sbGrainLen, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
-    connect(m_sbGrainInhibit, SIGNAL(valueChanged(int)), this, SIGNAL(GrainDesignChanged()));
+    //new function pointer syntax does not work for overloaded signals or slots >.<
+    connect(m_cbGrainType, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(OnGrainTypeChanged(int)));
+    connect(m_sbGrainDia, SIGNAL(valueChanged(double)),
+            this, SIGNAL(GrainDesignChanged()));
+    connect(m_sbGrainLen, SIGNAL(valueChanged(double)),
+            this, SIGNAL(GrainDesignChanged()));
+    connect(m_sbGrainInhibit, SIGNAL(valueChanged(int)),
+            this, SIGNAL(GrainDesignChanged()));
     
     SeedValues();
 }

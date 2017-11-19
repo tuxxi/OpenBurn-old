@@ -14,10 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
     m_Simulator = new MotorSim(m_DesignMotor);
     m_GlobalSettings = new OpenBurnSettings();
     SetupUI();
-    connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(OnSimulationStarted()));
-    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(OnSimulationFinished(bool))); 
-    connect(m_PropellantTab, SIGNAL(PropellantsUpdated()), this, SLOT(OnPropellantsUpdated()));
-    connect(m_GlobalSettings, SIGNAL(SettingsChanged()), this, SLOT(OnSettingsChanged()));
+    connect(m_Simulator, &MotorSim::SimulationStarted,
+            this, &MainWindow::OnSimulationStarted);
+    connect(m_Simulator, &MotorSim::SimulationFinished,
+            this, &MainWindow::OnSimulationFinished);
+    connect(m_PropellantTab, &PropellantTab::PropellantsUpdated,
+            this, &MainWindow::OnPropellantsUpdated);
+    connect(m_GlobalSettings, &OpenBurnSettings::SettingsChanged,
+            this, &MainWindow::OnSettingsChanged);
 }
 MainWindow::~MainWindow()
 {

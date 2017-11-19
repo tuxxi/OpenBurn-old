@@ -25,11 +25,16 @@ PropellantTab::PropellantTab(PropellantList* propellants, QWidget* parent)
         OnPropellantComboBoxIndexChanged(0); //finish setting up UI so that we've got the 1st entry highlighted
     }
 
-    connect(m_btnSaveProp, SIGNAL(clicked()), this, SLOT(OnSaveButtonClicked()));
-    connect(m_btnDeleteProp, SIGNAL(clicked()), this, SLOT(OnDeleteButtonClicked()));
-    connect(m_btnNewProp, SIGNAL(clicked()), this, SLOT(OnNewButtonClicked()));
+    connect(m_btnSaveProp, &QPushButton::clicked,
+            this, &PropellantTab::OnSaveButtonClicked);
+    connect(m_btnDeleteProp, &QPushButton::clicked,
+            this, &PropellantTab::OnDeleteButtonClicked);
+    connect(m_btnNewProp, &QPushButton::clicked,
+            this, &PropellantTab::OnNewButtonClicked);
     
-    connect(m_cbPropSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropellantComboBoxIndexChanged(int)));
+    //new function pointer syntax does not work for overloaded signals or slots >.<
+    connect(m_cbPropSelection, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(OnPropellantComboBoxIndexChanged(int)));
 }
 
 void PropellantTab::SetupUI()

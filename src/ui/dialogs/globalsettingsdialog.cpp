@@ -17,11 +17,11 @@ GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* 
     {
         PopulateSettings(SETTINGS_POPULATE_TYPE::def);
     }
-    connect(m_btnCancel, SIGNAL(clicked()), this, SLOT(OnCancelButtonClicked()));
-    connect(m_btnApply, SIGNAL(clicked()), this, SLOT(OnApplyButtonClicked()));
-    connect(m_btnDefaultUnits, SIGNAL(clicked()), this, SLOT(OnDefaultUnitsButtonClicked()));
-    connect(m_btnMetricUnits, SIGNAL(clicked()), this, SLOT(OnMetricUnitsButtonClicked()));
-    connect(m_btnImperialUnits, SIGNAL(clicked()), this, SLOT(OnImperialUnitsButtonClicked()));
+    connect(m_btnCancel, &QPushButton::clicked, this, &GlobalSettingsDialog::OnCancelButtonClicked);
+    connect(m_btnApply, &QPushButton::clicked, this, &GlobalSettingsDialog::OnApplyButtonClicked);
+    connect(m_btnDefaultUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnDefaultUnitsButtonClicked);
+    connect(m_btnMetricUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnMetricUnitsButtonClicked);
+    connect(m_btnImperialUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnImperialUnitsButtonClicked);
 }
 void GlobalSettingsDialog::SetupUI()
 {

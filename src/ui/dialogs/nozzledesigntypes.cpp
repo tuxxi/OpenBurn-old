@@ -7,8 +7,11 @@ OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz
     : QWidget(parent), m_nozzleSeed(nozz), m_GlobalSettings(settings)
 {
     SetupUI();
-    connect(m_sbThroatDia, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
-    connect(m_sbExitDia, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
+    //new function pointer syntax does not work for overloaded signals or slots >.<
+    connect(m_sbThroatDia, SIGNAL(valueChanged(double)),
+            this, SIGNAL(DesignUpdated()));
+    connect(m_sbExitDia, SIGNAL(valueChanged(double)),
+            this, SIGNAL(DesignUpdated()));
     SeedValues();
 }
 void OpenBurnDesignNozzle::SetupUI()
@@ -100,7 +103,8 @@ ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz, O
     AddNewControls(m_unitsHalfAngle, 0, 2);
     setTabOrder(m_sbExitDia, m_sbHalfAngle);
     SeedValues();
-    connect(m_sbHalfAngle, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
+    connect(m_sbHalfAngle, SIGNAL(valueChanged(double)),
+            this, SIGNAL(DesignUpdated()));
     
 }
 void ConicalNozzleDesign::SeedValues()

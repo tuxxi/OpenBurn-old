@@ -22,9 +22,12 @@ GrainDialog::GrainDialog(PropellantList* prop,
 {
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
-    connect(m_btnCancel, SIGNAL(clicked()), this, SLOT(OnCancelButtonClicked()));
-    connect(m_btnApply, SIGNAL(clicked()), this, SLOT(OnApplyButtonClicked()));
-    connect(m_GrainDesign, SIGNAL(GrainDesignChanged()), this, SLOT(OnDesignUpdated()));
+    connect(m_btnCancel, &QPushButton::clicked,
+            this, &GrainDialog::OnCancelButtonClicked);
+    connect(m_btnApply, &QPushButton::clicked,
+            this, &GrainDialog::OnApplyButtonClicked);
+    connect(m_GrainDesign, &OpenBurnDesignGrain::GrainDesignChanged,
+            this, &GrainDialog::OnDesignUpdated);
     setAttribute(Qt::WA_DeleteOnClose);
 }
 void GrainDialog::SetupUI(OpenBurnGrain* seed)

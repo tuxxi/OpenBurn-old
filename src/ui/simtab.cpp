@@ -8,9 +8,12 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
     : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SimSettingsDialog(nullptr), m_GlobalSettings(settings)
 {
     SetupUI();
-    connect(m_Motor, SIGNAL(DesignReady()), this, SLOT(OnDesignReady()));
-    connect(m_btnRunSim, SIGNAL(clicked()), this, SLOT(OnRunSimButtonClicked()));
-    connect(m_btnSimSettings, SIGNAL(clicked()), this, SLOT(OnSimSettingsButtonClicked()));
+    connect(m_Motor, &OpenBurnMotor::DesignReady,
+            this, &SimulationTab::OnDesignReady);
+    connect(m_btnRunSim, &QPushButton::clicked,
+            this, &SimulationTab::OnRunSimButtonClicked);
+    connect(m_btnSimSettings, &QPushButton::clicked,
+            this, &SimulationTab::OnSimSettingsButtonClicked);
     m_SimSettings = new MotorSimSettings;
 }
 SimulationTab::~SimulationTab()

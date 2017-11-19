@@ -8,8 +8,10 @@ SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, QWidget* parent
     : QDialog(parent), m_Settings(settings)
 {
     SetupUI();
-    connect(m_btnApply, SIGNAL(clicked()), this, SLOT(OnApplyButtonClicked()));
-    connect(m_btnCancel, SIGNAL(clicked()), this, SLOT(OnCancelButtonClicked()));
+    connect(m_btnApply, &QPushButton::clicked,
+            this, &SimSettingsDialog::OnApplyButtonClicked);
+    connect(m_btnCancel, &QPushButton::clicked,
+            this, &SimSettingsDialog::OnCancelButtonClicked);
 }
 void SimSettingsDialog::SetupUI()
 {

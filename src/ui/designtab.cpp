@@ -16,17 +16,25 @@ DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, Open
     m_Motor(motor), m_Propellants(propellantTypes), m_GlobalSettings(settings)
 {   
     SetupUI();
-    connect(m_btnNewGrain, SIGNAL(clicked()), this, SLOT(OnNewGrainButtonClicked()));
-    connect(m_btnNozzleSettings, SIGNAL(clicked()), this, SLOT(OnNozzleButtonClicked()));
-    connect(m_btnDeleteGrain, SIGNAL(clicked()), this, SLOT(OnDeleteGrainButtonClicked()));
-    connect(m_btnEditGrain, SIGNAL(clicked()), this, SLOT(OnEditGrainButtonClicked()));
-    connect(m_btntMoveGrainUp, SIGNAL(clicked()), this, SLOT(OnMoveGrainUpButtonClicked()));
-    connect(m_btntMoveGrainDown, SIGNAL(clicked()), this, SLOT(OnMoveGrainDownButtonClicked()));
+    connect(m_btnNewGrain, &QPushButton::clicked,
+            this, &DesignTab::OnNewGrainButtonClicked);
+    connect(m_btnNozzleSettings, &QPushButton::clicked,
+            this, &DesignTab::OnNozzleButtonClicked);
+    connect(m_btnDeleteGrain, &QPushButton::clicked,
+            this, &DesignTab::OnDeleteGrainButtonClicked);
+    connect(m_btnEditGrain, &QPushButton::clicked,
+            this, &DesignTab::OnEditGrainButtonClicked);
+    connect(m_btntMoveGrainUp, &QPushButton::clicked,
+            this, &DesignTab::OnMoveGrainUpButtonClicked);
+    connect(m_btntMoveGrainDown, &QPushButton::clicked,
+            this, &DesignTab::OnMoveGrainDownButtonClicked);
 
-    connect(m_GrainTable, SIGNAL(cellClicked(int, int)), this, SLOT(OnGrainTableCellClicked(int, int)));
-    //Double clicking on a row edits that grain
-    connect(m_GrainTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnEditGrainButtonClicked()));
-    connect(m_Motor, SIGNAL(DesignUpdated()), m_GrainTable, SLOT(OnMotorUpdated()));
+    connect(m_GrainTable, &GrainTableWidget::cellClicked,
+            this, &DesignTab::OnGrainTableCellClicked);
+    connect(m_GrainTable, &GrainTableWidget::cellDoubleClicked, //Double clicking on a row edits that grain
+            this, &DesignTab::OnEditGrainButtonClicked);
+    connect(m_Motor, &OpenBurnMotor::DesignUpdated,
+            m_GrainTable, &GrainTableWidget::OnMotorUpdated);
 
     UpdateDesign();
 }

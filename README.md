@@ -29,7 +29,7 @@ calculate necesscary propellant constants such as C\*, rho, gamma, T0, Pr, and m
 
 ## Compiling
 
-Compiling OpenBurn _should_ be easy on any platform as long as you have the [latest version of the Qt SDK.](https://www.qt.io/download-qt-for-application-development) 
+Compiling OpenBurn _should_ be easy on any platform as long as you have the [latest version of the Qt SDK.](https://www.qt.io/download-qt-for-application-development) Note that OpenBurn requires at least Qt5, so you may have to update your Qt installation.
 
 On Linux/OSX: 
 
@@ -38,6 +38,7 @@ $ qmake OpenBurn.pro
 $ make
 $ ./OpenBurn
 ```  
+
 Notes:  
 1) If you wish to add new source files to OpenBurn, run the following to generate a new OpenBurn.pro file:  
-`$ qmake -project "QT+= core gui widgets printsupport" "greaterThan(QT_MAJOR_VERSION, 4):`
+`$ qmake -project "QT+= core gui widgets printsupport" "greaterThan(QT_MAJOR_VERSION, 5):"`
