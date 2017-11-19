@@ -29,6 +29,6 @@ private:
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
     MotorSimSettings* m_SimSettings;
-    SimSettingsDialog* m_SimSettingsDialog;
     OpenBurnSettings* m_GlobalSettings;
+    SimSettingsDialog* m_SimSettingsDialog;
 };

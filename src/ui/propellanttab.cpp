@@ -12,7 +12,8 @@
 const static QString DEFAULT_NAME = QString("New Propellant");
 
 PropellantTab::PropellantTab(PropellantList* propellants, QWidget* parent)
-    : QWidget(parent), m_Propellants(propellants)
+    : QWidget(parent),
+      m_Propellants(propellants)
 {
     SetupUI();
     LoadDatabase("user/propellants.json");

@@ -5,7 +5,8 @@
 
 #include "src/units.h"
 SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, QWidget* parent)
-    : QDialog(parent), m_Settings(settings)
+    : QDialog(parent),
+      m_Settings(settings)
 {
     SetupUI();
     connect(m_btnApply, &QPushButton::clicked,

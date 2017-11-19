@@ -1,13 +1,15 @@
 #include "src/ui/graphics/graingraphicsitem.h"
 
 GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_Grain(grain), m_Color(Qt::gray), 
-    m_ScaleFactor(scale_factor), m_isCrossSectionView(crossSection)
+    : QGraphicsObject(parent),
+      m_Grain(grain),
+      m_Color(Qt::gray),
+      m_ScaleFactor(scale_factor),
+      m_isCrossSectionView(crossSection)
 {
     setAcceptDrops(true);
 }
-void GrainGraphicsItem::paint(QPainter *painter,
-    const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GrainGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

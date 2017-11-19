@@ -1,14 +1,18 @@
 #include "src/ui/graphics/nozzlegraphicsitem.h"
 
-NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle,
-    int scale_factor, double nozzle_height, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_Color(Qt::lightGray), m_Nozzle(nozzle), m_NozzleHeight(nozzle_height),
-      m_NozzleLength(0.f), m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
+NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle, int scale_factor,
+                                       double nozzle_height, bool crossSection, QGraphicsItem *parent)
+    : QGraphicsObject(parent),
+      m_Color(Qt::lightGray),
+      m_Nozzle(nozzle),
+      m_NozzleHeight(nozzle_height),
+      m_NozzleLength(0.f),
+      m_isCrossSectionView(crossSection),
+      m_scaleFactor(scale_factor)
 {
 
 }
-void NozzleGraphicsItem::paint(QPainter *painter,
-    const QStyleOptionGraphicsItem *option, QWidget *widget)
+void NozzleGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

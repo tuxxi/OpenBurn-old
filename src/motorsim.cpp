@@ -11,8 +11,9 @@ MotorSim::MotorSim()
 
 }
 MotorSim::MotorSim(OpenBurnMotor* motor)
-    : m_InitialDesignMotor(motor), m_TotalBurnTime(0), m_TotalImpulse(0)
-    
+    : m_InitialDesignMotor(motor),
+      m_TotalBurnTime(0),
+      m_TotalImpulse(0)
 {
 
 }

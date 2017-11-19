@@ -5,7 +5,11 @@
 #include "src/units.h"
 
 SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent)
-    : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SimSettingsDialog(nullptr), m_GlobalSettings(settings)
+    : QWidget(parent),
+      m_Motor(motor),
+      m_Simulator(sim),
+      m_GlobalSettings(settings),
+      m_SimSettingsDialog(nullptr)
 {
     SetupUI();
     connect(m_Motor, &OpenBurnMotor::DesignReady,

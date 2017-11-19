@@ -2,7 +2,11 @@
 
 #include "grain.h"
 OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant prop, int inhibited)
-    : m_GrainDia(diameter), m_GrainLen(length),m_Propellant(prop), m_NumInhibited(inhibited), m_isBurnedOut(false)
+    : m_GrainDia(diameter),
+      m_GrainLen(length),
+      m_Propellant(prop),
+      m_NumInhibited(inhibited),
+      m_isBurnedOut(false)
 {
 
 }

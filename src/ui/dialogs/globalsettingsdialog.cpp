@@ -5,7 +5,8 @@
 #include "globalsettingsdialog.h"
 
 GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* parent)
-    : QDialog(parent), m_GlobalSettings(settings)
+    : QDialog(parent),
+      m_GlobalSettings(settings)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
@@ -17,11 +18,16 @@ GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* 
     {
         PopulateSettings(SETTINGS_POPULATE_TYPE::def);
     }
-    connect(m_btnCancel, &QPushButton::clicked, this, &GlobalSettingsDialog::OnCancelButtonClicked);
-    connect(m_btnApply, &QPushButton::clicked, this, &GlobalSettingsDialog::OnApplyButtonClicked);
-    connect(m_btnDefaultUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnDefaultUnitsButtonClicked);
-    connect(m_btnMetricUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnMetricUnitsButtonClicked);
-    connect(m_btnImperialUnits, &QPushButton::clicked, this, &GlobalSettingsDialog::OnImperialUnitsButtonClicked);
+    connect(m_btnCancel, &QPushButton::clicked,
+            this, &GlobalSettingsDialog::OnCancelButtonClicked);
+    connect(m_btnApply, &QPushButton::clicked,
+            this, &GlobalSettingsDialog::OnApplyButtonClicked);
+    connect(m_btnDefaultUnits, &QPushButton::clicked,
+            this, &GlobalSettingsDialog::OnDefaultUnitsButtonClicked);
+    connect(m_btnMetricUnits, &QPushButton::clicked,
+            this, &GlobalSettingsDialog::OnMetricUnitsButtonClicked);
+    connect(m_btnImperialUnits, &QPushButton::clicked,
+            this, &GlobalSettingsDialog::OnImperialUnitsButtonClicked);
 }
 void GlobalSettingsDialog::SetupUI()
 {
@@ -56,7 +62,6 @@ void GlobalSettingsDialog::SetupUI()
     m_btnApply = new QPushButton(tr("Apply"), this);
     m_btnCancel = new QPushButton(tr("Close"), this);
 
-    
     QGridLayout* masterLayout = new QGridLayout;
     masterLayout->addWidget(settingsBox, 0, 0, 1, 2);
     masterLayout->addWidget(unitsBox, 1, 0, 1, 2);

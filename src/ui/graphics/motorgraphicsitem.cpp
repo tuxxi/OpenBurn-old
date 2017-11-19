@@ -2,8 +2,11 @@
 
 
 MotorGraphicsItem::MotorGraphicsItem(int scale_factor, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_ScaleFactor(scale_factor), m_gfxNozzle(nullptr),
-    m_MotorLen(0.0f), m_MotorHeight(0.0f)
+    : QGraphicsObject(parent),
+      m_ScaleFactor(scale_factor),
+      m_gfxNozzle(nullptr),
+      m_MotorLen(0.0f),
+      m_MotorHeight(0.0f)
 {
     
 }

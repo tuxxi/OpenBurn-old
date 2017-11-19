@@ -34,9 +34,7 @@ public:
     double GetDiameter();
     int GetInhibitedFaces();
     OpenBurnPropellant GetPropellant();
-    GRAINTYPE GetGrainType();
 signals:
-    void GrainTypeChanged(GRAINTYPE type);
     void GrainDesignChanged();
 protected:
     virtual void SeedValues();
@@ -54,8 +52,6 @@ protected:
     QToolButton *m_btntModifyPropellant;
     OpenBurnSettings* m_GlobalSettings;
 
-private slots:
-    void OnGrainTypeChanged(int);
 private:
     void SetupUI();
     QGridLayout* m_layControls;

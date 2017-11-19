@@ -2,7 +2,9 @@
 #include "src/units.h"
 
 GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent) 
-    : QTableWidget(parent), m_Motor(motor), m_Settings(settings)
+    : QTableWidget(parent),
+      m_Motor(motor),
+      m_Settings(settings)
 {
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setColumnCount(5); //propellant, len, core dia, dia, inhibited face

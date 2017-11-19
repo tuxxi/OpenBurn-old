@@ -6,8 +6,8 @@
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
     m_DesignMotor = new OpenBurnMotor();
     m_Propellants = new PropellantList();

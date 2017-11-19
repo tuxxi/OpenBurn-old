@@ -2,7 +2,8 @@
 #include <QtMath>
 
 OpenBurnNozzle::OpenBurnNozzle(double throat, double exit)
-    : m_NozzleThroat(throat), m_NozzleExit(exit)
+    : m_NozzleThroat(throat),
+      m_NozzleExit(exit)
 {
 
 }

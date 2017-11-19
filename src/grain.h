@@ -3,10 +3,6 @@
 #include <QtMath>
 #include <QJsonObject>
 
-enum GRAINTYPE
-{
-    GRAINTYPE_BATES = 0,
-};
 //represents a single propellant grain in a motor
 class OpenBurnGrain
 {

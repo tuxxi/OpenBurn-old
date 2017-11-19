@@ -10,16 +10,16 @@
 #include "src/ui/dialogs/graindialog.h"
 #include "src/grain.h"
 
-GrainDialog::GrainDialog(PropellantList* prop,
-    OpenBurnGrain* seedValues,
-    OpenBurnSettings *settings,
-    QList<OpenBurnGrain*>grains,
-    QWidget *parent)
-    : QDialog(parent), m_gfxGrain(nullptr), m_GrainsToEdit(grains),
-    m_Propellants(prop),
-    m_GlobalSettings(settings),
-    m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
+GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
+                        QList<OpenBurnGrain*>grains, QWidget *parent)
+    : QDialog(parent),
+      m_gfxGrain(nullptr),
+      m_GrainsToEdit(grains),
+      m_Propellants(prop),
+      m_GlobalSettings(settings),
+      m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
     connect(m_btnCancel, &QPushButton::clicked,
@@ -28,7 +28,6 @@ GrainDialog::GrainDialog(PropellantList* prop,
             this, &GrainDialog::OnApplyButtonClicked);
     connect(m_GrainDesign, &OpenBurnDesignGrain::GrainDesignChanged,
             this, &GrainDialog::OnDesignUpdated);
-    setAttribute(Qt::WA_DeleteOnClose);
 }
 void GrainDialog::SetupUI(OpenBurnGrain* seed)
 {
@@ -67,21 +66,21 @@ void GrainDialog::SetupUI(OpenBurnGrain* seed)
 
     QVBoxLayout* masterVLayout = new QVBoxLayout;
     masterVLayout->addWidget(m_gbFrame);
-    masterVLayout->addWidget(m_GrainGraphicsView);
+    masterVLayout->addWidget(m_GraphicsView);
     setLayout(masterVLayout);
     OnDesignUpdated();
 }
 void GrainDialog::SetupGraphics()
 {
-    m_GrainGraphicsView = new QGraphicsView;
-    m_GrainGraphicsScene = new QGraphicsScene;
-    m_GrainGraphicsView->setScene(m_GrainGraphicsScene);
-    m_GrainGraphicsView->show();
+    m_GraphicsView = new QGraphicsView;
+    m_GraphicsScene = new QGraphicsScene;
+    m_GraphicsView->setScene(m_GraphicsScene);
+    m_GraphicsView->show();
     QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     sizePolicy2.setHorizontalStretch(0);
     sizePolicy2.setVerticalStretch(0);
     sizePolicy2.setHeightForWidth(true);
-    m_GrainGraphicsView->setSizePolicy(sizePolicy2);
+    m_GraphicsView->setSizePolicy(sizePolicy2);
 }
 void GrainDialog::OnDesignUpdated()
 {
@@ -119,20 +118,20 @@ void GrainDialog::UpdateGraphics()
     if (!m_gfxGrain)
     {
         m_gfxGrain = new GrainGraphicsItem(m_GrainsToEdit.front(), 100, false);
-        m_GrainGraphicsScene->addItem(m_gfxGrain);
+        m_GraphicsScene->addItem(m_gfxGrain);
     }
     m_gfxGrain->setPos(0, 0);    
     m_gfxGrain->update(m_gfxGrain->boundingRect());
-    m_GrainGraphicsView->viewport()->repaint();
+    m_GraphicsView->viewport()->repaint();
 
     //set the display scene to the middle of the view plus a bit of padding on the sides
-    m_GrainGraphicsView->setSceneRect(m_gfxGrain->boundingRect());
+    m_GraphicsView->setSceneRect(m_gfxGrain->boundingRect());
     QRectF bounds = QRectF(m_gfxGrain->boundingRect().left(), m_gfxGrain->boundingRect().top(), 
         m_gfxGrain->boundingRect().width() + 50, m_gfxGrain->boundingRect().height() + 50);
-    m_GrainGraphicsView->fitInView(bounds, Qt::KeepAspectRatio);
+    m_GraphicsView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case 
-    m_GrainGraphicsView->viewport()->repaint();
+    m_GraphicsView->viewport()->repaint();
     m_gfxGrain->update(m_gfxGrain->boundingRect());    
 }
 void GrainDialog::resizeEvent(QResizeEvent* event)
@@ -146,7 +145,7 @@ void GrainDialog::OnCancelButtonClicked()
 }
 void GrainDialog::OnApplyButtonClicked()
 {
-    //OPENBURN_TODO: make this a small warning below the buttons or something rather than a msg box
+    //TODO: make this a small warning below the buttons or something rather than a msg box
     if (qFuzzyIsNull(m_GrainDesign->GetLength()) )
     {
         QMessageBox::warning(this, tr("OpenBurn: Warning!"),

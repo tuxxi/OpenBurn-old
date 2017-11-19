@@ -2,12 +2,14 @@
 #include "motor.h"
 
 OpenBurnMotor::OpenBurnMotor()
-    : m_Nozzle(nullptr), m_Grains(std::vector<OpenBurnGrain*>()), m_AvgPropellant(nullptr)
+    : OpenBurnMotor(nullptr, GrainVector())
 {
 
 }
 OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
-    : m_Nozzle(nozz), m_Grains(grains), m_AvgPropellant(nullptr)
+    : m_Nozzle(nozz),
+      m_Grains(grains),
+      m_AvgPropellant(nullptr)
 {
 
 }
@@ -24,7 +26,8 @@ void OpenBurnMotor::SetGrains(GrainVector grains, bool copy)
 {
     if (copy)
     {
-        std::transform(grains.begin(), grains.end(), std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
+        std::transform(grains.begin(), grains.end(),
+                       std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
     }
     else
     {

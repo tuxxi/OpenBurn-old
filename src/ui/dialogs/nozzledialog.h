@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <QPushButton>
 #include <QComboBox>
+#include <QGroupBox>
 
 #include "src/nozzle.h"
 #include "src/settings.h"
@@ -29,16 +30,11 @@ private slots:
 
 private:
     void SetupUI();
-    void UpdateGraphics();    
-    QFrame* m_Frame;
+    QGroupBox* m_gbFrame;
 
     QPushButton *m_btnApply, *m_btnOK, *m_btnClose;
 
-    QGraphicsView *m_NozzleGraphicsView;
-    QGraphicsScene *m_NozzleGraphicsScene;
-
     OpenBurnDesignNozzle* m_NozzleDesign;
     OpenBurnNozzle* m_Nozzle;
-    NozzleGraphicsItem* m_gfxNozzle;
     OpenBurnSettings* m_GlobalSettings;
 };

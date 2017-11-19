@@ -4,17 +4,16 @@
 #include "src/ui/dialogs/graindesigntypes.h"
 #include "src/units.h"
 
-OpenBurnDesignGrain::OpenBurnDesignGrain(
-    PropellantList* prop,
-    OpenBurnGrain* seed,
-    OpenBurnSettings* settings,
-    QWidget* parent)
-    : QWidget(parent), m_grainSeed(seed), m_GlobalSettings(settings), m_Propellants(prop)
+OpenBurnDesignGrain::OpenBurnDesignGrain(PropellantList* prop, OpenBurnGrain* seed,
+                                         OpenBurnSettings* settings, QWidget* parent)
+    : QWidget(parent),
+      m_grainSeed(seed),
+      m_GlobalSettings(settings),
+      m_Propellants(prop)
 {
     SetupUI();
+    SeedValues();
     //new function pointer syntax does not work for overloaded signals or slots >.<
-    connect(m_cbGrainType, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(OnGrainTypeChanged(int)));
     connect(m_sbGrainDia, SIGNAL(valueChanged(double)),
             this, SIGNAL(GrainDesignChanged()));
     connect(m_sbGrainLen, SIGNAL(valueChanged(double)),
@@ -22,7 +21,6 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(
     connect(m_sbGrainInhibit, SIGNAL(valueChanged(int)),
             this, SIGNAL(GrainDesignChanged()));
     
-    SeedValues();
 }
 void OpenBurnDesignGrain::SetupUI()
 {
@@ -53,8 +51,6 @@ void OpenBurnDesignGrain::SetupUI()
 
     //Grain Length 
     m_sbGrainLen = new QDoubleSpinBox(this);
-    m_sbGrainLen->setDecimals(3);
-    m_sbGrainLen->setSingleStep(0.25);
     QLabel* label_2 = new QLabel(tr("Grain Length"), this);
     m_unitsGrainLen = new LengthUnitsComboBox(this, m_sbGrainLen);
     m_unitsGrainLen->setLayoutDirection(Qt::LeftToRight);
@@ -64,8 +60,6 @@ void OpenBurnDesignGrain::SetupUI()
 
     //Grain Diameter
     m_sbGrainDia = new QDoubleSpinBox(this);
-    m_sbGrainDia->setDecimals(3);
-    m_sbGrainDia->setSingleStep(0.25);
     QLabel* label_3 = new QLabel(tr("Grain Diameter"), this);
     m_unitsGrainDia = new LengthUnitsComboBox(this, m_sbGrainDia);
     m_unitsGrainDia->setLayoutDirection(Qt::LeftToRight);
@@ -123,10 +117,6 @@ int OpenBurnDesignGrain::GetInhibitedFaces()
 {
     return m_sbGrainInhibit->value();
 }
-GRAINTYPE OpenBurnDesignGrain::GetGrainType()
-{
-    return static_cast<GRAINTYPE>(m_cbGrainType->currentIndex());
-}
 OpenBurnPropellant OpenBurnDesignGrain::GetPropellant()
 {
     if (!m_Propellants->empty())
@@ -135,12 +125,6 @@ OpenBurnPropellant OpenBurnDesignGrain::GetPropellant()
         return (*m_Propellants)[idx];
     }
     return OpenBurnPropellant();
-}
-
-void OpenBurnDesignGrain::OnGrainTypeChanged(int idx)
-{
-    //TODO: for some reason, the value in the grain design's type spin box doesn't update even though it says the index updated...
-    emit GrainTypeChanged(static_cast<GRAINTYPE>(idx));
 }
 void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 {
@@ -156,8 +140,6 @@ CylindricalGrainDesign::CylindricalGrainDesign(
 {
     //Grain Core Diameter
     m_sbGrainCoreDia = new QDoubleSpinBox(this);
-    m_sbGrainCoreDia->setDecimals(3);
-    m_sbGrainCoreDia->setSingleStep(0.25);
     QLabel* label_4 = new QLabel(tr("Grain Core Diameter"), this);
     m_unitsGrainCoreDia = new LengthUnitsComboBox(this, m_sbGrainCoreDia);
     m_unitsGrainCoreDia->setLayoutDirection(Qt::LeftToRight);

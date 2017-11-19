@@ -3,11 +3,15 @@
 #include "unitscombobox.h"
 
 UnitsComboBox::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
-    : QComboBox(parent), m_buddyBox(buddy)
+    : QComboBox(parent),
+      m_buddyBox(buddy)
 {
     if (buddy)
     {
-        buddy->setMaximum(99999.0);
+        buddy->setMinimum(0.0);
+        buddy->setMaximum(double(1e6) - 1);
+        buddy->setDecimals(3);
+        buddy->setSingleStep(0.25f);
     }
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnUnitsUpdated(int)));
 }
@@ -16,7 +20,6 @@ void UnitsComboBox::SetBuddyDoubleSpinBox(QDoubleSpinBox* box)
     if (box != nullptr) m_buddyBox = box;
 }
 QDoubleSpinBox* UnitsComboBox::GetBuddyDoubleSpinBox() { return m_buddyBox; }
-
 
 //=============================================================================
 //*************LENGTH UNITS********************

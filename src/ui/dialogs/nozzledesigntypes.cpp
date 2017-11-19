@@ -4,15 +4,18 @@
 #include "src/util.h"
 
 OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz, OpenBurnSettings* settings)
-    : QWidget(parent), m_nozzleSeed(nozz), m_GlobalSettings(settings)
+    : QWidget(parent),
+      m_nozzleSeed(nozz),
+      m_GlobalSettings(settings)
 {
     SetupUI();
+    SeedValues();
+
     //new function pointer syntax does not work for overloaded signals or slots >.<
     connect(m_sbThroatDia, SIGNAL(valueChanged(double)),
             this, SIGNAL(DesignUpdated()));
     connect(m_sbExitDia, SIGNAL(valueChanged(double)),
             this, SIGNAL(DesignUpdated()));
-    SeedValues();
 }
 void OpenBurnDesignNozzle::SetupUI()
 {
@@ -26,8 +29,6 @@ void OpenBurnDesignNozzle::SetupUI()
 
     //throat diameter
     m_sbThroatDia = new QDoubleSpinBox(this);
-    m_sbThroatDia->setDecimals(3);
-    m_sbThroatDia->setSingleStep(0.25f);
     QLabel* label = new QLabel(tr("Throat Diameter"), this);
     m_unitsThroatDia = new LengthUnitsComboBox(this, m_sbThroatDia);
     m_Layout->addWidget(label, 1, 0);
@@ -36,8 +37,6 @@ void OpenBurnDesignNozzle::SetupUI()
 
     //exit (expansion, divergence) diameter
     m_sbExitDia = new QDoubleSpinBox(this);
-    m_sbExitDia->setDecimals(3);
-    m_sbExitDia->setSingleStep(0.25f);
     QLabel* label_2 = new QLabel(tr("Exit Diameter"), this);
     m_unitsExitDia = new LengthUnitsComboBox(this, m_sbExitDia);
     m_Layout->addWidget(label_2, 2, 0);

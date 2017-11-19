@@ -12,8 +12,11 @@
 #endif
 
 DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, OpenBurnSettings* settings, QWidget* parent)
-    : QWidget(parent), m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
-    m_Motor(motor), m_Propellants(propellantTypes), m_GlobalSettings(settings)
+    : QWidget(parent),
+      m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
+      m_Motor(motor),
+      m_Propellants(propellantTypes),
+      m_GlobalSettings(settings)
 {   
     SetupUI();
     connect(m_btnNewGrain, &QPushButton::clicked,
