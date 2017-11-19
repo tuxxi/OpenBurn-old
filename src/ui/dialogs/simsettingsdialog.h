@@ -13,16 +13,16 @@ class SimSettingsDialog : public QDialog
     Q_OBJECT
 public:
     explicit SimSettingsDialog(MotorSimSettings* settings, QWidget* parent = nullptr);
-    ~SimSettingsDialog();
+    ~SimSettingsDialog() = default;
 private slots:
-    void ApplyButton_Clicked();
-    void CancelButton_Clicked();
+    void OnApplyButtonClicked();
+    void OnCancelButtonClicked();
 private:
     void SetupUI();
     void ApplySettings();
-    QPushButton* m_applyButton, *m_cancelButton;
-    QDoubleSpinBox* m_sb_ambientPressure, *m_sb_ambientTemp, *m_sb_twoPhaseFlow, *m_sb_skinFriction, *m_sb_timeStep;
-    PressureUnitsComboBox* m_cb_ambientPressureUnits;
-    TemperatureUnitsComboBox* m_cb_ambientTempUnits;
+    QPushButton* m_btnApply, *m_btnCancel;
+    QDoubleSpinBox* m_sbAmbientPressure, *m_sbAmbientTemp, *m_sbTwoPhaseFlow, *m_sbSkinFriction, *m_sbTimeStep;
+    PressureUnitsComboBox* m_unitsAmbientPressure;
+    TemperatureUnitsComboBox* m_unitsAmbientTemp;
     MotorSimSettings* m_Settings;
 };

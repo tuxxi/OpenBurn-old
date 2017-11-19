@@ -21,17 +21,17 @@ class PropellantTab : public QWidget
     Q_OBJECT
 public:
     explicit PropellantTab(PropellantList* propellants, QWidget* parent = nullptr);
-    ~PropellantTab();
+    ~PropellantTab() = default;
 signals:
     void PropellantsUpdated();
 
 private slots:
-    void SaveButton_Clicked();
-    void DeleteButton_Clicked();
-    void NewButton_Clicked();
-    void PropellantComboBox_Changed(int);
+    void OnSaveButtonClicked();
+    void OnDeleteButtonClicked();
+    void OnNewButtonClicked();
+    void OnPropellantComboBoxIndexChanged(int);
 
-    void UpdatePropellant();
+    void OnPropellantUpdated();
 private:
     void SetupUI();
     void ConnectLineEditSignals();
@@ -40,21 +40,21 @@ private:
     bool LoadDatabase(const QString& filename);
     bool SaveDatabase();
     PropellantList* m_Propellants;
-    QString m_propellantFileName;
+    QString m_DatabaseFileName;
 
-    QGroupBox* m_gb_edit;
+    QGroupBox* m_gbEdit;
 
-    QComboBox* m_cb_propSelection;
-    QPushButton* m_SavePropButton, *m_DeletePropButton, *m_NewPropButton, *m_CalculateButton;
-    QLineEdit* m_line_propName;
+    QComboBox* m_cbPropSelection;
+    QPushButton* m_btnSaveProp, *m_btnDeleteProp, *m_btnNewProp, *m_btnCalculate;
+    QLineEdit* m_lnePropName;
 
     //ingredients
     std::vector<IngredientLine> m_ingredients;
     //Propellant Gas Properties
     //basic
-    QLineEdit* m_line_propBRCoef, *m_line_propBRExp, *m_line_propDensity, *m_line_propCStar;
+    QLineEdit* m_lnePropBRCoef, *m_lnePropBRExp, *m_lnePropDensity, *m_lnePropCStar;
 
     //advanced
-    QLineEdit* m_line_propSpecificHeat, *m_line_propSpecificHeatRatio, *m_line_propCp, *m_line_propCv, *m_line_propAdiabaticFlameTemp,
-        *m_line_propMolarMass, *m_line_propGasViscosity, *m_line_propPrandtlNumber;
+    QLineEdit* m_lnePropSpecificHeat, *m_lnePropGasSpecificHeatRatio, *m_lnePropGasCp, *m_lnePropGasCv, *m_lnePropAdiabaticFlameTemp,
+        *m_lnePropMolarMass, *m_lnePropGasViscosity, *m_lnePropPrandtlNumber;
 };

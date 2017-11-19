@@ -8,9 +8,9 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
     : QWidget(parent), m_Motor(motor), m_Simulator(sim), m_SimSettingsDialog(nullptr), m_GlobalSettings(settings)
 {
     SetupUI();
-    connect(m_Motor, SIGNAL(SIG_DesignReady()), this, SLOT(SLOT_DesignReady()));
-    connect(m_RunSimulationButton, SIGNAL(clicked()), this, SLOT(RunSimButton_Clicked())); 
-    connect(m_SimSettingsButton, SIGNAL(clicked()), this, SLOT(SimSettingsButton_Clicked()));
+    connect(m_Motor, SIGNAL(DesignReady()), this, SLOT(OnDesignReady()));
+    connect(m_btnRunSim, SIGNAL(clicked()), this, SLOT(OnRunSimButtonClicked()));
+    connect(m_btnSimSettings, SIGNAL(clicked()), this, SLOT(OnSimSettingsButtonClicked()));
     m_SimSettings = new MotorSimSettings;
 }
 SimulationTab::~SimulationTab()
@@ -28,28 +28,28 @@ void SimulationTab::SetupUI()
     m_Plotter->xAxis->setRange(-.2f, 2.f);
     m_Plotter->yAxis->setRange(0.f, 1200.f);
     
-    m_RunSimulationButton = new QPushButton(tr("Run Simulation"));
-    m_RunSimulationButton->setEnabled(false);    
-    m_SimSettingsButton = new QPushButton(tr("Simulation Settings"));
+    m_btnRunSim = new QPushButton(tr("Run Simulation"));
+    m_btnRunSim->setEnabled(false);
+    m_btnSimSettings = new QPushButton(tr("Simulation Settings"));
 
     QGroupBox* gb_Simulate = new QGroupBox(tr("Motor Simulation"));
     QGroupBox* gb_Controls = new QGroupBox(tr("Controls"));    
     QGroupBox* gb_Results = new QGroupBox(tr("Results"));
 
     QGridLayout* controlsLayout = new QGridLayout;
-    controlsLayout->addWidget(m_RunSimulationButton);
-    controlsLayout->addWidget(m_SimSettingsButton);
+    controlsLayout->addWidget(m_btnRunSim);
+    controlsLayout->addWidget(m_btnSimSettings);
     gb_Controls->setLayout(controlsLayout);
 
     QGridLayout* resultsLayout = new QGridLayout;
     resultsLayout->addWidget(new QLabel(tr("Max Pc:")), 0, 0);
-    resultsLayout->addWidget(m_maxPressureLabel = new QLabel, 0, 1);
+    resultsLayout->addWidget(m_lblMaxpressure = new QLabel, 0, 1);
     resultsLayout->addWidget(new QLabel(tr("Burn Time:")), 1, 0);
-    resultsLayout->addWidget(m_BurnTimeLabel = new QLabel, 1, 1);
+    resultsLayout->addWidget(m_lblBurnTime = new QLabel, 1, 1);
     resultsLayout->addWidget(new QLabel(tr("Total Impulse:")), 2, 0);
-    resultsLayout->addWidget(m_totalImpulseLabel = new QLabel, 2, 1);
+    resultsLayout->addWidget(m_lblTotalImpulse = new QLabel, 2, 1);
     resultsLayout->addWidget(new QLabel(tr("Motor Designation:")), 3, 0);
-    resultsLayout->addWidget(m_motorDesignationLabel = new QLabel, 3, 1);
+    resultsLayout->addWidget(m_lblMotorDesignation = new QLabel, 3, 1);
     
     gb_Results->setLayout(resultsLayout);
     
@@ -116,12 +116,12 @@ void SimulationTab::UpdateResults()
         m_GlobalSettings->m_ForceUnits,
         m_Simulator->GetTotalImpulse());
 
-    m_maxPressureLabel->setText(QString::number(round(maxPressure)) +
+    m_lblMaxpressure->setText(QString::number(round(maxPressure)) +
         " " +
         OpenBurnUnits::GetPressureUnitSymbol(m_GlobalSettings->m_PressureUnits));
 
-    m_BurnTimeLabel->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3) + " s");
-    m_totalImpulseLabel->setText(QString::number(round(totalImpulse)) +
+    m_lblBurnTime->setText(QString::number(m_Simulator->GetTotalBurnTime(), 'g', 3) + " s");
+    m_lblTotalImpulse->setText(QString::number(round(totalImpulse)) +
         " " +
         OpenBurnUnits::GetForceUnitSymbol(m_GlobalSettings->m_ForceUnits) +
         "-"+ tr("sec"));
@@ -130,17 +130,17 @@ void SimulationTab::UpdateResults()
     QString designation(OpenBurnUtil::GetMotorClass(totalImpulseN));
     QString thrust(QString::number(round(avgThrustN)));
     QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
-    m_motorDesignationLabel->setText(percent + "% " + designation + "-" + thrust);
+    m_lblMotorDesignation->setText(percent + "% " + designation + "-" + thrust);
 }
-void SimulationTab::SLOT_DesignReady()
+void SimulationTab::OnDesignReady()
 {
     if (m_GlobalSettings->m_redrawOnChanges)
     {
         UpdateSimulation();
     }
-    m_RunSimulationButton->setEnabled(true);
+    m_btnRunSim->setEnabled(true);
 }
-void SimulationTab::SimSettingsButton_Clicked()
+void SimulationTab::OnSimSettingsButtonClicked()
 {
     if (m_SimSettingsDialog == nullptr)
     {
@@ -150,7 +150,7 @@ void SimulationTab::SimSettingsButton_Clicked()
     m_SimSettingsDialog->activateWindow();
     m_SimSettingsDialog->raise();
 }
-void SimulationTab::RunSimButton_Clicked()
+void SimulationTab::OnRunSimButtonClicked()
 {
     UpdateSimulation();
 }

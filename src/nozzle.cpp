@@ -6,7 +6,6 @@ OpenBurnNozzle::OpenBurnNozzle(double throat, double exit)
 {
 
 }
-OpenBurnNozzle::~OpenBurnNozzle() {}
 double OpenBurnNozzle::GetNozzleExit() const { return m_NozzleExit; }
 double OpenBurnNozzle::GetNozzleThroat() const { return m_NozzleThroat; }
 double OpenBurnNozzle::GetNozzleThroatArea() const
@@ -30,18 +29,17 @@ ConicalNozzle::ConicalNozzle(double throat, double exit, double halfAngle)
 {
 
 }
-ConicalNozzle::~ConicalNozzle() {}
 double ConicalNozzle::GetHalfAngle() const { return m_HalfAngle; }
-double ConicalNozzle::GetThroatLength() const { return m_throatLength; }
+double ConicalNozzle::GetThroatLength() const { return m_ThroatLen; }
 
 void ConicalNozzle::SetHalfAngle(double angl) { m_HalfAngle = angl; }
-void ConicalNozzle::SetNozzleThroatLen(double len) { m_throatLength = len; }
+void ConicalNozzle::SetNozzleThroatLen(double len) { m_ThroatLen = len; }
 void ConicalNozzle::ReadJSON(const QJsonObject& object)
 {
     m_NozzleThroat = object["throat"].toDouble();
     m_NozzleExit =  object["exit"].toDouble();
     m_HalfAngle = object["divergentangle"].toDouble();
-    m_throatLength = object["throatlength"].toDouble();
+    m_ThroatLen = object["throatlength"].toDouble();
 }
 void ConicalNozzle::WriteJSON(QJsonObject& object)
 {
@@ -49,7 +47,7 @@ void ConicalNozzle::WriteJSON(QJsonObject& object)
     object["throat"] = m_NozzleThroat;
     object["exit"] = m_NozzleExit;
     object["divergentangle"] = m_HalfAngle;
-    object["throatlength"] = m_throatLength;
+    object["throatlength"] = m_ThroatLen;
 }
 double ConicalNozzle::GetNozzleDivergenceLossFactor() const
 {

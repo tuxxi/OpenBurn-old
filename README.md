@@ -9,6 +9,7 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 - Motor cross section (grain geometry and nozzle) updates in real time as you design
 - Grain regression and chamber pressure are calculated for a steady-state chamber based on Saint Robert's law `r = aP^n`. 
 - OpenBurn will additionally calculate thrust and total impulse for the motor using the isentropic flow models, accounting for two-phase flow, skin friction, and divergent shape losses in the nozzle expansion cone.
+- Support for many different units
 
 ### OpenBurn Design
 ![OpenBurn main screen](https://i.imgur.com/afWFBhU.png)
@@ -16,14 +17,15 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 ### OpenBurn Simulation
 ![OpenBurn results screen](https://i.imgur.com/poPY1MT.png)
 
-## Planned/In-Progress Features
+## Planned/In-Progress Features (\* - in progress)
 
-- Support for many different units
+- \*Animated cross section view of the motor burn
+- \*Mass flux at any point in the chamber
 - Every major 2D port (core) geometry
 - A 2D geometric-based regression model allowing for any arbitrary 2D grain shape. 
 - An internal chemical equilibrium solver for shifting or frozen equlibrium, so the user can easily
 calculate necesscary propellant constants such as C\*, rho, gamma, T0, Pr, and more. 
-- If the user supplies advanced propellant interal ballistics parameters such as Prandtl number, adiabatic flame temperature, and gas viscosity (calculated using OpenBurn's internal CE solver), OpenBurn will calculate erosive burning effects on the grain surface.
+- \*If the user supplies advanced propellant interal ballistics parameters such as Prandtl number, adiabatic flame temperature, and gas viscosity (calculated using OpenBurn's internal CE solver), OpenBurn will calculate erosive burning effects on the grain surface.
 
 ## Compiling
 
@@ -38,4 +40,4 @@ $ ./OpenBurn
 ```  
 Notes:  
 1) If you wish to add new source files to OpenBurn, run the following to generate a new OpenBurn.pro file:  
-`$ qmake -project "QT+= core gui" "greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport"`   
+`$ qmake -project "QT+= core gui widgets printsupport" "greaterThan(QT_MAJOR_VERSION, 4):`

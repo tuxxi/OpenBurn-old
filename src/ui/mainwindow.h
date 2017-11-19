@@ -30,40 +30,44 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+protected:
+    virtual void closeEvent(QCloseEvent*) override;
 private slots:
-    void menuQuit();
-    void menuOpen();
-    void menuSave();
-    void menuSaveAs();
-    void menuNew();
-    
-    void menuSettings();
-    void SLOT_SimulationStarted();
-    void SLOT_SimulationFinished(bool success);
-    void SLOT_PropellantsUpdated();
-    void SLOT_SettingsChanged();
+    void OnMenuQuit();
+    void OnMenuOpen();
+    void OnMenuSave();
+    void OnMenuSaveAs();
+    void OnMenuNew();
+    void OnMenuSettings();
+
+    void OnSimulationStarted();
+    void OnSimulationFinished(bool success);
+    void OnPropellantsUpdated();
+    void OnSettingsChanged();
 private:
-    void closeEvent(QCloseEvent*);
     void SetupUI();
     void SaveFile(QString filename);
-    QWidget *centralWidget;
-
-    QMenuBar *menuBar;
-    QStatusBar *statusBar;
-    QMenu *menuFile, *menuEdit, *menuTools, *menuHelp;
-
-    QAction *actionOpen, *actionSave, *actionSave_As, *actionQuit, *actionNew, *actionExport;
-    QAction *actionSettings;
-    QStatusBar *m_statusBar;
-    QTabWidget *tabWidget;
-    DesignTab *m_designTab;
-    SimulationTab* m_SimTab;
-    PropellantTab* m_PropellantTab;
 
     OpenBurnMotor* m_DesignMotor;
     PropellantList* m_Propellants;
     MotorSim* m_Simulator;
     OpenBurnSettings* m_GlobalSettings;
-    QString m_CurrentFilename;
+    QString m_CurrentDesignFilename;
+
+    QWidget *m_CentralWidget;
+
+    QMenuBar *m_MenuBar;
+    QMenu *m_MenuFile, *m_MenuEdit, *m_MenuTools, *m_MenuHelp;
+    //file
+    QAction *m_ActionOpen, *m_ActionSave, *m_ActionSaveAs, *m_ActionQuit, *m_ActionNew, *m_ActionExport;
+    //tools
+    QAction *m_ActionSettings;
+
+    QStatusBar *m_StatusBar;
+
+    QTabWidget *m_TabWidget;
+    DesignTab *m_DesignTab;
+    SimulationTab* m_SimTab;
+    PropellantTab* m_PropellantTab;
+
 };

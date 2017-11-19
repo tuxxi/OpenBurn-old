@@ -12,7 +12,7 @@ public:
     OpenBurnPropellant();
     OpenBurnPropellant(const QString& name);    
     OpenBurnPropellant(const QString& name, double a, double n, double cstar, double rho, double gamma = 1.25);
-    ~OpenBurnPropellant();
+    virtual ~OpenBurnPropellant() = default;
 
     bool operator==(const OpenBurnPropellant& other);
     void SetPropellantName(const QString& name);

@@ -4,123 +4,115 @@
 #include "src/util.h"
 
 OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz, OpenBurnSettings* settings)
-    : QWidget(parent), m_seedNozzle(nozz), m_GlobalSettings(settings)
+    : QWidget(parent), m_nozzleSeed(nozz), m_GlobalSettings(settings)
 {
     SetupUI();
-    connect(m_throatDiaSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
-    connect(m_exitDiaSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
+    connect(m_sbThroatDia, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
+    connect(m_sbExitDia, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
     SeedValues();
 }
 void OpenBurnDesignNozzle::SetupUI()
 {
-    layout = new QGridLayout(this);
+    m_Layout = new QGridLayout(this);
     //nozzle type
-    m_nozzleType = new QComboBox(this);
-    m_nozzleType->addItem(tr("Conical Nozzle"));
+    m_cbNozzleType = new QComboBox(this);
+    m_cbNozzleType->addItem(tr("Conical Nozzle"));
     QLabel* label_0 = new QLabel(tr("Nozzle Type"));
-    layout->addWidget(label_0, 0, 0);
-    layout->addWidget(m_nozzleType, 0, 1);
+    m_Layout->addWidget(label_0, 0, 0);
+    m_Layout->addWidget(m_cbNozzleType, 0, 1);
 
     //throat diameter
-    m_throatDiaSpinBox = new QDoubleSpinBox(this);
-    m_throatDiaSpinBox->setDecimals(3);
-    m_throatDiaSpinBox->setSingleStep(0.25f);
+    m_sbThroatDia = new QDoubleSpinBox(this);
+    m_sbThroatDia->setDecimals(3);
+    m_sbThroatDia->setSingleStep(0.25f);
     QLabel* label = new QLabel(tr("Throat Diameter"), this);
-    m_throatDiaUnits = new LengthUnitsComboBox(this, m_throatDiaSpinBox);
-    layout->addWidget(label, 1, 0);
-    layout->addWidget(m_throatDiaSpinBox, 1, 1);
-    layout->addWidget(m_throatDiaUnits, 1, 2);
+    m_unitsThroatDia = new LengthUnitsComboBox(this, m_sbThroatDia);
+    m_Layout->addWidget(label, 1, 0);
+    m_Layout->addWidget(m_sbThroatDia, 1, 1);
+    m_Layout->addWidget(m_unitsThroatDia, 1, 2);
 
     //exit (expansion, divergence) diameter
-    m_exitDiaSpinBox = new QDoubleSpinBox(this);
-    m_exitDiaSpinBox->setDecimals(3);
-    m_exitDiaSpinBox->setSingleStep(0.25f);
+    m_sbExitDia = new QDoubleSpinBox(this);
+    m_sbExitDia->setDecimals(3);
+    m_sbExitDia->setSingleStep(0.25f);
     QLabel* label_2 = new QLabel(tr("Exit Diameter"), this);
-    m_exitDiaUnits = new LengthUnitsComboBox(this, m_exitDiaSpinBox);
-    layout->addWidget(label_2, 2, 0);
-    layout->addWidget(m_exitDiaSpinBox, 2, 1);
-    layout->addWidget(m_exitDiaUnits, 2, 2);
+    m_unitsExitDia = new LengthUnitsComboBox(this, m_sbExitDia);
+    m_Layout->addWidget(label_2, 2, 0);
+    m_Layout->addWidget(m_sbExitDia, 2, 1);
+    m_Layout->addWidget(m_unitsExitDia, 2, 2);
     
     if (m_GlobalSettings)
     {
-        m_throatDiaUnits->SetUnits(m_GlobalSettings->m_LengthUnits);
-        m_exitDiaUnits->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_unitsThroatDia->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_unitsExitDia->SetUnits(m_GlobalSettings->m_LengthUnits);
     }
-    setTabOrder(m_throatDiaSpinBox, m_exitDiaSpinBox);
-
-}
-OpenBurnDesignNozzle::~OpenBurnDesignNozzle()
-{
+    setTabOrder(m_sbThroatDia, m_sbExitDia);
 
 }
 void OpenBurnDesignNozzle::SeedValues()
 {
-    if (m_seedNozzle)
+    if (m_nozzleSeed)
     {
-        m_throatDiaSpinBox->setValue(m_seedNozzle->GetNozzleThroat());
-        m_exitDiaSpinBox->setValue(m_seedNozzle->GetNozzleExit());
+        m_sbThroatDia->setValue(m_nozzleSeed->GetNozzleThroat());
+        m_sbExitDia->setValue(m_nozzleSeed->GetNozzleExit());
     }
 }
 double OpenBurnDesignNozzle::GetThroatDiameter()
 {
     return OpenBurnUnits::ConvertLength(
-        m_throatDiaUnits->GetCurrentUnits(),
+        m_unitsThroatDia->GetCurrentUnits(),
         OpenBurnUnits::LengthUnits_T::inches,
-        m_throatDiaSpinBox->value());
+        m_sbThroatDia->value());
 }
 double OpenBurnDesignNozzle::GetExitDiameter()
 {
     return OpenBurnUnits::ConvertLength(
-        m_exitDiaUnits->GetCurrentUnits(),
+        m_unitsExitDia->GetCurrentUnits(),
         OpenBurnUnits::LengthUnits_T::inches,
-        m_exitDiaSpinBox->value());
+        m_sbExitDia->value());
 }
 OpenBurnNozzle* OpenBurnDesignNozzle::GetNozzle()
 {
-    return m_seedNozzle;
+    return m_nozzleSeed;
 }
 void OpenBurnDesignNozzle::AddNewControls(QWidget* widget, int row, int col)
 {
-    layout->addWidget(widget, row+3, col);
+    m_Layout->addWidget(widget, row+3, col);
 }
 
 ConicalNozzleDesign::ConicalNozzleDesign(QWidget* parent, ConicalNozzle* nozz, OpenBurnSettings *settings)
     : OpenBurnDesignNozzle(parent, nozz, settings)
 {
-    m_halfAngleSpinBox = new QDoubleSpinBox(this);
-    m_halfAngleSpinBox->setDecimals(1);
-    m_halfAngleSpinBox->setSingleStep(1);
-    m_halfAngleSpinBox->setValue(15.f); //default to 15 degrees :)
+    m_sbHalfAngle = new QDoubleSpinBox(this);
+    m_sbHalfAngle->setDecimals(1);
+    m_sbHalfAngle->setSingleStep(1);
+    m_sbHalfAngle->setValue(15.f); //default to 15 degrees :)
     QLabel* label_3 = new QLabel(tr("Divergent Half Angle"), this);
-    m_halfAngleUnits = new AngleUnitsComboBox(this);
-    m_halfAngleUnits->setLayoutDirection(Qt::LeftToRight);
+    m_unitsHalfAngle = new AngleUnitsComboBox(this);
+    m_unitsHalfAngle->setLayoutDirection(Qt::LeftToRight);
     if (m_GlobalSettings)
     {
-        m_halfAngleUnits->SetUnits(m_GlobalSettings->m_AngleUnits);
+        m_unitsHalfAngle->SetUnits(m_GlobalSettings->m_AngleUnits);
     }
 
     AddNewControls(label_3, 0, 0);
-    AddNewControls(m_halfAngleSpinBox, 0, 1);
-    AddNewControls(m_halfAngleUnits, 0, 2);
-    setTabOrder(m_exitDiaSpinBox, m_halfAngleSpinBox);
+    AddNewControls(m_sbHalfAngle, 0, 1);
+    AddNewControls(m_unitsHalfAngle, 0, 2);
+    setTabOrder(m_sbExitDia, m_sbHalfAngle);
     SeedValues();
-    connect(m_halfAngleSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_DesignUpdated()));
+    connect(m_sbHalfAngle, SIGNAL(valueChanged(double)), this, SIGNAL(DesignUpdated()));
     
-}
-ConicalNozzleDesign::~ConicalNozzleDesign()
-{
-
 }
 void ConicalNozzleDesign::SeedValues()
 {
-    if ( ConicalNozzle* nozz = (dynamic_cast<ConicalNozzle*>(m_seedNozzle)))
+    if ( ConicalNozzle* nozz = (dynamic_cast<ConicalNozzle*>(m_nozzleSeed)))
     {
-        m_halfAngleSpinBox->setValue(nozz->GetHalfAngle());
+        m_sbHalfAngle->setValue(nozz->GetHalfAngle());
     }
 }
 double ConicalNozzleDesign::GetDivergentHalfAngle()
 {
-    return OpenBurnUnits::ConvertAngle(m_halfAngleUnits->GetCurrentUnits(),
+    return OpenBurnUnits::ConvertAngle(m_unitsHalfAngle->GetCurrentUnits(),
         OpenBurnUnits::AngleUnits_T::degrees,
-        m_halfAngleSpinBox->value());
+        m_sbHalfAngle->value());
 }

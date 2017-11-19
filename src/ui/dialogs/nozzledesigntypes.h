@@ -23,26 +23,27 @@ public:
         QWidget* parent = nullptr,
         OpenBurnNozzle* seed = nullptr,
         OpenBurnSettings* settings = nullptr);
-    virtual ~OpenBurnDesignNozzle();
+
+    virtual ~OpenBurnDesignNozzle() = default;
 
     double GetThroatDiameter();
     double GetExitDiameter();
     OpenBurnNozzle* GetNozzle();
 signals:
-    void SIG_DesignUpdated();
+    void DesignUpdated();
 protected:
     virtual void SeedValues();
     void AddNewControls(QWidget* widet, int row, int col);
 
-    QDoubleSpinBox *m_throatDiaSpinBox, *m_exitDiaSpinBox;
-    LengthUnitsComboBox *m_throatDiaUnits, *m_exitDiaUnits;
-    QComboBox *m_nozzleType;
+    QDoubleSpinBox *m_sbThroatDia, *m_sbExitDia;
+    LengthUnitsComboBox *m_unitsThroatDia, *m_unitsExitDia;
+    QComboBox *m_cbNozzleType;
 
-    OpenBurnNozzle* m_seedNozzle;
+    OpenBurnNozzle* m_nozzleSeed;
     OpenBurnSettings* m_GlobalSettings;
 private:
     void SetupUI();
-    QGridLayout* layout;
+    QGridLayout* m_Layout;
 
 };
 class ConicalNozzleDesign : public OpenBurnDesignNozzle
@@ -53,11 +54,11 @@ public:
         QWidget* parent = nullptr,
         ConicalNozzle* seed = nullptr,
         OpenBurnSettings* settings = nullptr);
-    virtual ~ConicalNozzleDesign();
+    ~ConicalNozzleDesign() = default;
 
     double GetDivergentHalfAngle();
 protected:
     virtual void SeedValues() override;
-    QDoubleSpinBox *m_halfAngleSpinBox;
-    AngleUnitsComboBox *m_halfAngleUnits;
+    QDoubleSpinBox *m_sbHalfAngle;
+    AngleUnitsComboBox *m_unitsHalfAngle;
 };

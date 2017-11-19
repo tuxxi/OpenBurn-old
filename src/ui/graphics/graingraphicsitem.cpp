@@ -1,14 +1,10 @@
 #include "src/ui/graphics/graingraphicsitem.h"
 
 GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_grain(grain), m_color(Qt::gray), 
-    m_scaleFactor(scale_factor), m_isCrossSectionView(crossSection)
+    : QGraphicsObject(parent), m_Grain(grain), m_Color(Qt::gray), 
+    m_ScaleFactor(scale_factor), m_isCrossSectionView(crossSection)
 {
     setAcceptDrops(true);
-}
-GrainGraphicsItem::~GrainGraphicsItem()
-{
-    m_grain = nullptr;
 }
 void GrainGraphicsItem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -16,23 +12,23 @@ void GrainGraphicsItem::paint(QPainter *painter,
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if (m_grain)
+    if (m_Grain)
     {
-        QBrush brush = QBrush(m_color, Qt::FDiagPattern);
+        QBrush brush = QBrush(m_Color, Qt::FDiagPattern);
         QPen pen = QPen(Qt::black, 0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
         painter->setPen(pen);
         painter->setBrush(brush);
     
-        double wid = m_grain->GetDiameter() * m_scaleFactor;
-        double len = m_grain->GetLength() * m_scaleFactor;
+        double wid = m_Grain->GetDiameter() * m_ScaleFactor;
+        double len = m_Grain->GetLength() * m_ScaleFactor;
     
         if (m_isCrossSectionView)
         {
             //draw grain rect
             painter->drawRect(0, 0, len, wid);
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(m_grain))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(m_Grain))
             {
-                double corewid = bates->GetCoreDiameter() * m_scaleFactor;
+                double corewid = bates->GetCoreDiameter() * m_ScaleFactor;
                 //"cut out" core using white brush
                 painter->setBrush(Qt::white);
                 painter->setPen(pen);    
@@ -46,9 +42,9 @@ void GrainGraphicsItem::paint(QPainter *painter,
         else
         {
             painter->drawEllipse(0, 0, wid, wid);
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(m_grain))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(m_Grain))
             {
-                double corewid = bates->GetCoreDiameter() * m_scaleFactor;
+                double corewid = bates->GetCoreDiameter() * m_ScaleFactor;
                 //"cut out" core using white brush
                 painter->setBrush(Qt::white);
                 painter->setPen(pen);    
@@ -63,15 +59,15 @@ void GrainGraphicsItem::paint(QPainter *painter,
 }
 QRectF GrainGraphicsItem::boundingRect() const
 {
-    if (m_grain)
+    if (m_Grain)
     {
         if (m_isCrossSectionView)
         {
-            return QRectF(0, 0, m_grain->GetLength() * m_scaleFactor, m_grain->GetDiameter() * m_scaleFactor);        
+            return QRectF(0, 0, m_Grain->GetLength() * m_ScaleFactor, m_Grain->GetDiameter() * m_ScaleFactor);        
         }
         else
         {
-            return QRectF(0, 0, m_grain->GetDiameter() * m_scaleFactor, m_grain->GetDiameter() * m_scaleFactor);
+            return QRectF(0, 0, m_Grain->GetDiameter() * m_ScaleFactor, m_Grain->GetDiameter() * m_ScaleFactor);
         }    
     }
     return QRectF();

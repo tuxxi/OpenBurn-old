@@ -27,39 +27,40 @@ public:
     OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains);
     ~OpenBurnMotor();
 
-    double CalcStaticKn(KN_STATIC_CALC_TYPE type);    
-
+    double CalcStaticKn(KN_STATIC_CALC_TYPE type); //static kn calc based on regression derivitiave
     double CalcKn(); //instantaneous Kn calc for the current motor configuration
-    void SetGrains(GrainVector grains);
-    void SetCopyGrains(GrainVector grains);
-    void SetNozzle(OpenBurnNozzle* nozz);
-    GrainVector GetGrains();
-    OpenBurnNozzle* GetNozzle();
 
-    bool HasGrains() const;
-    bool HasNozzle() const;
+    //if (copy), clones the grain objects and sets the grains as these new objects
+    void SetGrains(GrainVector grains, bool copy = false);
+    void SetNozzle(OpenBurnNozzle* nozz);
 
     void AddGrain(OpenBurnGrain* grain);
     void UpdateGrain(OpenBurnGrain* grain, int index);
+    void SwapGrains(int idx1, int idx2);
     void RemoveGrain(OpenBurnGrain* grain);
     void RemoveGrain(int index);
-    void SwapGrains(int idx1, int idx2);
-    size_t GetNumGrains();
-    
-    double GetMotorLength();
-    double GetMotorMajorDiameter();
-    //this is in slugs by default
-    double GetMotorPropellantMass();
-    double GetVolumeLoading();
-    double GetPortThroatRatio();
 
+    GrainVector GetGrains();
+    OpenBurnNozzle* GetNozzle();
     const OpenBurnPropellant& GetAvgPropellant();
+
+    bool HasNozzle() const;
+    bool HasGrains() const;
+    size_t GetNumGrains() const;
+
+    double GetMotorLength() const;
+    double GetMotorMajorDiameter() const;
+    double GetMotorPropellantMass() const;
+    double GetVolumeLoading() const;
+    double GetPortThroatRatio() const;
+
 
     void ReadJSON(const QJsonObject& object, PropellantList* database);
     void WriteJSON(QJsonObject &object);
+
 signals:
-    void SIG_DesignReady();
-    void SIG_DesignUpdated();
+    void DesignReady();
+    void DesignUpdated();
 private:
     OpenBurnNozzle* m_Nozzle;
     GrainVector m_Grains;
@@ -67,6 +68,6 @@ private:
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing
     //weighted average based on mass of each segment of propellant
     void CalcAvgPropellant();
-    OpenBurnPropellant m_avgPropellant;
+    OpenBurnPropellant m_AvgPropellant;
 
 };

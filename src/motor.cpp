@@ -2,12 +2,12 @@
 #include "motor.h"
 
 OpenBurnMotor::OpenBurnMotor()
-    : m_Nozzle(nullptr), m_Grains(std::vector<OpenBurnGrain*>()), m_avgPropellant(nullptr)
+    : m_Nozzle(nullptr), m_Grains(std::vector<OpenBurnGrain*>()), m_AvgPropellant(nullptr)
 {
 
 }
 OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
-    : m_Nozzle(nozz), m_Grains(grains), m_avgPropellant(nullptr)
+    : m_Nozzle(nozz), m_Grains(grains), m_AvgPropellant(nullptr)
 {
 
 }
@@ -20,28 +20,29 @@ OpenBurnMotor::~OpenBurnMotor()
     m_Grains.clear();
     //delete m_avgPropellant;    
 }
-
-void OpenBurnMotor::SetGrains(GrainVector grains)
+void OpenBurnMotor::SetGrains(GrainVector grains, bool copy)
 {
-    m_Grains = grains;
+    if (copy)
+    {
+        std::transform(grains.begin(), grains.end(), std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
+    }
+    else
+    {
+        m_Grains = grains;
+        emit DesignUpdated();
+    }
     CalcAvgPropellant();
-    emit SIG_DesignUpdated();
-}
-void OpenBurnMotor::SetCopyGrains(GrainVector grains)
-{
-    std::transform(grains.begin(), grains.end(), std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
-    CalcAvgPropellant();    
 }
 void OpenBurnMotor::AddGrain(OpenBurnGrain* grain)
 {
     m_Grains.push_back(grain);
-    emit SIG_DesignUpdated();    
+    emit DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::UpdateGrain(OpenBurnGrain* grain, int index)
 {
     m_Grains[index] = grain;
-    emit SIG_DesignUpdated();
+    emit DesignUpdated();
     CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
@@ -55,7 +56,7 @@ void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
             m_Grains.erase(i);
         }
     }
-    emit SIG_DesignUpdated();    
+    emit DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::RemoveGrain(int index)
@@ -63,24 +64,24 @@ void OpenBurnMotor::RemoveGrain(int index)
     delete m_Grains[index];
     m_Grains[index] = nullptr;    
     m_Grains.erase(m_Grains.begin() + index);
-    emit SIG_DesignUpdated();    
+    emit DesignUpdated();    
     CalcAvgPropellant();
 }
 void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
 {
     std::swap(m_Grains[oldPos], m_Grains[newPos]); //std::swap uses move semantics afaik
-    emit SIG_DesignUpdated();    
+    emit DesignUpdated();    
 }
 void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
 {
-    emit SIG_DesignUpdated();
+    emit DesignUpdated();
     m_Nozzle = nozz;
 }
 
-size_t OpenBurnMotor::GetNumGrains() { return m_Grains.size(); }
+size_t OpenBurnMotor::GetNumGrains() const { return m_Grains.size(); }
 GrainVector OpenBurnMotor::GetGrains() { return m_Grains;}
 OpenBurnNozzle* OpenBurnMotor::GetNozzle() { return m_Nozzle; }
-const OpenBurnPropellant& OpenBurnMotor::GetAvgPropellant() { return m_avgPropellant; }
+const OpenBurnPropellant& OpenBurnMotor::GetAvgPropellant() { return m_AvgPropellant; }
 
 double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
 {
@@ -99,7 +100,7 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
     case KN_CALC_MAX:
         for (auto i : m_Grains)
         {
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(i))
             {
                 int inhibited = (2 - bates->GetInhibitedFaces());
                 double webRegression = float(1.0f/6.0f) * (bates->GetLength() - inhibited * bates->GetCoreDiameter());
@@ -117,7 +118,7 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
     case KN_CALC_FINAL:
         for (auto i : m_Grains)
         {
-            if (BatesGrain* bates = dynamic_cast<BatesGrain*>(i))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(i))
             {
                 double web_thickness = 0.5f * (bates->GetDiameter() - bates->GetCoreDiameter());
                 double core_area = M_PI * bates->GetDiameter() * (bates->GetLength() - 2 * web_thickness);
@@ -148,7 +149,7 @@ bool OpenBurnMotor::HasGrains() const
 {
     return m_Grains.size() != 0;
 }
-double OpenBurnMotor::GetMotorLength()
+double OpenBurnMotor::GetMotorLength() const
 {
     double len = 0;
     for (auto i : m_Grains)
@@ -157,7 +158,7 @@ double OpenBurnMotor::GetMotorLength()
     }
     return len;
 }
-double OpenBurnMotor::GetMotorMajorDiameter()
+double OpenBurnMotor::GetMotorMajorDiameter() const
 {
     double dia = 0;
     for (auto i : m_Grains)
@@ -167,7 +168,7 @@ double OpenBurnMotor::GetMotorMajorDiameter()
     }
     return dia;
 }
-double OpenBurnMotor::GetMotorPropellantMass()
+double OpenBurnMotor::GetMotorPropellantMass() const
 {
     double mass = 0;
     for (auto i : m_Grains)
@@ -208,9 +209,9 @@ void OpenBurnMotor::CalcAvgPropellant()
     }
     */
     //todo: fix this and make it actually work properly 
-    if (HasGrains()) m_avgPropellant = m_Grains[0]->GetPropellantType();
+    if (HasGrains()) m_AvgPropellant = m_Grains[0]->GetPropellantType();
 }
-double OpenBurnMotor::GetVolumeLoading()
+double OpenBurnMotor::GetVolumeLoading() const
 {
     double propellantVolume = 0;
     for (auto i : m_Grains)
@@ -220,7 +221,7 @@ double OpenBurnMotor::GetVolumeLoading()
     double chamberVolume = .25f * M_PI * GetMotorMajorDiameter() * GetMotorMajorDiameter() * GetMotorLength();
     return propellantVolume / chamberVolume;
 }
-double OpenBurnMotor::GetPortThroatRatio()
+double OpenBurnMotor::GetPortThroatRatio() const
 {
     //the nth grain in the list of n grains should always be the one at the nozzle end.
     return m_Grains[GetNumGrains()-1]->GetPortArea() / m_Nozzle->GetNozzleThroatArea();
@@ -249,7 +250,7 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
         QJsonObject grainObject = i.toObject();
         if (grainObject["_type"] == "BATES")
         {
-            BatesGrain* bates = new BatesGrain;
+            CylindricalGrain* bates = new CylindricalGrain;
             QString propellantName;
             bates->ReadJSON(grainObject, propellantName);
             for (auto i : propellants)

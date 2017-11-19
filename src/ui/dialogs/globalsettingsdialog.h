@@ -8,24 +8,24 @@
 
 enum class SETTINGS_POPULATE_TYPE
 {
-    current_,
-    default_,
-    metric_,
-    imperial_
+    current,
+    def, //can't use the literal "default" lmao
+    metric,
+    imperial
 };
 class GlobalSettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
     explicit GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* parent = nullptr);
-    ~GlobalSettingsDialog();
+    ~GlobalSettingsDialog() = default;
 private slots:
-    void ApplyButton_Clicked();
-    void CancelButton_Clicked();
+    void OnApplyButtonClicked();
+    void OnCancelButtonClicked();
 
-    void DefaultUnitsButton_Clicked();
-    void MetricUnitsButton_Clicked();
-    void ImperialUnitsButton_Clicked();
+    void OnDefaultUnitsButtonClicked();
+    void OnMetricUnitsButtonClicked();
+    void OnImperialUnitsButtonClicked();
 
 private:
     void SetupUI();
@@ -33,13 +33,16 @@ private:
     void PopulateSettings(SETTINGS_POPULATE_TYPE type);
     OpenBurnSettings* m_GlobalSettings;
 
-    QPushButton* m_applyButton, *m_cancelButton;
-    QPushButton* m_defaultUnitsButton, *m_imperialUnitsButton, *m_metricUnitsButton;
-    QCheckBox* m_reSimCheckBox;
-    LengthUnitsComboBox* m_cb_LengthUnits;
-    AngleUnitsComboBox* m_cb_AngleUnits;
-    TemperatureUnitsComboBox* m_cb_TemperatureUnits;
-    PressureUnitsComboBox* m_cb_PressureUnits;
-    ForceUnitsComboBox* m_cb_ForceUnits;
-    MassUnitsComboBox* m_cb_MassUnits;
+    QPushButton* m_btnApply, *m_btnCancel;
+
+    QCheckBox* m_chbxReSimOnChanges;
+
+    //units
+    QPushButton* m_btnDefaultUnits, *m_btnImperialUnits, *m_btnMetricUnits;
+    LengthUnitsComboBox* m_unitsLength;
+    AngleUnitsComboBox* m_unitsAngle;
+    TemperatureUnitsComboBox* m_unitsTemperature;
+    PressureUnitsComboBox* m_unitsPressure;
+    ForceUnitsComboBox* m_unitsForce;
+    MassUnitsComboBox* m_unitsMass;
 };

@@ -11,4 +11,3 @@ OpenBurnSettings::OpenBurnSettings()
 {
     
 }
-OpenBurnSettings::~OpenBurnSettings() {}

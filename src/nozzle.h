@@ -5,7 +5,7 @@ class OpenBurnNozzle
 {
 public:
     OpenBurnNozzle(double throat, double exit);
-    virtual ~OpenBurnNozzle();
+    virtual ~OpenBurnNozzle() = default;
     virtual void SetNozzleThroat(double);
     virtual void SetNozzleExit(double);
 
@@ -28,7 +28,7 @@ class ConicalNozzle : public OpenBurnNozzle
 {
 public:
     ConicalNozzle(double throat, double exit, double halfAngle = 15.0f);
-    virtual ~ConicalNozzle();
+    virtual ~ConicalNozzle() = default;
 
     void SetHalfAngle(double);
     void SetNozzleThroatLen(double);
@@ -39,9 +39,8 @@ public:
     virtual void ReadJSON(const QJsonObject& object) override;
     virtual void WriteJSON(QJsonObject &object) override;
 
-    //TODO: add calculations to account for departures from ideal performance
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf
 private:
     double m_HalfAngle;
-    double m_throatLength; //straight cut throat
+    double m_ThroatLen; //straight cut throat TODO: delete/move to new class maybe?
 };

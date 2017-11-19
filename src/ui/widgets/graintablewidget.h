@@ -7,26 +7,33 @@
 
 #include "src/motor.h"
 #include "src/settings.h"
+
 //This class manages the table of grains displayed in the design window.
+
+//TODO: maybe move to tree view?
 class GrainTableWidget : public QTableWidget
 {
     Q_OBJECT
 public:
     explicit GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent = nullptr);
-    ~GrainTableWidget();
+    ~GrainTableWidget() = default;
 
-    virtual void dropEvent(QDropEvent* event) override;
-    virtual void resizeEvent(QResizeEvent* event) override;
     QList<int>GetSelectedGrainIndices();
     QList<OpenBurnGrain*>GetSelectedGrains();
-    
-    void move(bool up);
-    QList<QTableWidgetItem*> takeRow(int row);
-    void setRow(int row, const QList<QTableWidgetItem*>& rowItems);
+
 public slots:
-    void Update();
+    void OnMotorUpdated();
+
+protected:
+    virtual void dropEvent(QDropEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
+    //TODO: use these and get rid of the ugly hack I was doing before :^)
+    void Move(bool up);
+    QList<QTableWidgetItem*> TakeRow(int row);
+    void SetRow(int row, const QList<QTableWidgetItem*>& rowItems);
+
     OpenBurnMotor* m_Motor;
     OpenBurnSettings* m_Settings;
 };

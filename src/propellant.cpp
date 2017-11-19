@@ -14,10 +14,6 @@ OpenBurnPropellant::OpenBurnPropellant(const QString& name, double a, double n, 
 {
 
 }
-OpenBurnPropellant::~OpenBurnPropellant()
-{
-    
-}
 //dimensionless, dimensionless, feet/sec, slugs/in^3
 void OpenBurnPropellant::SetBasicParams(double a, double n, double cstar, double rho, double gamma)
 {

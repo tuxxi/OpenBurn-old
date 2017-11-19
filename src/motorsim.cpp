@@ -42,11 +42,11 @@ void MotorSim::RunSim(MotorSimSettings* settings)
 
         if (m_SimResultData.empty()) //start with initial conditions
         {
-            newDataPointMotor->SetCopyGrains(m_InitialDesignMotor->GetGrains());                        
+            newDataPointMotor->SetGrains(m_InitialDesignMotor->GetGrains(), true);
         }
         else //after we've run the sim for one time step, use the previous result as initial condition
         {
-            newDataPointMotor->SetCopyGrains(m_SimResultData[iterations-1]->motor->GetGrains());            
+            newDataPointMotor->SetGrains(m_SimResultData[iterations-1]->motor->GetGrains(), true);
         }
         m_TotalBurnTime += settings->timeStep;
         newDataPoint->time = m_TotalBurnTime;

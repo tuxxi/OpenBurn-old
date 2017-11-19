@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "motor.h"
+#include "settings.h"
 
 struct MotorSimDataPoint
 {
@@ -19,26 +20,6 @@ struct MotorSimDataPoint
     {
         delete motor;
     }
-};
-struct MotorSimSettings
-{
-    double ambientPressure;
-    double ambientTemp;
-
-    double twoPhaseFlowEfficency; //% of combustion that is gaseous. Burnsim assumes 85% by default.
-    double skinFrictionEfficency; //99% is typical for this value
-    double timeStep;
-
-    //default settings
-    MotorSimSettings()
-        : MotorSimSettings(14.7f, 70, 0.85f, 0.98f)
-    {}
-    MotorSimSettings(double ambientPress, double ambientTemperature, double twophase, double skinfriction, double timestep = 0.01f)
-        : ambientPressure(ambientPress), ambientTemp(ambientTemperature), 
-        twoPhaseFlowEfficency(twophase), 
-        skinFrictionEfficency(skinfriction), 
-        timeStep(timestep)
-    {}
 };
 class MotorSim : public QObject
 {

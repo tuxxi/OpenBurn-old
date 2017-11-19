@@ -17,6 +17,7 @@ class MotorGraphicsItem : public QGraphicsObject
 {
 public:
     MotorGraphicsItem(int scale_factor, QGraphicsItem *parent = nullptr);
+    ~MotorGraphicsItem() = default;
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
@@ -26,11 +27,11 @@ public:
     void RemoveGrain(int index);
     void RemoveAllGrains();
     void SetScaleFactor(int scale);
-    int GetScaleFactor() { return m_scaleFactor; }
-    
+    int GetScaleFactor() { return m_ScaleFactor; }
+
 private:
     void CalculateMotorHeight();
-    int m_scaleFactor;
+    int m_ScaleFactor;
     std::vector<GrainGraphicsItem*> m_gfxGrains;
     NozzleGraphicsItem* m_gfxNozzle;
     double m_MotorLen, m_MotorHeight; //in pixnels    

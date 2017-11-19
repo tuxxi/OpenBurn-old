@@ -9,98 +9,94 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(
     OpenBurnGrain* seed,
     OpenBurnSettings* settings,
     QWidget* parent)
-    : QWidget(parent), m_seedGrain(seed), m_GlobalSettings(settings), m_Propellants(prop)
+    : QWidget(parent), m_grainSeed(seed), m_GlobalSettings(settings), m_Propellants(prop)
 {
     SetupUI();
-    connect(m_grainTypeComboBox, SIGNAL(currentIndexChanged(int)), 
-        this, SLOT(on_grainType_changed(int)));
-    connect(m_grainDiameterSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
-    connect(m_grainLengthSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
-    connect(m_grainInhibitedFacesSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(SIG_GrainDesign_Changed()));
+    connect(m_cbGrainType, SIGNAL(currentIndexChanged(int)), 
+        this, SLOT(OnGrainTypeChanged(int)));
+    connect(m_sbGrainDia, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
+    connect(m_sbGrainLen, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
+    connect(m_sbGrainInhibit, SIGNAL(valueChanged(int)), this, SIGNAL(GrainDesignChanged()));
     
     SeedValues();
 }
 void OpenBurnDesignGrain::SetupUI()
 {
-    controlsLayout = new QGridLayout;
+    m_layControls = new QGridLayout;
     //Grain type combo box
-    m_grainTypeComboBox = new QComboBox(this);
-    m_grainTypeComboBox->addItems(QStringList() 
+    m_cbGrainType = new QComboBox(this);
+    m_cbGrainType->addItems(QStringList() 
         << tr("Cylindrical (BATES)"));
     QLabel* label_0 = new QLabel(tr("Grain Core Type"), this);
-    controlsLayout->addWidget(label_0, 0, 0);
-    controlsLayout->addWidget(m_grainTypeComboBox, 0, 1);
+    m_layControls->addWidget(label_0, 0, 0);
+    m_layControls->addWidget(m_cbGrainType, 0, 1);
 
     //Propellant Selection Box 
-    m_propellantComboBox = new QComboBox(this);
+    m_cbPropellantType = new QComboBox(this);
     QLabel* label = new QLabel(tr("Propellant Type"), this);
     if (m_Propellants)
     {
         for (auto i : *m_Propellants)
         {
-            m_propellantComboBox->addItem(i.GetPropellantName());            
+            m_cbPropellantType->addItem(i.GetPropellantName());            
         }
     }
-    m_modifyPropellantDatabase = new QToolButton(this);
-    m_modifyPropellantDatabase->setText("...");    
-    controlsLayout->addWidget(label, 1, 0);
-    controlsLayout->addWidget(m_propellantComboBox, 1, 1);
-    controlsLayout->addWidget(m_modifyPropellantDatabase, 1, 2);
+    m_btntModifyPropellant = new QToolButton(this);
+    m_btntModifyPropellant->setText("...");    
+    m_layControls->addWidget(label, 1, 0);
+    m_layControls->addWidget(m_cbPropellantType, 1, 1);
+    m_layControls->addWidget(m_btntModifyPropellant, 1, 2);
 
     //Grain Length 
-    m_grainLengthSpinBox = new QDoubleSpinBox(this);
-    m_grainLengthSpinBox->setDecimals(3);
-    m_grainLengthSpinBox->setSingleStep(0.25);
+    m_sbGrainLen = new QDoubleSpinBox(this);
+    m_sbGrainLen->setDecimals(3);
+    m_sbGrainLen->setSingleStep(0.25);
     QLabel* label_2 = new QLabel(tr("Grain Length"), this);
-    m_grainLenUnitsComboBox = new LengthUnitsComboBox(this, m_grainLengthSpinBox);
-    m_grainLenUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    controlsLayout->addWidget(label_2, 2, 0);
-    controlsLayout->addWidget(m_grainLengthSpinBox, 2, 1);
-    controlsLayout->addWidget(m_grainLenUnitsComboBox, 2, 2);
+    m_unitsGrainLen = new LengthUnitsComboBox(this, m_sbGrainLen);
+    m_unitsGrainLen->setLayoutDirection(Qt::LeftToRight);
+    m_layControls->addWidget(label_2, 2, 0);
+    m_layControls->addWidget(m_sbGrainLen, 2, 1);
+    m_layControls->addWidget(m_unitsGrainLen, 2, 2);
 
     //Grain Diameter
-    m_grainDiameterSpinBox = new QDoubleSpinBox(this);
-    m_grainDiameterSpinBox->setDecimals(3);
-    m_grainDiameterSpinBox->setSingleStep(0.25);
+    m_sbGrainDia = new QDoubleSpinBox(this);
+    m_sbGrainDia->setDecimals(3);
+    m_sbGrainDia->setSingleStep(0.25);
     QLabel* label_3 = new QLabel(tr("Grain Diameter"), this);
-    m_grainDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainDiameterSpinBox);
-    m_grainDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
-    controlsLayout->addWidget(label_3, 3, 0);
-    controlsLayout->addWidget(m_grainDiameterSpinBox, 3, 1);
-    controlsLayout->addWidget(m_grainDiaUnitsComboBox, 3, 2);
+    m_unitsGrainDia = new LengthUnitsComboBox(this, m_sbGrainDia);
+    m_unitsGrainDia->setLayoutDirection(Qt::LeftToRight);
+    m_layControls->addWidget(label_3, 3, 0);
+    m_layControls->addWidget(m_sbGrainDia, 3, 1);
+    m_layControls->addWidget(m_unitsGrainDia, 3, 2);
 
     if (m_GlobalSettings)
     {
-        m_grainDiaUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
-        m_grainLenUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_unitsGrainDia->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_unitsGrainLen->SetUnits(m_GlobalSettings->m_LengthUnits);
     }
 
     //Inhibited Faces
-    m_grainInhibitedFacesSpinBox = new QSpinBox(this);
-    m_grainInhibitedFacesSpinBox->setMaximum(2);
+    m_sbGrainInhibit = new QSpinBox(this);
+    m_sbGrainInhibit->setMaximum(2);
     QLabel* label_5 = new QLabel(tr("Inhibited Faces"), this);
 
-    controlsLayout->addWidget(label_5, 255, 0);
-    controlsLayout->addWidget(m_grainInhibitedFacesSpinBox, 255, 1);    
+    m_layControls->addWidget(label_5, 255, 0);
+    m_layControls->addWidget(m_sbGrainInhibit, 255, 1);    
 
-    setTabOrder(m_grainTypeComboBox, m_propellantComboBox);
-    setTabOrder(m_propellantComboBox, m_grainLengthSpinBox);
-    setTabOrder(m_grainLengthSpinBox, m_grainDiameterSpinBox);
-    setTabOrder(m_grainDiameterSpinBox, m_grainInhibitedFacesSpinBox);
+    setTabOrder(m_cbGrainType, m_cbPropellantType);
+    setTabOrder(m_cbPropellantType, m_sbGrainLen);
+    setTabOrder(m_sbGrainLen, m_sbGrainDia);
+    setTabOrder(m_sbGrainDia, m_sbGrainInhibit);
     
-    setLayout(controlsLayout);
-}
-OpenBurnDesignGrain::~OpenBurnDesignGrain()
-{
-
+    setLayout(m_layControls);
 }
 void OpenBurnDesignGrain::SeedValues()
 {
-    if (m_seedGrain)
+    if (m_grainSeed)
     {
-        m_grainLengthSpinBox->setValue(m_seedGrain->GetLength());
-        m_grainDiameterSpinBox->setValue(m_seedGrain->GetDiameter());
-        m_grainInhibitedFacesSpinBox->setValue(m_seedGrain->GetInhibitedFaces());
+        m_sbGrainLen->setValue(m_grainSeed->GetLength());
+        m_sbGrainDia->setValue(m_grainSeed->GetDiameter());
+        m_sbGrainInhibit->setValue(m_grainSeed->GetInhibitedFaces());
     
         //propellant ..     
     }
@@ -108,46 +104,46 @@ void OpenBurnDesignGrain::SeedValues()
 double OpenBurnDesignGrain::GetLength()
 {
     return OpenBurnUnits::ConvertLength(
-        m_grainLenUnitsComboBox->GetCurrentUnits(),
+        m_unitsGrainLen->GetCurrentUnits(),
         OpenBurnUnits::LengthUnits_T::inches, 
-        m_grainLengthSpinBox->value());
+        m_sbGrainLen->value());
 }
 double OpenBurnDesignGrain::GetDiameter()
 {
     return OpenBurnUnits::ConvertLength(
-        m_grainDiaUnitsComboBox->GetCurrentUnits(),
+        m_unitsGrainDia->GetCurrentUnits(),
         OpenBurnUnits::LengthUnits_T::inches, 
-        m_grainDiameterSpinBox->value());
+        m_sbGrainDia->value());
 }
 int OpenBurnDesignGrain::GetInhibitedFaces()
 {
-    return m_grainInhibitedFacesSpinBox->value();
+    return m_sbGrainInhibit->value();
 }
 GRAINTYPE OpenBurnDesignGrain::GetGrainType()
 {
-    return static_cast<GRAINTYPE>(m_grainTypeComboBox->currentIndex());
+    return static_cast<GRAINTYPE>(m_cbGrainType->currentIndex());
 }
 OpenBurnPropellant OpenBurnDesignGrain::GetPropellant()
 {
     if (!m_Propellants->empty())
     {
-        int idx = m_propellantComboBox->currentIndex() > 0 ? m_propellantComboBox->currentIndex() : 0;
+        int idx = m_cbPropellantType->currentIndex() > 0 ? m_cbPropellantType->currentIndex() : 0;
         return (*m_Propellants)[idx];
     }
     return OpenBurnPropellant();
 }
 
-void OpenBurnDesignGrain::on_grainType_changed(int idx)
+void OpenBurnDesignGrain::OnGrainTypeChanged(int idx)
 {
     //TODO: for some reason, the value in the grain design's type spin box doesn't update even though it says the index updated...
-    emit SIG_GrainType_Changed(static_cast<GRAINTYPE>(idx));
+    emit GrainTypeChanged(static_cast<GRAINTYPE>(idx));
 }
 void OpenBurnDesignGrain::AddNewControls(QWidget* widet, int row, int col)
 {
-    controlsLayout->addWidget(widet, row+4, col);
+    m_layControls->addWidget(widet, row+4, col);
 }
 //BATES
-BatesGrainDesign::BatesGrainDesign(
+CylindricalGrainDesign::CylindricalGrainDesign(
     PropellantList* prop, 
     OpenBurnGrain* seed , 
     OpenBurnSettings* settings,
@@ -155,43 +151,39 @@ BatesGrainDesign::BatesGrainDesign(
     : OpenBurnDesignGrain(prop, seed, settings, parent)
 {
     //Grain Core Diameter
-    m_grainCoreDiameterSpinBox = new QDoubleSpinBox(this);
-    m_grainCoreDiameterSpinBox->setDecimals(3);
-    m_grainCoreDiameterSpinBox->setSingleStep(0.25);
+    m_sbGrainCoreDia = new QDoubleSpinBox(this);
+    m_sbGrainCoreDia->setDecimals(3);
+    m_sbGrainCoreDia->setSingleStep(0.25);
     QLabel* label_4 = new QLabel(tr("Grain Core Diameter"), this);
-    m_grainCoreDiaUnitsComboBox = new LengthUnitsComboBox(this, m_grainCoreDiameterSpinBox);
-    m_grainCoreDiaUnitsComboBox->setLayoutDirection(Qt::LeftToRight);
+    m_unitsGrainCoreDia = new LengthUnitsComboBox(this, m_sbGrainCoreDia);
+    m_unitsGrainCoreDia->setLayoutDirection(Qt::LeftToRight);
     if (m_GlobalSettings)
     {
-        m_grainCoreDiaUnitsComboBox->SetUnits(m_GlobalSettings->m_LengthUnits);
+        m_unitsGrainCoreDia->SetUnits(m_GlobalSettings->m_LengthUnits);
     }
 
     AddNewControls(label_4, 0, 0);
-    AddNewControls(m_grainCoreDiameterSpinBox, 0, 1);
-    AddNewControls(m_grainCoreDiaUnitsComboBox, 0, 2);
+    AddNewControls(m_sbGrainCoreDia, 0, 1);
+    AddNewControls(m_unitsGrainCoreDia, 0, 2);
     
-    setTabOrder(m_grainDiameterSpinBox, m_grainCoreDiameterSpinBox);        
-    setTabOrder(m_grainCoreDiameterSpinBox, m_grainInhibitedFacesSpinBox);
+    setTabOrder(m_sbGrainDia, m_sbGrainCoreDia);        
+    setTabOrder(m_sbGrainCoreDia, m_sbGrainInhibit);
 
     SeedValues();
-    connect(m_grainCoreDiameterSpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(SIG_GrainDesign_Changed()));
+    connect(m_sbGrainCoreDia, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
 }
-BatesGrainDesign::~BatesGrainDesign()
-{
-
-}
-double BatesGrainDesign::GetCoreDiameter()
+double CylindricalGrainDesign::GetCoreDiameter()
 {
     return OpenBurnUnits::ConvertLength(
-        m_grainCoreDiaUnitsComboBox->GetCurrentUnits(),
+        m_unitsGrainCoreDia->GetCurrentUnits(),
         OpenBurnUnits::LengthUnits_T::inches, 
-        m_grainCoreDiameterSpinBox->value());
+        m_sbGrainCoreDia->value());
 }
-void BatesGrainDesign::SeedValues()
+void CylindricalGrainDesign::SeedValues()
 {
     OpenBurnDesignGrain::SeedValues();
-    if (BatesGrain* seed = dynamic_cast<BatesGrain*>(m_seedGrain))
+    if (CylindricalGrain* seed = dynamic_cast<CylindricalGrain*>(m_grainSeed))
     {
-        m_grainCoreDiameterSpinBox->setValue(seed->GetCoreDiameter());
+        m_sbGrainCoreDia->setValue(seed->GetCoreDiameter());
     }
 }

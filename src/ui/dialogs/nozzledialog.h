@@ -17,25 +17,28 @@ class NozzleDialog : public QDialog
     Q_OBJECT
 public:
     explicit NozzleDialog(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr, OpenBurnSettings* settings = nullptr);
-    ~NozzleDialog();
+    ~NozzleDialog() = default;
 signals:
-    void SIG_NozzleChanged(OpenBurnNozzle*);
+    void NozzleChanged(OpenBurnNozzle*);
 private slots:
-    bool apply();
-    void accept();
-    void closeDialog();
-    void UpdateDesign();    
+    virtual void accept() override;
+
+    bool OnApplyButtonClicked();
+    void OnCloseButtonClicked();
+    void OnDesignUpdated();
 
 private:
     void SetupUI();
     void UpdateGraphics();    
-    QFrame* m_frame;
-    QGraphicsView *m_graphicsView;
-    QGraphicsScene *m_graphicsScene;
+    QFrame* m_Frame;
+
+    QPushButton *m_btnApply, *m_btnOK, *m_btnClose;
+
+    QGraphicsView *m_NozzleGraphicsView;
+    QGraphicsScene *m_NozzleGraphicsScene;
 
     OpenBurnDesignNozzle* m_NozzleDesign;
     OpenBurnNozzle* m_Nozzle;
     NozzleGraphicsItem* m_gfxNozzle;
     OpenBurnSettings* m_GlobalSettings;
-    QPushButton *m_applyButton, *m_OKButton, *m_cancelButton;   
 };

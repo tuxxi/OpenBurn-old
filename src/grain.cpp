@@ -2,73 +2,66 @@
 
 #include "grain.h"
 OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant prop, int inhibited)
-    : m_grainDia(diameter), m_grainLen(length),m_propellantType(prop), m_numInhibitedFaces(inhibited), m_isBurnedOut(false)
+    : m_GrainDia(diameter), m_GrainLen(length),m_Propellant(prop), m_NumInhibited(inhibited), m_isBurnedOut(false)
 {
 
 }
-OpenBurnGrain::~OpenBurnGrain()
-{    
-}
-double OpenBurnGrain::GetLength() { return m_grainLen; }
-double OpenBurnGrain::GetDiameter() { return m_grainDia; }
-int OpenBurnGrain::GetInhibitedFaces() { return m_numInhibitedFaces; }
-OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_propellantType; }
+double OpenBurnGrain::GetLength() { return m_GrainLen; }
+double OpenBurnGrain::GetDiameter() { return m_GrainDia; }
+int OpenBurnGrain::GetInhibitedFaces() { return m_NumInhibited; }
+OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_Propellant; }
 bool OpenBurnGrain::GetIsBurnedOut() { return m_isBurnedOut; }
-void OpenBurnGrain::SetLength(double length) { m_grainLen = length; }
-void OpenBurnGrain::SetDiameter(double dia) { m_grainDia = dia; }
-void OpenBurnGrain::SetInhibitedFaces(int faces) { m_numInhibitedFaces = faces; }
-void OpenBurnGrain::SetPropellantType(OpenBurnPropellant prop) { m_propellantType = prop; }
+void OpenBurnGrain::SetLength(double length) { m_GrainLen = length; }
+void OpenBurnGrain::SetDiameter(double dia) { m_GrainDia = dia; }
+void OpenBurnGrain::SetInhibitedFaces(int faces) { m_NumInhibited = faces; }
+void OpenBurnGrain::SetPropellantType(OpenBurnPropellant prop) { m_Propellant = prop; }
 void OpenBurnGrain::SetBurnRate(double steadyState, double erosiveFactor)
 {
     m_rNot = steadyState;
     m_rErosive = erosiveFactor;
 }
 
-BatesGrain::BatesGrain()
-    : OpenBurnGrain(0, 0, OpenBurnPropellant()), m_coreDia(0)
+CylindricalGrain::CylindricalGrain()
+    : OpenBurnGrain(0, 0, OpenBurnPropellant()), m_CoreDia(0)
 {}
 // Bates Grains
-BatesGrain::BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces)
-    : OpenBurnGrain(dia, len, prop, inhibitedfaces), m_coreDia(coredia)
+CylindricalGrain::CylindricalGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibited)
+    : OpenBurnGrain(dia, len, prop, inhibited), m_CoreDia(coredia)
 {
 
 }
-BatesGrain::~BatesGrain()
+double CylindricalGrain::GetCoreDiameter() { return m_CoreDia; }
+void CylindricalGrain::SetCoreDiameter(double dia) { m_CoreDia = dia; }
+double CylindricalGrain::GetBurningSurfaceArea()
 {
-}
+    double face_area = 0.25f * M_PI * ((m_GrainDia * m_GrainDia) - (m_CoreDia * m_CoreDia));
+    double core_area = M_PI * m_CoreDia * m_GrainLen;
 
-double BatesGrain::GetCoreDiameter() { return m_coreDia; }
-void BatesGrain::SetCoreDiameter(double dia) { m_coreDia = dia; }
-double BatesGrain::GetBurningSurfaceArea()
-{
-    double face_area = 0.25f * M_PI * ((m_grainDia * m_grainDia) - (m_coreDia * m_coreDia));
-    double core_area = M_PI * m_coreDia * m_grainLen;
-
-    return core_area + ((2 - m_numInhibitedFaces) * face_area);
+    return core_area + ((2 - m_NumInhibited) * face_area);
 }
-double BatesGrain::GetPortArea()
+double CylindricalGrain::GetPortArea()
 {
-    double coreRadius = m_coreDia / 2.0f;
+    double coreRadius = m_CoreDia / 2.0f;
     return M_PI * coreRadius * coreRadius;
 }
-double BatesGrain::GetVolume()
+double CylindricalGrain::GetVolume()
 {
-    double radiusSq = (m_grainDia / 2.f) * (m_grainDia / 2.f);
-    double coreRadiusSq = (m_coreDia / 2.f) * (m_coreDia / 2.f);
-    return M_PI * m_grainLen * (radiusSq - coreRadiusSq);
+    double radiusSq = (m_GrainDia / 2.f) * (m_GrainDia / 2.f);
+    double coreRadiusSq = (m_CoreDia / 2.f) * (m_CoreDia / 2.f);
+    return M_PI * m_GrainLen * (radiusSq - coreRadiusSq);
 }
-double BatesGrain::GetHydraulicDiameter()
+double CylindricalGrain::GetHydraulicDiameter()
 {
-    return 4 *( GetPortArea() / (M_PI * m_grainDia) );
+    return 4 *( GetPortArea() / (M_PI * m_GrainDia) );
 }
-bool BatesGrain::Burn(double timestep)
+bool CylindricalGrain::Burn(double timestep)
 {
-    if (m_coreDia <= m_grainDia)
+    if (m_CoreDia <= m_GrainDia)
     {
         double burnDist = (m_rNot + m_rErosive) * timestep;
         
-        m_coreDia += (2 * burnDist);
-        m_grainLen -= burnDist * (2 - m_numInhibitedFaces);
+        m_CoreDia += (2 * burnDist);
+        m_GrainLen -= burnDist * (2 - m_NumInhibited);
         return true;      
     }
     else
@@ -77,28 +70,28 @@ bool BatesGrain::Burn(double timestep)
         return false;        
     }
 }
-bool BatesGrain::IsBurnedOut()
+bool CylindricalGrain::IsBurnedOut()
 {
-    return m_coreDia <= m_grainDia;
+    return m_CoreDia <= m_GrainDia;
 }
-BatesGrain* BatesGrain::Clone()
+CylindricalGrain* CylindricalGrain::Clone()
 {
-    return new BatesGrain(*this);
+    return new CylindricalGrain(*this);
 }
-void BatesGrain::ReadJSON(const QJsonObject& object, QString& propellantNameReturn)
+void CylindricalGrain::ReadJSON(const QJsonObject& object, QString& propellantNameReturn)
 {
-    m_coreDia = object["corediameter"].toDouble();
-    m_grainDia = object["diameter"].toDouble();
-    m_grainLen = object["length"].toDouble();
-    m_numInhibitedFaces = object["inhibited"].toInt();
+    m_CoreDia = object["corediameter"].toDouble();
+    m_GrainDia = object["diameter"].toDouble();
+    m_GrainLen = object["length"].toDouble();
+    m_NumInhibited = object["inhibited"].toInt();
     propellantNameReturn = object["propellant"].toString();
 }
-void BatesGrain::WriteJSON(QJsonObject& object)
+void CylindricalGrain::WriteJSON(QJsonObject& object)
 {
     object["_type"] = "BATES";
-    object["length"] = m_grainLen;
-    object["diameter"] = m_grainDia;
-    object["corediameter"] = m_coreDia;
-    object["propellant"] = m_propellantType.GetPropellantName();
-    object["inhibited"] = m_numInhibitedFaces;
+    object["length"] = m_GrainLen;
+    object["diameter"] = m_GrainDia;
+    object["corediameter"] = m_CoreDia;
+    object["propellant"] = m_Propellant.GetPropellantName();
+    object["inhibited"] = m_NumInhibited;
 }

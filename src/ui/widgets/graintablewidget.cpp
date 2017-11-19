@@ -31,8 +31,6 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
     //m_grainsDisplay->setDragEnabled(true);
     //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
 }
-GrainTableWidget::~GrainTableWidget() {} 
-
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
@@ -41,7 +39,7 @@ void GrainTableWidget::resizeEvent(QResizeEvent* event)
         setColumnWidth(i, this->width()/columnCount());
     }    
 }
-void GrainTableWidget::Update()
+void GrainTableWidget::OnMotorUpdated()
 {
     setRowCount(0);
     for (auto grain : m_Motor->GetGrains())
@@ -69,7 +67,7 @@ void GrainTableWidget::Update()
         setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
         setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
     
-        if (BatesGrain* bates = dynamic_cast<BatesGrain*>(grain))
+        if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
         {
             setItem(numItems, 2, new QTableWidgetItem(QString::number(
                             OpenBurnUnits::ConvertLength(
@@ -112,7 +110,7 @@ QList<OpenBurnGrain*> GrainTableWidget::GetSelectedGrains()
     }
     return selectedList;
 }
-void GrainTableWidget::move(bool up)
+void GrainTableWidget::Move(bool up)
 {
     Q_ASSERT(selectedItems().count() > 0);
     const int sourceRow = row(selectedItems().at(0));
@@ -120,16 +118,16 @@ void GrainTableWidget::move(bool up)
     Q_ASSERT(destRow >= 0 && destRow < rowCount());
  
     // take whole rows
-    QList<QTableWidgetItem*> sourceItems = takeRow(sourceRow);
-    QList<QTableWidgetItem*> destItems = takeRow(destRow);
+    QList<QTableWidgetItem*> sourceItems = TakeRow(sourceRow);
+    QList<QTableWidgetItem*> destItems = TakeRow(destRow);
  
     // set back in reverse order
-    setRow(sourceRow, destItems);
-    setRow(destRow, sourceItems);
+    SetRow(sourceRow, destItems);
+    SetRow(destRow, sourceItems);
     selectRow(destRow);
 }
 // takes and returns the whole row
-QList<QTableWidgetItem*> GrainTableWidget::takeRow(int row)
+QList<QTableWidgetItem*> GrainTableWidget::TakeRow(int row)
 {
     QList<QTableWidgetItem*> rowItems;
     for (int col = 0; col < columnCount(); ++col)
@@ -139,7 +137,7 @@ QList<QTableWidgetItem*> GrainTableWidget::takeRow(int row)
     return rowItems;
 }
 // sets the whole row
-void GrainTableWidget::setRow(int row, const QList<QTableWidgetItem*>& rowItems)
+void GrainTableWidget::SetRow(int row, const QList<QTableWidgetItem*>& rowItems)
 {
     for (int col = 0; col < columnCount(); ++col)
     {

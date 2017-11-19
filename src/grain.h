@@ -12,7 +12,7 @@ class OpenBurnGrain
 {
 public:
     OpenBurnGrain(double length, double diameter, OpenBurnPropellant prop, int inhibited = 0 );
-    virtual ~OpenBurnGrain();
+    virtual ~OpenBurnGrain() = default;
 
     virtual double GetLength();
     virtual double GetDiameter();
@@ -41,22 +41,22 @@ public:
     virtual void WriteJSON(QJsonObject &object) = 0;
 
 protected:
-    double m_grainDia, m_grainLen;
-    OpenBurnPropellant m_propellantType;
-    int m_numInhibitedFaces;
+    double m_GrainDia, m_GrainLen;
+    OpenBurnPropellant m_Propellant;
+    int m_NumInhibited;
 
     double m_rNot, m_rErosive; //burn rates, additive (i.e r = r_0 + r_e)
     bool m_isBurnedOut;
 };
 
-//a cylindrical bates grain
-class BatesGrain : public OpenBurnGrain
+//a cylindrical core "BATES" grain
+class CylindricalGrain : public OpenBurnGrain
 {
 public:
-    BatesGrain();
-    BatesGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibitedfaces = 0);
+    CylindricalGrain();
+    CylindricalGrain(double dia, double coredia, double len, OpenBurnPropellant prop, int inhibited = 0);
 
-    virtual ~BatesGrain() override;
+    virtual ~CylindricalGrain() = default;
     
     virtual double GetBurningSurfaceArea() override;
     virtual double GetPortArea() override;
@@ -64,7 +64,7 @@ public:
     virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
     virtual bool IsBurnedOut() override;
-    virtual BatesGrain* Clone() override;
+    virtual CylindricalGrain* Clone() override;
     
     virtual double GetCoreDiameter();
     virtual void SetCoreDiameter(double dia);
@@ -73,6 +73,6 @@ public:
     virtual void WriteJSON(QJsonObject &object) override;
 
 private:
-    double m_coreDia;
+    double m_CoreDia;
 };
 

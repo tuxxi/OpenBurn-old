@@ -15,11 +15,9 @@
 #include "src/ui/widgets/unitscombobox.h"
 
 //This class represents the "default" parameters for grain design:
-//Length, Diameter, TYPE, propellant, and inhibited faces. 
-//The QGridLayout lays out the following:
-//idx 0: type, 1: propellant, 2: length, 3: diameter, 255: inhibited faces
-//any __custom__ grain properties, e.g core diameter, should inherit this class and
-//call AddNewControls() in the constructor.
+//Length, Diameter, bore shape, propellant, and inhibited faces.
+//any custom grain properties, e.g core diameter, should inherit this class and
+//call AddNewControls() on the new control widgets in the constructor.
 class OpenBurnDesignGrain : public QWidget
 {
     Q_OBJECT
@@ -30,59 +28,58 @@ public:
         OpenBurnSettings* settings = nullptr,
         QWidget* parent = nullptr);
 
-    virtual ~OpenBurnDesignGrain();
+    virtual ~OpenBurnDesignGrain() = default;
 
     double GetLength();
     double GetDiameter();
     int GetInhibitedFaces();
     OpenBurnPropellant GetPropellant();
     GRAINTYPE GetGrainType();
-
-private slots:
-    void on_grainType_changed(int);
 signals:
-    void SIG_GrainType_Changed(GRAINTYPE type);
-    void SIG_GrainDesign_Changed();
+    void GrainTypeChanged(GRAINTYPE type);
+    void GrainDesignChanged();
 protected:
     virtual void SeedValues();
     void AddNewControls(QWidget* widet, int row, int col);
 
-    OpenBurnGrain* m_seedGrain;
+    OpenBurnGrain* m_grainSeed;
     
-    QDoubleSpinBox *m_grainDiameterSpinBox, *m_grainLengthSpinBox;
-    QSpinBox *m_grainInhibitedFacesSpinBox;
+    QDoubleSpinBox *m_sbGrainDia, *m_sbGrainLen;
+    QSpinBox *m_sbGrainInhibit;
 
-    QComboBox *m_grainTypeComboBox;
-    QComboBox *m_propellantComboBox;
-    LengthUnitsComboBox *m_grainLenUnitsComboBox, *m_grainDiaUnitsComboBox;
+    QComboBox *m_cbGrainType;
+    QComboBox *m_cbPropellantType;
+    LengthUnitsComboBox *m_unitsGrainLen, *m_unitsGrainDia;
 
-    QToolButton *m_modifyPropellantDatabase;
+    QToolButton *m_btntModifyPropellant;
     OpenBurnSettings* m_GlobalSettings;
 
+private slots:
+    void OnGrainTypeChanged(int);
 private:
-    QGridLayout* controlsLayout;
-    PropellantList* m_Propellants;
     void SetupUI();
+    QGridLayout* m_layControls;
+    PropellantList* m_Propellants;
     
 };
 
 //a BATES grain
-class BatesGrainDesign : public OpenBurnDesignGrain
+class CylindricalGrainDesign : public OpenBurnDesignGrain
 {
     Q_OBJECT
 public:
-    explicit BatesGrainDesign(
+    explicit CylindricalGrainDesign(
         PropellantList* prop, 
         OpenBurnGrain* seed = nullptr,
         OpenBurnSettings* settings = nullptr,
         QWidget* parent = nullptr);
         
-    virtual ~BatesGrainDesign();
+    ~CylindricalGrainDesign() = default;
 
     double GetCoreDiameter();
 protected:
     virtual void SeedValues() override;
     
-    QDoubleSpinBox* m_grainCoreDiameterSpinBox;
-    LengthUnitsComboBox* m_grainCoreDiaUnitsComboBox;
+    QDoubleSpinBox* m_sbGrainCoreDia;
+    LengthUnitsComboBox* m_unitsGrainCoreDia;
 };

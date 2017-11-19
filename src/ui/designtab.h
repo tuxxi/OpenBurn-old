@@ -23,53 +23,56 @@ public:
     void resizeEvent(QResizeEvent* event) override;
     void UpdateDesign();  
 public slots:
-    void SLOT_NewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
-    void SLOT_ModifyGrain(OpenBurnGrain* grain); //recieved from the grain dialog
-    void SLOT_NozzleUpdated(OpenBurnNozzle* nozz);
+    void OnNewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
+    void OnGrainModified(OpenBurnGrain* grain); //recieved from the grain dialog
+    void OnNozzleUpdated(OpenBurnNozzle* nozz);
 private slots:
-    void NewGrainButton_Clicked();
-    void EditGrainButton_Clicked();
-    void NozzleButton_Clicked();
-    void DeleteGrainButton_Clicked();
-    void MoveGrainUpButton_Clicked();
-    void MoveGrainDownButton_Clicked();
+    void OnNewGrainButtonClicked();
+    void OnEditGrainButtonClicked();
+    void OnNozzleButtonClicked();
+    void OnDeleteGrainButtonClicked();
+    void OnMoveGrainUpButtonClicked();
+    void OnMoveGrainDownButtonClicked();
 
 
-    void SLOT_GrainDialogClosed();
-    void SLOT_NozzDialogClosed();
-    void SLOT_grainTable_cellClicked(int row, int column);
+    void OnGrainDialogClosed();
+    void OnNozzleDialogClosed();
+    void OnGrainTableCellClicked(int row, int column);
 private:
     void SetSeed(OpenBurnGrain* grain);
     void SetupUI();
     void UpdateGraphics();  
     
-    //design overview - static
-    QLabel *m_motorMajorDiaLabel, *m_motorLenLabel, *m_numGrainsLabel, *m_propellantMassLabel, *m_VolumeLoadingLabel;
+    //grain design overview - static
+    QLabel *m_lblMotorMajorDia, *m_lblMotorLen, *m_lblNumGrains, *m_lblPropellantMass, *m_lblVolumeLoading;
+    //nozzle overview
+    QLabel* m_lblNozzleThroatDia, *m_lblNozzleExitDia, *m_lblNozzleExpansionRatio;
+    //motor general overview
+    QLabel *m_lblKn, *m_lblPortThroatRatio;
 
-    QLabel* m_nozzleDiaLabel, *m_nozzleExitLabel, *m_expansionRatioLabel; 
-
-    QLabel *m_knLabel, *m_portThroatRatioLabel;
     //simulated results - requires a sim to be run
     //for quick reference only- more detailed results are available on results tab
     //QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
 
-    QPushButton* m_nozzleSettingsButton;
+    QPushButton* m_btnNozzleSettings;
 
     //grain settings
-    OpenBurnGrain* m_seed_grain; //stores settings to "seed" the dialog
-    QPushButton *m_newGrainButton, *m_deleteGrainButton, *m_editGrainButton;
+    OpenBurnGrain* m_grainSeed; //stores settings to "seed" the dialog
+    QPushButton *m_btnNewGrain, *m_btnDeleteGrain, *m_btnEditGrain;
 
     //controls
-    QToolButton *m_moveGrainUp, *m_moveGrainDown, *m_moveGrainToTop, *m_moveGrainToBottom;
+    QToolButton *m_btntMoveGrainUp, *m_btntMoveGrainDown;
 
-    GrainDialog* m_grainDialog;
-    NozzleDialog* m_nozzleDialog;
-    GrainTableWidget* m_grainTable;
+    GrainDialog* m_GrainDialog;
+    NozzleDialog* m_NozzleDialog;
+    GrainTableWidget* m_GrainTable;
 
-    MotorGraphicsItem* m_motorObject;
-    QGraphicsView* m_motorDisplayView;
-    QGraphicsScene* m_motorDisplayScene;
-    OpenBurnMotor* m_Motor; //The initial design  
+    //gfx
+    MotorGraphicsItem* m_gfxMotor;
+    QGraphicsView* m_MotorDisplayView;
+    QGraphicsScene* m_MotorDisplayScene;
+
+    OpenBurnMotor* m_Motor; //The initial design
     PropellantList* m_Propellants;
     OpenBurnSettings* m_GlobalSettings;
 };

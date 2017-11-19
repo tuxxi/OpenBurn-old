@@ -14,10 +14,17 @@ MainWindow::MainWindow(QWidget *parent) :
     m_Simulator = new MotorSim(m_DesignMotor);
     m_GlobalSettings = new OpenBurnSettings();
     SetupUI();
-    connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(SLOT_SimulationStarted()));
-    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(SLOT_SimulationFinished(bool))); 
-    connect(m_PropellantTab, SIGNAL(PropellantsUpdated()), this, SLOT(SLOT_PropellantsUpdated()));
-    connect(m_GlobalSettings, SIGNAL(SettingsChanged()), this, SLOT(SLOT_SettingsChanged()));
+    connect(m_Simulator, SIGNAL(SimulationStarted()), this, SLOT(OnSimulationStarted()));
+    connect(m_Simulator, SIGNAL(SimulationFinished(bool)), this, SLOT(OnSimulationFinished(bool))); 
+    connect(m_PropellantTab, SIGNAL(PropellantsUpdated()), this, SLOT(OnPropellantsUpdated()));
+    connect(m_GlobalSettings, SIGNAL(SettingsChanged()), this, SLOT(OnSettingsChanged()));
+}
+MainWindow::~MainWindow()
+{
+    delete m_DesignMotor;
+    delete m_Propellants;
+    delete m_Simulator;
+    delete m_GlobalSettings;
 }
 void MainWindow::SetupUI()
 {
@@ -26,90 +33,84 @@ void MainWindow::SetupUI()
 
     setWindowTitle(tr("OpenBurn"));
     setGeometry(100, 100, 800, 600);
-    menuBar = new QMenuBar(this);
-    menuBar->setGeometry(QRect(0, 0, 800, 20));
-    setMenuBar(menuBar);
-    m_statusBar = new QStatusBar;
-    setStatusBar(m_statusBar);
+    m_MenuBar = new QMenuBar(this);
+    m_MenuBar->setGeometry(QRect(0, 0, 800, 20));
+    setMenuBar(m_MenuBar);
+    m_StatusBar = new QStatusBar;
+    setStatusBar(m_StatusBar);
     
-    menuFile = new QMenu(menuBar);
-    menuFile->setTitle(tr("File"));
-    menuBar->addAction(menuFile->menuAction());
+    m_MenuFile = new QMenu(m_MenuBar);
+    m_MenuFile->setTitle(tr("File"));
+    m_MenuBar->addAction(m_MenuFile->menuAction());
 
-    actionNew = new QAction(this);
-    actionNew->setText(tr("New"));
-    actionNew->setShortcuts(QKeySequence::New);    
-    connect(actionNew, &QAction::triggered, this, &MainWindow::menuNew);
-    menuFile->addAction(actionNew);
+    m_ActionNew = new QAction(this);
+    m_ActionNew->setText(tr("New"));
+    m_ActionNew->setShortcuts(QKeySequence::New);    
+    connect(m_ActionNew, &QAction::triggered, this, &MainWindow::OnMenuNew);
+    m_MenuFile->addAction(m_ActionNew);
 
-    actionOpen = new QAction(this);
-    actionOpen->setText(tr("Open"));
-    actionOpen->setShortcuts(QKeySequence::Open);    
-    connect(actionOpen, &QAction::triggered, this, &MainWindow::menuOpen);
-    menuFile->addAction(actionOpen);
+    m_ActionOpen = new QAction(this);
+    m_ActionOpen->setText(tr("Open"));
+    m_ActionOpen->setShortcuts(QKeySequence::Open);    
+    connect(m_ActionOpen, &QAction::triggered, this, &MainWindow::OnMenuOpen);
+    m_MenuFile->addAction(m_ActionOpen);
 
-    actionSave = new QAction(this);
-    actionSave->setText(tr("Save"));
-    actionSave->setShortcuts(QKeySequence::Save);
-    connect(actionSave, &QAction::triggered, this, &MainWindow::menuSave);
-    menuFile->addAction(actionSave);
+    m_ActionSave = new QAction(this);
+    m_ActionSave->setText(tr("Save"));
+    m_ActionSave->setShortcuts(QKeySequence::Save);
+    connect(m_ActionSave, &QAction::triggered, this, &MainWindow::OnMenuSave);
+    m_MenuFile->addAction(m_ActionSave);
 
-    actionSave_As = new QAction(this);
-    actionSave_As->setText(tr("Save As..."));
-    actionSave_As->setShortcuts(QKeySequence::SaveAs);
-    connect(actionSave_As, &QAction::triggered, this, &MainWindow::menuSaveAs);
-    menuFile->addAction(actionSave_As);
+    m_ActionSaveAs = new QAction(this);
+    m_ActionSaveAs->setText(tr("Save As..."));
+    m_ActionSaveAs->setShortcuts(QKeySequence::SaveAs);
+    connect(m_ActionSaveAs, &QAction::triggered, this, &MainWindow::OnMenuSaveAs);
+    m_MenuFile->addAction(m_ActionSaveAs);
 
-    actionExport = new QAction(this);
-    actionExport->setText(tr("Export"));    
+    m_ActionExport = new QAction(this);
+    m_ActionExport->setText(tr("Export"));    
     //connect(actionExport, &QAction::triggered, this, &MainWindow::menuExport);
-    menuFile->addAction(actionExport);
+    m_MenuFile->addAction(m_ActionExport);
 
-    menuFile->addSeparator();
+    m_MenuFile->addSeparator();
 
-    actionQuit = new QAction(this);
-    actionQuit->setText(tr("Quit"));
-    actionQuit->setShortcuts(QKeySequence::Quit);
-    connect(actionQuit, &QAction::triggered, this, &MainWindow::menuQuit);
-    menuFile->addAction(actionQuit);
+    m_ActionQuit = new QAction(this);
+    m_ActionQuit->setText(tr("Quit"));
+    m_ActionQuit->setShortcuts(QKeySequence::Quit);
+    connect(m_ActionQuit, &QAction::triggered, this, &MainWindow::OnMenuQuit);
+    m_MenuFile->addAction(m_ActionQuit);
 
 
 
-    menuEdit = new QMenu(menuBar);
-    menuEdit->setTitle(tr("Edit"));
-    menuBar->addAction(menuEdit->menuAction());
+    m_MenuEdit = new QMenu(m_MenuBar);
+    m_MenuEdit->setTitle(tr("Edit"));
+    m_MenuBar->addAction(m_MenuEdit->menuAction());
 
-    menuTools = new QMenu(menuBar);
-    menuTools->setTitle(tr("Tools"));    
-    menuBar->addAction(menuTools->menuAction());
+    m_MenuTools = new QMenu(m_MenuBar);
+    m_MenuTools->setTitle(tr("Tools"));    
+    m_MenuBar->addAction(m_MenuTools->menuAction());
 
-    actionSettings = new QAction(this);
-    actionSettings->setText(tr("Settings"));
-    actionSettings->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
-    connect(actionSettings, &QAction::triggered, this, &MainWindow::menuSettings);
-    menuTools->addAction(actionSettings);
+    m_ActionSettings = new QAction(this);
+    m_ActionSettings->setText(tr("Settings"));
+    m_ActionSettings->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+    connect(m_ActionSettings, &QAction::triggered, this, &MainWindow::OnMenuSettings);
+    m_MenuTools->addAction(m_ActionSettings);
 
-    menuHelp = new QMenu(menuBar);
-    menuHelp->setTitle(tr("Help"));
-    menuBar->addAction(menuHelp->menuAction());
+    m_MenuHelp = new QMenu(m_MenuBar);
+    m_MenuHelp->setTitle(tr("Help"));
+    m_MenuBar->addAction(m_MenuHelp->menuAction());
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
     
-    tabWidget = new QTabWidget(this);
-    m_designTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
+    m_TabWidget = new QTabWidget(this);
+    m_DesignTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
     m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator, m_GlobalSettings);
     m_PropellantTab = new PropellantTab(m_Propellants);
-    tabWidget->addTab(m_designTab, tr("Design"));
-    tabWidget->addTab(m_SimTab, tr("Simulation"));
-    tabWidget->addTab(m_PropellantTab, tr("Propellants"));
-    setCentralWidget(tabWidget);
-}
-
-MainWindow::~MainWindow()
-{
-    delete m_DesignMotor;
-    delete m_Propellants;
+    m_TabWidget->addTab(m_DesignTab, tr("Design"));
+    m_TabWidget->addTab(m_SimTab, tr("Simulation"));
+    m_TabWidget->addTab(m_PropellantTab, tr("Propellants"));
+    setCentralWidget(m_TabWidget);
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -125,22 +126,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->accept();
     }
 }
-void MainWindow::menuNew()
+void MainWindow::OnMenuNew()
 {
     if (m_DesignMotor)
     {
         delete m_DesignMotor;
     }
-    if (m_designTab)
+    if (m_DesignTab)
     {
-        delete m_designTab;
+        delete m_DesignTab;
     }
     m_DesignMotor = new OpenBurnMotor;
-    m_designTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
-    tabWidget->insertTab(0, m_designTab, tr("Design"));
-    tabWidget->setCurrentIndex(0);
+    m_DesignTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
+    m_TabWidget->insertTab(0, m_DesignTab, tr("Design"));
+    m_TabWidget->setCurrentIndex(0);
 }
-void MainWindow::menuOpen()
+void MainWindow::OnMenuOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
             tr("OpenBurn File (*.obm)"));
@@ -159,28 +160,28 @@ void MainWindow::menuOpen()
         m_DesignMotor->ReadJSON(motor, m_Propellants);
         file.close();
     }
-    m_CurrentFilename = fileName;
-    m_designTab->UpdateDesign();
-    m_statusBar->showMessage(tr("Opened file ") + m_CurrentFilename, 3000);    
+    m_CurrentDesignFilename = fileName;
+    m_DesignTab->UpdateDesign();
+    m_StatusBar->showMessage(tr("Opened file ") + m_CurrentDesignFilename, 3000);
 }
-void MainWindow::menuSave()
+void MainWindow::OnMenuSave()
 {
-    if (!m_CurrentFilename.isEmpty())
+    if (!m_CurrentDesignFilename.isEmpty())
     {
-        SaveFile(m_CurrentFilename);
+        SaveFile(m_CurrentDesignFilename);
     }
     else
     {
-        menuSaveAs();
+        OnMenuSaveAs();
     }
 }
-void MainWindow::menuSaveAs()
+void MainWindow::OnMenuSaveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
             tr("OpenBurn File (*.obm)"));
     SaveFile(fileName);
 }
-void MainWindow::menuQuit()
+void MainWindow::OnMenuQuit()
 {
     QMessageBox::StandardButton resBtn =
     QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
@@ -194,7 +195,7 @@ void MainWindow::menuQuit()
         return;
     }
 }
-void MainWindow::menuSettings()
+void MainWindow::OnMenuSettings()
 {
     //we don't have to worry about memory managment because of WA_DeleteOnClose
     GlobalSettingsDialog* dialog = new GlobalSettingsDialog(m_GlobalSettings);
@@ -210,7 +211,7 @@ void MainWindow::SaveFile(QString fileName)
         {
             fileName += ".obm";
         }
-        m_CurrentFilename = fileName;
+        m_CurrentDesignFilename = fileName;
         QFile file(fileName);
         if (!file.open(QIODevice::WriteOnly))
         {
@@ -224,29 +225,29 @@ void MainWindow::SaveFile(QString fileName)
             QJsonDocument saveDoc(motorObject);
             file.write(saveDoc.toJson());
             file.close();
-            m_statusBar->showMessage(tr("File saved."), 3000);
+            m_StatusBar->showMessage(tr("File saved."), 3000);
         }
     }
 
 }
-void MainWindow::SLOT_SimulationStarted()
+void MainWindow::OnSimulationStarted()
 {
-    m_statusBar->showMessage(tr("Starting simulation"), 3000);    
+    m_StatusBar->showMessage(tr("Starting simulation"), 3000);
 }
-void MainWindow::SLOT_SimulationFinished(bool success)
+void MainWindow::OnSimulationFinished(bool success)
 {
     if (success)
     {
-        m_statusBar->showMessage(tr("Simulation finished"), 5000);            
+        m_StatusBar->showMessage(tr("Simulation finished"), 5000);
     }
     else
     {
         QMessageBox::critical(this, tr("Error"), tr("Simulation ERROR"));        
-        m_statusBar->showMessage(tr("Simulation ERROR!"), 5000);            
+        m_StatusBar->showMessage(tr("Simulation ERROR!"), 5000);
     }
 }
 //this slot sets all the grains to a new propellant type if the propellant database happens to change
-void MainWindow::SLOT_PropellantsUpdated()
+void MainWindow::OnPropellantsUpdated()
 {
     for (auto prop : *m_Propellants)
     {
@@ -259,10 +260,10 @@ void MainWindow::SLOT_PropellantsUpdated()
         }    
     }
 }
-void MainWindow::SLOT_SettingsChanged()
+void MainWindow::OnSettingsChanged()
 {
-    m_statusBar->showMessage(tr("Settings updated."), 5000);
+    m_StatusBar->showMessage(tr("Settings updated."), 5000);
 
-    emit m_DesignMotor->SIG_DesignUpdated();
+    emit m_DesignMotor->DesignUpdated();
     m_SimTab->UpdateResults();
 }

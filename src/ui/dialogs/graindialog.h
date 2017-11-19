@@ -33,28 +33,28 @@ public:
         QList<OpenBurnGrain*>m_GrainsToEdit = QList<OpenBurnGrain*>(),
         QWidget* parent = nullptr
         );
-    virtual ~GrainDialog();
+    ~GrainDialog() = default;
+protected:
+    void resizeEvent(QResizeEvent* event) override;
 
 signals:
-    void SIG_DIALOG_NewGrain(OpenBurnGrain*);
-    void SIG_DIALOG_EditGrain(OpenBurnGrain*);
+    void GrainAdded(OpenBurnGrain*);
+    void GrainEdited(OpenBurnGrain*);
 private slots:
-    void on_cancelButton_clicked();
-    void on_applyButton_clicked();
-    void UpdateDesign();    
-    void RefreshUI(GRAINTYPE type);    
+    void OnCancelButtonClicked();
+    void OnApplyButtonClicked();
+    void OnDesignUpdated();
 private:
     void SetupUI(OpenBurnGrain* seed);
     void SetupGraphics();
     void UpdateGraphics();
-    void resizeEvent(QResizeEvent* event) override;
-    QGridLayout* m_controlsLayout;
-    QGroupBox* m_frame;
+    QGridLayout* m_layControls;
+    QGroupBox* m_gbFrame;
 
-    QGraphicsView *m_graphicsView;
-    QGraphicsScene *m_graphicsScene;
+    QGraphicsView *m_GrainGraphicsView;
+    QGraphicsScene *m_GrainGraphicsScene;
     GrainGraphicsItem *m_gfxGrain;
-    QPushButton *m_applyButton, *m_cancelButton;
+    QPushButton *m_btnApply, *m_btnCancel;
 
     OpenBurnDesignGrain* m_GrainDesign;
     QList<OpenBurnGrain*>m_GrainsToEdit;

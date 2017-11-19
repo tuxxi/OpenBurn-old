@@ -12,20 +12,20 @@ class GrainGraphicsItem : public QGraphicsObject
 {
 public:
     GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection = true, QGraphicsItem *parent = nullptr);
-    virtual ~GrainGraphicsItem();
+    ~GrainGraphicsItem() = default;
+
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
-    const OpenBurnGrain* GetGrain() { return m_grain; }
+
+    const OpenBurnGrain* GetGrain() { return m_Grain; }
 protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     void dropEvent(QGraphicsSceneDragDropEvent *event) override;
 
-    OpenBurnGrain* m_grain;
-    QColor m_color;
-    int m_scaleFactor;
+    OpenBurnGrain* m_Grain;
+    QColor m_Color;
+    int m_ScaleFactor;
     bool m_isCrossSectionView;
-
-    double grainX, grainY;    
 };
 

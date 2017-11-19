@@ -2,8 +2,8 @@
 
 NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle,
     int scale_factor, double nozzle_height, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_color(Qt::lightGray), m_Nozzle(nozzle), m_nozzleHeight(nozzle_height),
-      m_nozzleLength(0.f), m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
+    : QGraphicsObject(parent), m_Color(Qt::lightGray), m_Nozzle(nozzle), m_NozzleHeight(nozzle_height),
+      m_NozzleLength(0.f), m_isCrossSectionView(crossSection), m_scaleFactor(scale_factor)
 {
 
 }
@@ -16,18 +16,18 @@ void NozzleGraphicsItem::paint(QPainter *painter,
     if (m_isCrossSectionView)
     {
         //draw entrance cone
-        QBrush brush = QBrush(m_color, Qt::DiagCrossPattern);
+        QBrush brush = QBrush(m_Color, Qt::DiagCrossPattern);
         QPen pen = QPen(Qt::black, 0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
         painter->setPen(pen);
         painter->setBrush(brush);
         double exitRadius = 0.5f * (m_Nozzle->GetNozzleExit() * m_scaleFactor);
         double throatRadius = 0.5f * (m_Nozzle->GetNozzleThroat() * m_scaleFactor);
 
-        double throatHeightUpper = m_nozzleHeight * 0.5f + throatRadius;
-        double throatHeightLower = m_nozzleHeight * 0.5f - throatRadius;
+        double throatHeightUpper = m_NozzleHeight * 0.5f + throatRadius;
+        double throatHeightLower = m_NozzleHeight * 0.5f - throatRadius;
 
-        double exitHeightUpper = m_nozzleHeight * 0.5f + exitRadius;
-        double exitHeightLower = m_nozzleHeight * 0.5f - exitRadius;
+        double exitHeightUpper = m_NozzleHeight * 0.5f + exitRadius;
+        double exitHeightLower = m_NozzleHeight * 0.5f - exitRadius;
 
         double convergentAngle = 25; // ?? allow user to change? maybe?
         double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));            
@@ -40,21 +40,21 @@ void NozzleGraphicsItem::paint(QPainter *painter,
             double throatLen = 20.0f; //nozz->GetThroatLen();
         
             double divergentLen = exitRadius * (1.0f / qTan(qDegreesToRadians(divergentAngle))); //cot
-            m_nozzleLength = convergentLen + throatLen + divergentLen;
-            bool exitConeRestrained = exitRadius * 2.0f < m_nozzleHeight;
+            m_NozzleLength = convergentLen + throatLen + divergentLen;
+            bool exitConeRestrained = exitRadius * 2.0f < m_NozzleHeight;
             QPoint nozzleLowerHalf[5] = 
             {   QPoint(0, 0), 
                 QPoint(convergentLen, throatHeightLower), 
                 QPoint(convergentLen + throatLen, throatHeightLower), 
-                QPoint(m_nozzleLength, exitHeightLower),
-                QPoint(m_nozzleLength, exitConeRestrained ? 0 : exitHeightLower) 
+                QPoint(m_NozzleLength, exitHeightLower),
+                QPoint(m_NozzleLength, exitConeRestrained ? 0 : exitHeightLower) 
             };
             QPoint nozzleUpperHalf[5] = 
-            {   QPoint(0, m_nozzleHeight), 
+            {   QPoint(0, m_NozzleHeight), 
                 QPoint(convergentLen, throatHeightUpper), 
                 QPoint(convergentLen + throatLen, throatHeightUpper), 
-                QPoint(m_nozzleLength, exitHeightUpper),
-                QPoint(m_nozzleLength, exitConeRestrained ? m_nozzleHeight : exitHeightUpper),  
+                QPoint(m_NozzleLength, exitHeightUpper),
+                QPoint(m_NozzleLength, exitConeRestrained ? m_NozzleHeight : exitHeightUpper),  
             };
             painter->drawPolygon(nozzleUpperHalf, 5);
             painter->drawPolygon(nozzleLowerHalf, 5);
@@ -81,7 +81,7 @@ QRectF NozzleGraphicsItem::boundingRect() const
         double throatRadius = 0.5f * (m_Nozzle->GetNozzleThroat() * m_scaleFactor);
 
         double convergentAngle = 25; // ?? allow user to change? maybe?
-        double throatHeightUpper = m_nozzleHeight * 0.5f + throatRadius;
+        double throatHeightUpper = m_NozzleHeight * 0.5f + throatRadius;
         double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));
 
         double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
@@ -90,7 +90,7 @@ QRectF NozzleGraphicsItem::boundingRect() const
 
         nozzleLen = convergentLen + throatLen + divergentLen;
     }
-   return QRectF(0, 0, nozzleLen, m_nozzleHeight);
+   return QRectF(0, 0, nozzleLen, m_NozzleHeight);
 }
 void NozzleGraphicsItem::UpdateNozzle(OpenBurnNozzle* nozz)
 {
@@ -98,5 +98,5 @@ void NozzleGraphicsItem::UpdateNozzle(OpenBurnNozzle* nozz)
 }
 void NozzleGraphicsItem::UpdateHeight(double height)
 {
-    m_nozzleHeight = height;
+    m_NozzleHeight = height;
 }
