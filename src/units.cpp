@@ -6,7 +6,8 @@ namespace OpenBurnUnits
 //=============================================================================
 //*************LENGTH UNITS********************
 //=============================================================================
-    double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
+    template<>
+    double Convert<LengthUnits_T>(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
     {
         switch(newUnits)
         {
@@ -128,28 +129,24 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetLengthUnitName(LengthUnits_T unit)
+    template<>
+    const QStringList GetAllUnitSymbols<LengthUnits_T>() { return kLengthUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<LengthUnits_T>() { return kLengthUnitNames; }
+
+    double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
     {
-        return kLengthUnitNames.at(int(unit));
+        return Convert<LengthUnits_T>(prevUnits, newUnits, value);
     }
     const QString GetLengthUnitSymbol(LengthUnits_T unit)
     {
-        return kLengthUnitSymbols.at(int(unit));
+        return GetUnitSymbol<LengthUnits_T>(unit);
     }
-    const QStringList GetLengthUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kLengthUnitNames.size(); i++)
-        {
-            list << kLengthUnitNames[i] + "(" + kLengthUnitSymbols[i] + ")";
-        }
-        return list;
-    }
-
 //=============================================================================
 //*************ANGLE UNITS********************
 //=============================================================================
-    double ConvertAngle(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
+    template<>
+    double Convert<AngleUnits_T>(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
     {
         switch (oldUnits)
         {
@@ -184,28 +181,24 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetAngleUnitName(AngleUnits_T units)
-    {
-        return kAngleUnitNames.at(int(units));
-    }
-    const QString GetAngleUnitSymbol(AngleUnits_T units)
-    {
-        return kAngleUnitSymbols.at(int(units));
-    }
-    const QStringList GetAngleUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kAngleUnitNames.size(); i++)
-        {
-            list << kAngleUnitNames[i] + "(" + kAngleUnitSymbols[i] + ")";
-        }
-        return list;
-    }
+    template<>
+    const QStringList GetAllUnitSymbols<AngleUnits_T>() { return kAngleUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<AngleUnits_T>() { return kAngleUnitNames; }
 
+    double ConvertAngle(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
+    {
+        return Convert<AngleUnits_T>(oldUnits, newUnits, value);
+    }
+    const QString GetAngleUnitSymbol(AngleUnits_T unit)
+    {
+        return GetUnitSymbol<AngleUnits_T>(unit);
+    }
 //=============================================================================
 //*************PRESSURE UNITS********************
 //=============================================================================
-    double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
+    template<>
+    double Convert<PressureUnits_T>(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
     {
         switch(oldUnits)
         {
@@ -292,27 +285,24 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetPressureUnitName(PressureUnits_T units)
+    template<>
+    const QStringList GetAllUnitSymbols<PressureUnits_T>() { return kPressureUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<PressureUnits_T>() { return kPressureUnitNames; }
+
+    double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
     {
-        return kPressureUnitNames.at(int(units));
+        return Convert<PressureUnits_T>(oldUnits, newUnits, value);
     }
-    const QString GetPressureUnitSymbol(PressureUnits_T units)
+    const QString GetPressureUnitSymbol(PressureUnits_T unit)
     {
-        return kPressureUnitSymbols.at(int(units));
-    }
-    const QStringList GetPressureUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kPressureUnitNames.size(); i++)
-        {
-            list << kPressureUnitNames[i] + "(" + kPressureUnitSymbols[i] + ")";
-        }
-        return list;
+        return GetUnitSymbol<PressureUnits_T>(unit);
     }
 //=============================================================================
 //*************TEMPERATURE UNITS********************
 //=============================================================================
-    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
+    template<>
+    double Convert<TemperatureUnits_T>(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
     {
         switch(oldUnits)
         {
@@ -370,29 +360,24 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetTemperatureUnitName(TemperatureUnits_T unit)
+    template<>
+    const QStringList GetAllUnitSymbols<TemperatureUnits_T>() { return kTemperatureUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<TemperatureUnits_T>() { return kTemperatureUnitNames; }
+
+    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
     {
-        return kTemperatureUnitNames.at(int(unit));
+        return Convert<TemperatureUnits_T>(oldUnits, newUnits, value);
     }
     const QString GetTemperatureUnitSymbol(TemperatureUnits_T unit)
     {
-        return kTemperatureUnitSymbols.at(int(unit));
+        return GetUnitSymbol<TemperatureUnits_T>(unit);
     }
-    const QStringList GetTemperatureUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kTemperatureUnitNames.size(); i++)
-        {
-            list << kTemperatureUnitNames[i] + "(" + kTemperatureUnitSymbols[i] + ")";
-        }
-        return list;
-
-    }
-
 //=============================================================================
 //*************FORCE UNITS********************
 //=============================================================================
-    double ConvertForce(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
+    template<>
+    double Convert<ForceUnits_T>(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
     {
         switch (oldUnits)
         {
@@ -427,27 +412,24 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetForceUnitName(ForceUnits_T unit)
+    template<>
+    const QStringList GetAllUnitSymbols<ForceUnits_T>() { return kForceUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<ForceUnits_T>() { return kForceUnitNames; }
+
+    double ConvertForce(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
     {
-        return kForceUnitNames.at(int(unit));
+        return Convert<ForceUnits_T>(oldUnits, newUnits, value);
     }
     const QString GetForceUnitSymbol(ForceUnits_T unit)
     {
-        return kForceUnitSymbols.at(int(unit));
-    }
-    const QStringList GetForceUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kForceUnitNames.size(); i++)
-        {
-            list << kForceUnitNames[i] + "(" + kForceUnitSymbols[i] + ")";
-        }
-        return list;
+        return GetUnitSymbol<ForceUnits_T>(unit);
     }
 //=============================================================================
 //*************MASS UNITS********************
 //=============================================================================
-    double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
+    template<>
+    double Convert<MassUnits_T>(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
     {
         switch(oldUnits)
         {
@@ -506,22 +488,18 @@ namespace OpenBurnUnits
             }
         }
     }
-    const QString GetMassUnitName(MassUnits_T unit)
+    template<>
+    const QStringList GetAllUnitSymbols<MassUnits_T>() { return kMassUnitSymbols; }
+    template<>
+    const QStringList GetAllUnitNames<MassUnits_T>() { return kMassUnitNames; }
+
+    double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
     {
-        return kMassUnitNames.at(int(unit));
+        return Convert<MassUnits_T>(oldUnits, newUnits, value);
     }
     const QString GetMassUnitSymbol(MassUnits_T unit)
     {
-        return kMassUnitSymbols.at(int(unit));
-    }
-    const QStringList GetMassUnits()
-    {
-        QStringList list = QStringList();
-        for (int i = 0; i < kMassUnitNames.size(); i++)
-        {
-            list << kMassUnitNames[i] + "(" + kMassUnitSymbols[i] + ")";
-        }
-        return list;
+        return GetUnitSymbol<MassUnits_T>(unit);
     }
 }
 
