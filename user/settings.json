@@ -1,0 +1,13 @@
+{
+    "settings": {
+        "redrawOnChanges": true
+    },
+    "units": {
+        "angleunits": 0,
+        "forceunits": 1,
+        "lengthunits": 0,
+        "massunits": 0,
+        "pressureunits": 0,
+        "temperatureunits": 0
+    }
+}

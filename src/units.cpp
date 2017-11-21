@@ -47,13 +47,13 @@ namespace OpenBurnUnits
                     return value;
                     break;
                 case LengthUnits_T::centimeters:
-                    return value / 10.0;
+                    return value * 10.0;
                     break;
                 case LengthUnits_T::meters:
-                    return value / 1000.0;
+                    return value * 1000.0;
                     break;
                 case LengthUnits_T::feet:
-                    return MM_PER_INCH * FEET_PER_INCH * value;
+                    return MM_PER_INCH * INCHES_PER_FOOT * value;
                     break;
                 }
                 break;
@@ -76,7 +76,7 @@ namespace OpenBurnUnits
                     return value / 100.0;
                     break;
                 case LengthUnits_T::feet:
-                    return MM_PER_INCH * FEET_PER_INCH / 10.0 * value;
+                    return MM_PER_INCH * INCHES_PER_FOOT / 10.0 * value;
                     break;
                 }
                 break;
@@ -99,7 +99,7 @@ namespace OpenBurnUnits
                     return value;
                     break;
                 case LengthUnits_T::feet:
-                    return MM_PER_INCH / 1000.0 * FEET_PER_INCH * value;
+                    return (MM_PER_INCH / 1000.0)* INCHES_PER_FOOT * value;
                     break;
                 }
                 break;
@@ -113,13 +113,13 @@ namespace OpenBurnUnits
                     return FEET_PER_INCH * value;
                     break;
                 case LengthUnits_T::millimeters:
-                    return MM_PER_INCH * INCHES_PER_FOOT * value;
+                    return INCHES_PER_MM * FEET_PER_INCH * value;
                     break;
                 case LengthUnits_T::centimeters:
-                    return MM_PER_INCH / 10.0 * INCHES_PER_FOOT* value;
+                    return (INCHES_PER_MM * 10.0) * FEET_PER_INCH * value;
                     break;
                 case LengthUnits_T::meters:
-                    return MM_PER_INCH / 1000.0 * INCHES_PER_FOOT * value;
+                    return (INCHES_PER_MM * 1000.0) * FEET_PER_INCH * value;
                     break;
                 case LengthUnits_T::feet:
                     return value;

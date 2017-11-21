@@ -38,7 +38,8 @@ DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, Open
             this, &DesignTab::OnEditGrainButtonClicked);
     connect(m_Motor, &OpenBurnMotor::DesignUpdated,
             m_GrainTable, &GrainTableWidget::OnMotorUpdated);
-
+    connect(m_Motor, &OpenBurnMotor::DesignUpdated,
+            this, &DesignTab::OnDesignUpdated);
     UpdateDesign();
 }
 DesignTab::~DesignTab() 
@@ -285,18 +286,19 @@ void DesignTab::OnGrainDialogClosed()
 void DesignTab::OnNewGrain(OpenBurnGrain* grain)
 {
     m_Motor->AddGrain(grain);
-    UpdateDesign();    
-    SetSeed(grain);    
+    SetSeed(grain);
 }
 void DesignTab::OnGrainModified(OpenBurnGrain* grain)
 {
     emit m_Motor->DesignUpdated();
-    UpdateDesign(); 
     SetSeed(grain);    
 }
 void DesignTab::OnNozzleUpdated(OpenBurnNozzle* nozz)
 {
     m_Motor->SetNozzle(nozz);  
+}
+void DesignTab::OnDesignUpdated()
+{
     UpdateDesign();
 }
 void DesignTab::OnNewGrainButtonClicked()

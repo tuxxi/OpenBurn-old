@@ -55,8 +55,14 @@ void OpenBurnDesignNozzle::SeedValues()
 {
     if (m_nozzleSeed)
     {
-        m_sbThroatDia->setValue(m_nozzleSeed->GetNozzleThroat());
-        m_sbExitDia->setValue(m_nozzleSeed->GetNozzleExit());
+        m_sbThroatDia->setValue(OpenBurnUnits::ConvertLength(
+            OpenBurnUnits::LengthUnits_T::inches, 
+            m_unitsThroatDia->GetCurrentUnits(),
+            m_nozzleSeed->GetNozzleThroat()));
+        m_sbExitDia->setValue(OpenBurnUnits::ConvertLength(
+            OpenBurnUnits::LengthUnits_T::inches, 
+            m_unitsExitDia->GetCurrentUnits(),
+            m_nozzleSeed->GetNozzleExit()));
     }
 }
 double OpenBurnDesignNozzle::GetThroatDiameter()
@@ -110,7 +116,10 @@ void ConicalNozzleDesign::SeedValues()
 {
     if ( ConicalNozzle* nozz = (dynamic_cast<ConicalNozzle*>(m_nozzleSeed)))
     {
-        m_sbHalfAngle->setValue(nozz->GetHalfAngle());
+        m_sbHalfAngle->setValue(OpenBurnUnits::ConvertAngle(
+            OpenBurnUnits::AngleUnits_T::degrees, 
+            m_unitsHalfAngle->GetCurrentUnits(),
+            nozz->GetHalfAngle()));
     }
 }
 double ConicalNozzleDesign::GetDivergentHalfAngle()
