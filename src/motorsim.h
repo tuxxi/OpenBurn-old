@@ -59,6 +59,7 @@ public:
     double GetMaxMassFlux() const;
     std::vector<MotorSimDataPoint*>& GetResults();
 
+    void SetDesignMotor(OpenBurnMotor* motor);
 signals:
     void SimulationStarted();
     //false if there was an error

@@ -1,4 +1,4 @@
-#include <QJsonArray>
+#include <QJsonObject>
 #include <string>
 #include "settings.h"
 
@@ -13,7 +13,6 @@ OpenBurnSettings::OpenBurnSettings()
 {
     
 }
-<<<<<<< HEAD
 MotorSimSettings::MotorSimSettings()
     : MotorSimSettings(14.7f, 70.0f, 0.85f, 0.98f)
 {
@@ -26,8 +25,7 @@ MotorSimSettings::MotorSimSettings(double ambientPress, double ambientTemperatur
     skinFrictionEfficency(skinfriction),
     timeStep(timestep)
 {
-
-=======
+}
 void OpenBurnSettings::ReadJSON(const QJsonObject& object)
 {
     QJsonObject unitsObject = object["units"].toObject();
@@ -58,5 +56,4 @@ void OpenBurnSettings::WriteJSON(QJsonObject &object)
     settings["redrawOnChanges"] = m_redrawOnChanges;
     object["units"] = units;
     object["settings"] = settings;
->>>>>>> 3fca494addf42139cb6ffec2d051c499215990ef
 }

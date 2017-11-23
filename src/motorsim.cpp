@@ -19,11 +19,7 @@ MotorSim::MotorSim(OpenBurnMotor* motor)
 }
 MotorSim::~MotorSim()
 {
-    for (auto* i : m_SimResultData)
-    {
-        delete i;
-    }
-    m_SimResultData.clear();
+    ClearAllData();
 }
 void MotorSim::RunSim(MotorSimSettings* settings)
 {
@@ -41,12 +37,13 @@ void MotorSim::RunSim(MotorSimSettings* settings)
         OpenBurnMotor* newDataPointMotor = new OpenBurnMotor;
         newDataPointMotor->SetNozzle(m_InitialDesignMotor->GetNozzle());
 
-        if (m_SimResultData.empty()) //start with initial conditions
+        if (iterations == 0) //start with initial conditions
         {
             newDataPointMotor->SetGrains(m_InitialDesignMotor->GetGrains(), true);
         }
-        else //after we've run the sim for one time step, use the previous result as initial condition
+        else if (iterations > 0 && !m_SimResultData.empty())
         {
+            //after we've run the sim for one time step, use the previous result as initial condition
             newDataPointMotor->SetGrains(m_SimResultData[iterations-1]->motor->GetGrains(), true);
         }
         m_TotalBurnTime += settings->timeStep;
@@ -55,15 +52,13 @@ void MotorSim::RunSim(MotorSimSettings* settings)
         newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
         newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
         m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
-        iterations++;
         for (auto* i : newDataPointMotor->GetGrains())
         {
-            double burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
-            newDataPoint->burnRate = burnRate;
-            i->SetBurnRate(burnRate);            
-            // TODO: if (erosive)
-            //i->SetErosiveBurnRate();
-            if (!i->GetIsBurnedOut() && !i->Burn(settings->timeStep)) //OpenBurnGrain::Burn should return false if the grain burned out
+            newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
+            i->SetBurnRate(newDataPoint->burnRate);
+
+            //OpenBurnGrain::Burn should return false if the grain burned out
+            if (!i->GetIsBurnedOut() && !i->Burn(settings->timeStep))
             {
                 numBurnedOut++;
             }
@@ -76,6 +71,7 @@ void MotorSim::RunSim(MotorSimSettings* settings)
             emit SimulationFinished(false);            
             break;
         }
+        iterations++;
     }
     emit SimulationFinished(true);
 }
@@ -86,12 +82,7 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double xVal)
     OpenBurnGrain* grain = motor->GetGrainAtX(xVal);
     if (grain)
     {
-        double burnRate = grain->GetBurnRate();
-        double burningSurface = motor->GetUpstreamBurningSurfaceArea(xVal);
-        double portArea = grain->GetPortArea();
-        double propDensity = grain->GetPropellantType().GetDensity();
-
-        return (burningSurface * burnRate * propDensity ) / portArea;
+        return motor->GetUpstreamMassFlow(xVal) / grain->GetPortArea();
     }
     return 0;
 }
@@ -314,9 +305,13 @@ double MotorSim::GetAvgThrust() const
 }
 void MotorSim::ClearAllData()
 {
-    for (auto i : m_SimResultData)
+    for (auto& i : m_SimResultData)
     {
         delete i;
     }
     m_SimResultData.clear();
+}
+void MotorSim::SetDesignMotor(OpenBurnMotor *motor)
+{
+    m_InitialDesignMotor = motor;
 }

@@ -30,10 +30,10 @@ public:
     double CalcStaticKn(KN_STATIC_CALC_TYPE type); //static kn calc based on regression derivitiave
     double CalcKn(); //instantaneous Kn calc for the current motor configuration
 
-    double GetUpstreamBurningSurfaceArea(double xVal); //returns the burning surface area upstream of this point
+    double GetUpstreamMassFlow(double xVal);
     double GetBurningSurfaceArea();
     //if (copy), clones the grain objects and sets the grains as these new objects
-    void SetGrains(GrainVector grains, bool copy = false);
+    void SetGrains(const GrainVector& grains, bool copy = false);
     void SetNozzle(OpenBurnNozzle* nozz);
 
     void AddGrain(OpenBurnGrain* grain);
@@ -42,7 +42,7 @@ public:
     void RemoveGrain(OpenBurnGrain* grain);
     void RemoveGrain(int index);
 
-    GrainVector GetGrains();
+    GrainVector& GetGrains();
     OpenBurnGrain* GetGrainAtX(double x);
     OpenBurnNozzle* GetNozzle();
     const OpenBurnPropellant& GetAvgPropellant();
