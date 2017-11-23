@@ -10,12 +10,12 @@ OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant 
 {
 
 }
-double OpenBurnGrain::GetLength() { return m_GrainLen; }
-double OpenBurnGrain::GetDiameter() { return m_GrainDia; }
-int OpenBurnGrain::GetInhibitedFaces() { return m_NumInhibited; }
+double OpenBurnGrain::GetLength() const { return m_GrainLen; }
+double OpenBurnGrain::GetDiameter() const { return m_GrainDia; }
+int OpenBurnGrain::GetInhibitedFaces() const { return m_NumInhibited; }
 OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_Propellant; }
-bool OpenBurnGrain::GetIsBurnedOut() { return m_isBurnedOut; }
-double OpenBurnGrain::GetBurnRate() { return m_rNot + m_rErosive; }
+bool OpenBurnGrain::GetIsBurnedOut() const { return m_isBurnedOut; }
+double OpenBurnGrain::GetBurnRate() const { return m_rNot + m_rErosive; }
 void OpenBurnGrain::SetLength(double length) { m_GrainLen = length; }
 void OpenBurnGrain::SetDiameter(double dia) { m_GrainDia = dia; }
 void OpenBurnGrain::SetInhibitedFaces(int faces) { m_NumInhibited = faces; }

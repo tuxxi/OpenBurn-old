@@ -1,7 +1,6 @@
 #include <QGroupBox>
 #include <QGridLayout>
-
-#include <cmath>
+#include <QPropertyAnimation>
 
 #include "simtab.h"
 #include "src/units.h"
@@ -13,11 +12,14 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
       m_Motor(motor),
       m_Simulator(sim),
       m_GlobalSettings(settings),
-      m_SimSettingsDialog(nullptr)
+      m_SimSettingsDialog(nullptr),
+      m_gfxMotor(nullptr)
 {
     SetupUI();
     connect(m_Motor, &OpenBurnMotor::DesignReady,
             this, &SimulationTab::OnDesignReady);
+    connect(m_Motor, &OpenBurnMotor::DesignUpdated,
+            this, &SimulationTab::OnDesignUpdated);
     connect(m_btnRunSim, &QPushButton::clicked,
             this, &SimulationTab::OnRunSimButtonClicked);
     connect(m_btnSimSettings, &QPushButton::clicked,
@@ -25,6 +27,11 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
     m_SimSettings = new MotorSimSettings;
     connect(m_SimSettings, &MotorSimSettings::SettingsChanged,
             this, &SimulationTab::OnSimSettingsChanged);
+    connect(m_sldBurnTimeScrubBar, &QSlider::valueChanged,
+            this, &SimulationTab::OnMotorSliceChanged);
+    connect(m_btnPlayAnimation, &QPushButton::clicked,
+            this, &SimulationTab::OnPlayAnimationButtonClicked);
+
 }
 SimulationTab::~SimulationTab()
 {
@@ -62,11 +69,25 @@ void SimulationTab::SetupUI()
     resultsLayout->addWidget(m_lblMotorDesignation = new QLabel, 5, 1);
     gb_Results->setLayout(resultsLayout);
     
+    m_MotorDisplayView = new QGraphicsView;
+    m_MotorDisplayScene = new QGraphicsScene;
+    m_MotorDisplayView->setScene(m_MotorDisplayScene);
+    m_MotorDisplayView->show();
+    m_sldBurnTimeScrubBar = new QSlider(Qt::Horizontal);
+    m_btnPlayAnimation = new QPushButton(tr("Burn!"));
+    UpdateGraphics();
+
     QGridLayout* gbGridLayout = new QGridLayout;    
-    gbGridLayout->addWidget(m_Plotter, 0, 0, 2, 3);
-    gbGridLayout->addWidget(gb_Controls, 0, 3, 1, 1);    
-    gbGridLayout->addWidget(gb_Results, 1, 3, 1, 1);
-    //gbGridLayout->addWidget(m_RunSimulationButton, 0, 3, 1, 1);
+    gbGridLayout->addWidget(m_Plotter, 0, 0, 2, 2);
+    gbGridLayout->addWidget(gb_Controls, 0, 2, 1, 1);
+    gbGridLayout->addWidget(gb_Results, 1, 2, 1, 1);
+    gbGridLayout->addWidget(m_sldBurnTimeScrubBar, 2, 0, 1, 2);
+    gbGridLayout->addWidget(m_btnPlayAnimation, 2, 2);
+    gbGridLayout->addWidget(m_MotorDisplayView, 3, 0, 1, 3);
+    gbGridLayout->setRowStretch(0, 10);
+    gbGridLayout->setRowStretch(2, 1);
+    gbGridLayout->setRowStretch(3, 4);
+
     gb_Simulate->setLayout(gbGridLayout);
     
     QHBoxLayout* masterLayout = new QHBoxLayout;
@@ -117,6 +138,11 @@ void SimulationTab::UpdateResults()
     const QString thrust(QString::number(round(avgThrustN)));
     const QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
     m_lblMotorDesignation->setText(percent + "% " + designation + "-" + thrust);
+
+    //update gfx thingies
+    const int numPoints = m_Simulator->GetTotalBurnTime() / m_SimSettings->timeStep;
+    m_sldBurnTimeScrubBar->setRange(0, numPoints-1);
+    UpdateGraphics();
 }
 void SimulationTab::OnDesignReady()
 {
@@ -125,6 +151,12 @@ void SimulationTab::OnDesignReady()
         UpdateSimulation();
     }
     m_btnRunSim->setEnabled(true);
+}
+void SimulationTab::OnDesignUpdated()
+{
+    delete m_gfxMotor;
+    m_gfxMotor = nullptr;
+    UpdateGraphics();
 }
 void SimulationTab::OnSimSettingsButtonClicked()
 {
@@ -143,6 +175,15 @@ void SimulationTab::OnRunSimButtonClicked()
 void SimulationTab::OnSimSettingsChanged()
 {
     UpdateSimulation();
+}
+void SimulationTab::OnPlayAnimationButtonClicked()
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(m_sldBurnTimeScrubBar,"sliderPosition");
+    animation->setDuration(1000.0 * m_Simulator->GetTotalBurnTime());
+    animation->setStartValue(m_sldBurnTimeScrubBar->minimum());
+    animation->setEndValue(m_sldBurnTimeScrubBar->maximum());
+    animation->setEasingCurve(QEasingCurve::Linear);
+    animation->start();
 }
 void SimulationTab::SetGraphNames()
 {
@@ -190,7 +231,6 @@ void SimulationTab::UpdatePlotter()
         OpenBurnUnits::PressureUnits_T::psi,
         m_GlobalSettings->m_PressureUnits,
         m_Simulator->GetMaxPressure());
-    const double maxMassFlux = m_Simulator->GetMaxMassFlux();
 
     const double maxPressureScale = 1.10 * maxPressure;
     const double massFluxScale = 300.0f;
@@ -212,8 +252,46 @@ void SimulationTab::UpdatePlotter()
     m_Plotter->yAxis->setRange(0, maxPressureScale);
 
     QCPAxis* massFluxAxis = m_Plotter->yAxis->axisRect()->axis(QCPAxis::atRight, 1);
-    massFluxAxis->setRange(0.0f, maxMassFlux * maxPressureScale / (massFluxScale * maxMassFlux));
+    massFluxAxis->setRange(0.0f, maxPressureScale / massFluxScale);
 
     m_Plotter->replot();
     SetGraphNames();
+}
+void SimulationTab::OnMotorSliceChanged(int sliceIndex)
+{
+    if (m_Simulator->GetResults().empty()) return;
+    OpenBurnMotor* motor = m_Simulator->GetResults()[sliceIndex]->motor;
+
+    if (!m_gfxMotor)
+    {
+        m_gfxMotor = new MotorGraphicsItem(20);
+        m_MotorDisplayScene->addItem(m_gfxMotor);
+        if (motor->HasGrains())
+        {
+            m_gfxMotor->SetGrains(motor->GetGrains());
+        }
+        if (motor->HasNozzle())
+        {
+            m_gfxMotor->SetNozzle(motor->GetNozzle());
+        }
+    }
+    m_gfxMotor->UpdateGrains(motor->GetGrains());
+    //set the motor display scene to the middle of the view plus a bit of padding on the sides
+    m_MotorDisplayScene->setSceneRect(m_gfxMotor->boundingRect());
+    QRectF bounds = QRectF(m_gfxMotor->boundingRect().left(), m_gfxMotor->boundingRect().top(),
+        m_gfxMotor->boundingRect().width() + 50, m_gfxMotor->boundingRect().height() + 15);
+
+    m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+
+    //update again just in case
+    repaint();
+}
+void SimulationTab::UpdateGraphics()
+{
+    OnMotorSliceChanged(m_sldBurnTimeScrubBar->value());
+}
+void SimulationTab::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    UpdateGraphics();
 }

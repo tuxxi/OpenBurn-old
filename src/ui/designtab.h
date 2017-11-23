@@ -20,8 +20,9 @@ class DesignTab : public QWidget
 public:
     explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~DesignTab();
-    void resizeEvent(QResizeEvent* event) override;
     void UpdateDesign();  
+protected:
+    void resizeEvent(QResizeEvent* event) override;
 public slots:
     void OnNewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
     void OnGrainModified(OpenBurnGrain* grain); //recieved from the grain dialog

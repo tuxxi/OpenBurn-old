@@ -1,3 +1,4 @@
+#pragma once
 #include <QGraphicsObject>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -23,6 +24,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
     void SetGrains(const std::vector<OpenBurnGrain*>& grains);
+    void UpdateGrains(const std::vector<OpenBurnGrain*>& grains);
     void SetNozzle(OpenBurnNozzle* nozzle);
     void RemoveGrain(int index);
     void RemoveAllGrains();

@@ -89,3 +89,8 @@ void GrainGraphicsItem::dropEvent(QGraphicsSceneDragDropEvent *event)
     Q_UNUSED(event);    
     update();
 }
+void GrainGraphicsItem::UpdateGrain(OpenBurnGrain *grain)
+{
+    m_Grain = grain;
+    update();
+}

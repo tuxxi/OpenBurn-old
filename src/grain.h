@@ -10,18 +10,18 @@ public:
     OpenBurnGrain(double length, double diameter, OpenBurnPropellant prop, int inhibited = 0 );
     virtual ~OpenBurnGrain() = default;
 
-    virtual double GetLength();
-    virtual double GetDiameter();
-    virtual int GetInhibitedFaces();
+    virtual double GetLength() const;
+    virtual double GetDiameter() const;
+    virtual int GetInhibitedFaces() const;
     virtual OpenBurnPropellant& GetPropellantType();
-    virtual double GetBurnRate();
+    virtual double GetBurnRate() const;
 
     virtual void SetLength(double length);
     virtual void SetDiameter(double dia);
     virtual void SetInhibitedFaces(int faces);
     virtual void SetPropellantType(OpenBurnPropellant prop);
 
-    virtual bool GetIsBurnedOut();
+    virtual bool GetIsBurnedOut() const;
     virtual double GetBurningSurfaceArea() = 0; //return the burning surface area of the propellant
 
     //burning surface area "upstream" of this x value
