@@ -3,10 +3,6 @@
 
 #include "src/ui/mainwindow.h"
 
-#include "motorsim.h"
-#include "grain.h"
-#include "nozzle.h"
-
 #define QT_AUTO_SCREEN_SCALE_FACTOR 1
 
 int main(int argc, char *argv[])

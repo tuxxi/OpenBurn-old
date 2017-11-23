@@ -13,7 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_Propellants = new PropellantList();
     m_Simulator = new MotorSim(m_DesignMotor);
     m_GlobalSettings = new OpenBurnSettings();
+    LoadSettings("user/settings.json");
     SetupUI();
+
     connect(m_Simulator, &MotorSim::SimulationStarted,
             this, &MainWindow::OnSimulationStarted);
     connect(m_Simulator, &MotorSim::SimulationFinished,
@@ -22,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::OnPropellantsUpdated);
     connect(m_GlobalSettings, &OpenBurnSettings::SettingsChanged,
             this, &MainWindow::OnSettingsChanged);
+
 }
 MainWindow::~MainWindow()
 {
@@ -234,6 +237,36 @@ void MainWindow::SaveFile(QString fileName)
     }
 
 }
+bool MainWindow::LoadSettings(const QString& filename)
+{
+    m_SettingsFileName = filename;
+    QFile file(m_SettingsFileName);
+    if (file.open(QIODevice::ReadOnly))
+    {
+        if (file.atEnd()) //is file empty?
+            return false;
+        QByteArray data = file.readAll();
+        QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+        QJsonObject settingsObject = loadDoc.object();
+        m_GlobalSettings->ReadJSON(settingsObject);
+        return true;
+    }
+    return false;
+}
+bool MainWindow::SaveSettings()
+{
+    QFile file(m_SettingsFileName);
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QJsonObject settingsObject;
+        m_GlobalSettings->WriteJSON(settingsObject);
+        QJsonDocument saveDoc(settingsObject);
+        file.write(saveDoc.toJson());
+        return true;
+    }
+    return false;
+}
+
 void MainWindow::OnSimulationStarted()
 {
     m_StatusBar->showMessage(tr("Starting simulation"), 3000);
@@ -266,6 +299,7 @@ void MainWindow::OnPropellantsUpdated()
 }
 void MainWindow::OnSettingsChanged()
 {
+    SaveSettings();
     m_StatusBar->showMessage(tr("Settings updated."), 5000);
 
     emit m_DesignMotor->DesignUpdated();

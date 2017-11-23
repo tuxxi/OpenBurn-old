@@ -26,6 +26,7 @@ public slots:
     void OnNewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
     void OnGrainModified(OpenBurnGrain* grain); //recieved from the grain dialog
     void OnNozzleUpdated(OpenBurnNozzle* nozz);
+    void OnDesignUpdated();
 private slots:
     void OnNewGrainButtonClicked();
     void OnEditGrainButtonClicked();

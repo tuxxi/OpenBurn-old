@@ -4,6 +4,35 @@
 
 namespace OpenBurnUnits
 {
+    //Generic functions, overload these for each unit
+    template<class T>
+    double Convert(T prevUnits, T newUnits, double value);
+    template<class T>
+    const QStringList GetAllUnitSymbols();
+    template<class T>
+    const QStringList GetAllUnitNames();
+    
+    template<class T>
+    const QString GetUnitSymbol(T unit)
+    {
+        return GetAllUnitSymbols<T>().at(int(unit));
+    }
+    template<class T>
+    const QString GetUnitName(T unit)
+    {
+        return GetAllUnitNames<T>().at(int(unit));
+    }
+    template<class T>
+    const QStringList GetUnits()
+    {
+        QStringList list = QStringList();
+        for (int i = 0; i < GetAllUnitNames<T>().size(); i++)
+        {
+            list << GetAllUnitNames<T>()[i] + "(" + GetAllUnitSymbols<T>()[i] + ")";
+        }
+        return list;
+    }
+    
 //=============================================================================
 //*************LENGTH UNITS********************
 //=============================================================================
@@ -32,10 +61,15 @@ namespace OpenBurnUnits
         QObject::tr("Feet") <<
         QObject::tr("Meters"));
 
+    template<>
+    double Convert<LengthUnits_T>(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<LengthUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<LengthUnits_T>();
+
     double ConvertLength(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value);
-    const QString GetLengthUnitName(LengthUnits_T units);
-    const QString GetLengthUnitSymbol(LengthUnits_T units);
-    const QStringList GetLengthUnits();
+    const QString GetLengthUnitSymbol(LengthUnits_T unit);
 
 //=============================================================================
 //*************ANGLE UNITS********************
@@ -51,11 +85,15 @@ namespace OpenBurnUnits
     static const QStringList kAngleUnitNames = (QStringList() <<
         QObject::tr("Degrees") << 
         QObject::tr("Radians"));
-    double ConvertAngle(AngleUnits_T oldUnits, AngleUnits_T newAngle, double value);
-    const QString GetAngleUnitName(AngleUnits_T units);
-    const QString GetAngleUnitSymbol(AngleUnits_T units);
-    const QStringList GetAngleUnits();
+    template<>
+    double Convert<AngleUnits_T>(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<AngleUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<AngleUnits_T>();
 
+    double ConvertAngle(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value);
+    const QString GetAngleUnitSymbol(AngleUnits_T unit);
 //=============================================================================
 //*************PRESSURE UNITS********************
 //=============================================================================
@@ -90,10 +128,15 @@ namespace OpenBurnUnits
         QObject::tr("Atmospheres") <<
         QObject::tr("Kilopascals") <<
         QObject::tr("Torr"));
+    template<>
+    double Convert<PressureUnits_T>(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<PressureUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<PressureUnits_T>();
+
     double ConvertPressure(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value);
-    const QString GetPressureUnitName(PressureUnits_T units);
-    const QString GetPressureUnitSymbol(PressureUnits_T units);
-    const QStringList GetPressureUnits();
+    const QString GetPressureUnitSymbol(PressureUnits_T unit);
 //=============================================================================
 //*************TEMPERATURE UNITS********************
 //=============================================================================
@@ -115,11 +158,15 @@ namespace OpenBurnUnits
         QObject::tr("Fahrenheit") <<
         QObject::tr("Celsius") <<
         QObject::tr("Kelvin"));
-    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value);
-    const QString GetTemperatureUnitName(TemperatureUnits_T unit);
-    const QString GetTemperatureUnitSymbol(TemperatureUnits_T unit);
-    const QStringList GetTemperatureUnits();
+    template<>
+    double Convert<TemperatureUnits_T>(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<TemperatureUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<TemperatureUnits_T>();
 
+    double ConvertTemperature(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value);
+    const QString GetTemperatureUnitSymbol(TemperatureUnits_T unit);
 //=============================================================================
 //*************FORCE UNITS********************
 //=============================================================================
@@ -136,11 +183,15 @@ namespace OpenBurnUnits
     static const QStringList kForceUnitNames = (QStringList() << 
         QObject::tr("Pounds") <<
         QObject::tr("Newtons"));
+    template<>
+    double Convert<ForceUnits_T>(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<ForceUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<ForceUnits_T>();
 
     double ConvertForce(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value);
-    const QString GetForceUnitName(ForceUnits_T unit);
     const QString GetForceUnitSymbol(ForceUnits_T unit);
-    const QStringList GetForceUnits();
 //=============================================================================
 //*************MASS UNITS********************
 //=============================================================================
@@ -164,8 +215,13 @@ namespace OpenBurnUnits
         QObject::tr("Pounds-mass") <<
         QObject::tr("Kilograms") << 
         QObject::tr("Slugs"));
+    template<>
+    double Convert<MassUnits_T>(MassUnits_T oldUnits, MassUnits_T newUnits, double value);
+    template<>
+    const QStringList GetAllUnitSymbols<MassUnits_T>();
+    template<>
+    const QStringList GetAllUnitNames<MassUnits_T>();
+
     double ConvertMass(MassUnits_T oldUnits, MassUnits_T newUnits, double value);
-    const QString GetMassUnitName(MassUnits_T unit);
     const QString GetMassUnitSymbol(MassUnits_T unit);
-    const QStringList GetMassUnits();
 }

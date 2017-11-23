@@ -1,5 +1,6 @@
 #pragma once
 #include <QObject>
+#include <QJsonObject>
 
 #include "src/units.h"
 
@@ -10,6 +11,9 @@ class OpenBurnSettings : public QObject
 public:
     OpenBurnSettings();
     ~OpenBurnSettings() = default;
+    
+    void ReadJSON(const QJsonObject& object);
+    void WriteJSON(QJsonObject &object);
     
     OpenBurnUnits::LengthUnits_T m_LengthUnits;
     OpenBurnUnits::AngleUnits_T m_AngleUnits;

@@ -92,10 +92,15 @@ void OpenBurnDesignGrain::SeedValues()
 {
     if (m_grainSeed)
     {
-        m_sbGrainLen->setValue(m_grainSeed->GetLength());
-        m_sbGrainDia->setValue(m_grainSeed->GetDiameter());
+        m_sbGrainLen->setValue(OpenBurnUnits::ConvertLength(
+            OpenBurnUnits::LengthUnits_T::inches,
+            m_unitsGrainLen->GetCurrentUnits(), 
+            m_grainSeed->GetLength()));
+        m_sbGrainDia->setValue(OpenBurnUnits::ConvertLength(
+            OpenBurnUnits::LengthUnits_T::inches, 
+            m_unitsGrainLen->GetCurrentUnits(),
+            m_grainSeed->GetDiameter()));
         m_sbGrainInhibit->setValue(m_grainSeed->GetInhibitedFaces());
-    
         //propellant ..     
     }
 }
@@ -170,6 +175,9 @@ void CylindricalGrainDesign::SeedValues()
     OpenBurnDesignGrain::SeedValues();
     if (CylindricalGrain* seed = dynamic_cast<CylindricalGrain*>(m_grainSeed))
     {
-        m_sbGrainCoreDia->setValue(seed->GetCoreDiameter());
+        m_sbGrainCoreDia->setValue(OpenBurnUnits::ConvertLength(
+            OpenBurnUnits::LengthUnits_T::inches, 
+            m_unitsGrainCoreDia->GetCurrentUnits(),
+            seed->GetCoreDiameter()));
     }
 }

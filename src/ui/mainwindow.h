@@ -48,12 +48,17 @@ private:
     void SetupUI();
     void SaveFile(QString filename);
 
+    bool LoadSettings(const QString& filename);
+    bool SaveSettings();
+
     OpenBurnMotor* m_DesignMotor;
     PropellantList* m_Propellants;
     MotorSim* m_Simulator;
     OpenBurnSettings* m_GlobalSettings;
     QString m_CurrentDesignFilename;
 
+    QString m_SettingsFileName;
+    
     QWidget *m_CentralWidget;
 
     QMenuBar *m_MenuBar;
