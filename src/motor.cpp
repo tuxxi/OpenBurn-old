@@ -87,12 +87,12 @@ const OpenBurnPropellant& OpenBurnMotor::GetAvgPropellant() { return m_AvgPropel
 OpenBurnGrain* OpenBurnMotor::GetGrainAtX(double x)
 {
     double currentX = 0;
-    for (size_t i = GetNumGrains() - 1; i >= 0; --i)
+    for (auto* grain : m_Grains)
     {
-        currentX += m_Grains[i]->GetLength();
+        currentX += grain->GetLength();
         if (currentX >= x)
         {
-            return m_Grains[i];
+            return grain;
         }
     }
     return nullptr;
@@ -161,20 +161,26 @@ double OpenBurnMotor::GetBurningSurfaceArea()
     return surfaceArea;
 }
 //returns the mass flow upstream of this point
-//x=0 at nozzle entrance
+//x=0 at fwd end
 double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
 {
     double massFlow = 0;
     double currentX = 0;
-    for (auto grain : m_Grains)
+    for (auto* grain : m_Grains)
     {
-        currentX += grain->GetLength();
-        if (currentX >= xVal)
+        double grainLen = grain->GetLength();
+        currentX += grainLen;
+        if (currentX >= GetMotorLength() - xVal)
         {
-            //GetBurningSurfaceArea(double) will return GetBurningSurfaceArea(void) if xval > grain len
+            double burningSurface = 0;
+            if (currentX < xVal) {
+                burningSurface = grain->GetBurningSurfaceArea();
+            }
+            else {
+                burningSurface = grain->GetBurningSurfaceArea(currentX - xVal);
+            }
             //mass flow = burning surface area * propellant density * burn rate
-            massFlow += grain->GetBurningSurfaceArea(currentX - xVal) *
-                    grain->GetPropellantType().GetDensity() * grain->GetBurnRate();
+            massFlow += burningSurface * grain->GetPropellantType().GetDensity() * grain->GetBurnRate();
         }
     }
     return massFlow;

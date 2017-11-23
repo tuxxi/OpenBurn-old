@@ -49,8 +49,8 @@ double CylindricalGrain::GetBurningSurfaceArea(double xVal)
     if (xVal <= m_GrainLen) //only try to calculate if we're given an xval that is inside the grain volume
     {
         double face_area = 0.25f * M_PI * ((m_GrainDia * m_GrainDia) - (m_CoreDia * m_CoreDia));
-        double core_area = M_PI * m_CoreDia * m_GrainLen - xVal;
-        return core_area + qAbs(1 - m_NumInhibited) * face_area; //only one potential grain face will be upstream
+        double core_area = M_PI * m_CoreDia * (m_GrainLen - xVal);
+        return core_area + (m_NumInhibited > 0 ? 1 : 0) * face_area; //only one potential grain face will be upstream
     }
     else
     {

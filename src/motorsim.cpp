@@ -97,11 +97,11 @@ double MotorSim::CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFl
 //bottom of the last grain
 double MotorSim::CalcCoreMassFlux(OpenBurnMotor* motor)
 {
-    return CalcMassFlux(motor, 0);
+    return CalcMassFlux(motor, motor->GetMotorLength());
 }
 double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
 {
-    return CalcMachNumber(motor, 0, coreMassFlux);
+    return CalcMachNumber(motor, motor->GetMotorLength(), coreMassFlux);
 }
 
 //Calculates the exit mach number from the area ratio.

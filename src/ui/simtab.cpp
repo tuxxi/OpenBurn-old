@@ -192,6 +192,9 @@ void SimulationTab::UpdatePlotter()
         m_Simulator->GetMaxPressure());
     const double maxMassFlux = m_Simulator->GetMaxMassFlux();
 
+    const double maxPressureScale = 1.10 * maxPressure;
+    const double massFluxScale = 300.0f;
+
     QVector<double> time(numPoints), pressure(numPoints), massflux(numPoints);
     for (int i=0; i<numPoints; ++i)
     {
@@ -200,19 +203,16 @@ void SimulationTab::UpdatePlotter()
             OpenBurnUnits::PressureUnits_T::psi,
             m_GlobalSettings->m_PressureUnits,
             m_Simulator->GetResults()[i]->pressure);
+        massflux[i] = massFluxScale * m_Simulator->GetResults()[i]->massflux;
     }
     m_Plotter->graph(0)->setData(time, pressure);
-    m_Plotter->xAxis->setRange(0.f, m_Simulator->GetTotalBurnTime() + .2f);
-    m_Plotter->yAxis->setRange(0, 1.10* maxPressure);
-
-    const double scaleFactor = 1.10 * maxPressure / maxMassFlux;
-    for (int i = 0; i<numPoints; ++i)
-    {
-        massflux[i] = scaleFactor * m_Simulator->GetResults()[i]->massflux;
-    }
     m_Plotter->graph(1)->setData(time, massflux);
+
+    m_Plotter->xAxis->setRange(0.f, m_Simulator->GetTotalBurnTime() + .2f);
+    m_Plotter->yAxis->setRange(0, maxPressureScale);
+
     QCPAxis* massFluxAxis = m_Plotter->yAxis->axisRect()->axis(QCPAxis::atRight, 1);
-    massFluxAxis->setRange(0.0f, maxMassFlux);
+    massFluxAxis->setRange(0.0f, maxMassFlux * maxPressureScale / (massFluxScale * maxMassFlux));
 
     m_Plotter->replot();
     SetGraphNames();
