@@ -221,7 +221,7 @@ void DesignTab::UpdateGraphics()
 {
     if (!m_gfxMotor)
     {
-        m_gfxMotor = new MotorGraphicsItem(100);
+        m_gfxMotor = new MotorGraphicsItem(20);
         m_MotorDisplayScene->addItem(m_gfxMotor);
     }
     if (m_Motor->HasGrains())
@@ -239,7 +239,6 @@ void DesignTab::UpdateGraphics()
     {
         m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
     }
-
     //set the motor display scene to the middle of the view plus a bit of padding on the sides
     m_MotorDisplayScene->setSceneRect(m_gfxMotor->boundingRect());
     QRectF bounds = QRectF(m_gfxMotor->boundingRect().left(), m_gfxMotor->boundingRect().top(),

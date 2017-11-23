@@ -11,3 +11,17 @@ OpenBurnSettings::OpenBurnSettings()
 {
     
 }
+MotorSimSettings::MotorSimSettings()
+    : MotorSimSettings(14.7f, 70.0f, 0.85f, 0.98f)
+{
+
+}
+MotorSimSettings::MotorSimSettings(double ambientPress, double ambientTemperature, double twophase, double skinfriction,
+                 double timestep)
+    : ambientPressure(ambientPress), ambientTemp(ambientTemperature),
+    twoPhaseFlowEfficency(twophase),
+    skinFrictionEfficency(skinfriction),
+    timeStep(timestep)
+{
+
+}

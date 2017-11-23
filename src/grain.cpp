@@ -15,6 +15,7 @@ double OpenBurnGrain::GetDiameter() { return m_GrainDia; }
 int OpenBurnGrain::GetInhibitedFaces() { return m_NumInhibited; }
 OpenBurnPropellant& OpenBurnGrain::GetPropellantType() { return m_Propellant; }
 bool OpenBurnGrain::GetIsBurnedOut() { return m_isBurnedOut; }
+double OpenBurnGrain::GetBurnRate() { return m_rNot + m_rErosive; }
 void OpenBurnGrain::SetLength(double length) { m_GrainLen = length; }
 void OpenBurnGrain::SetDiameter(double dia) { m_GrainDia = dia; }
 void OpenBurnGrain::SetInhibitedFaces(int faces) { m_NumInhibited = faces; }
@@ -43,6 +44,19 @@ double CylindricalGrain::GetBurningSurfaceArea()
 
     return core_area + ((2 - m_NumInhibited) * face_area);
 }
+double CylindricalGrain::GetBurningSurfaceArea(double xVal)
+{
+    if (xVal <= m_GrainLen) //only try to calculate if we're given an xval that is inside the grain volume
+    {
+        double face_area = 0.25f * M_PI * ((m_GrainDia * m_GrainDia) - (m_CoreDia * m_CoreDia));
+        double core_area = M_PI * m_CoreDia * m_GrainLen - xVal;
+        return core_area + qAbs(1 - m_NumInhibited) * face_area; //only one potential grain face will be upstream
+    }
+    else
+    {
+        return GetBurningSurfaceArea();
+    }
+}
 double CylindricalGrain::GetPortArea()
 {
     double coreRadius = m_CoreDia / 2.0f;
@@ -62,7 +76,7 @@ bool CylindricalGrain::Burn(double timestep)
 {
     if (m_CoreDia <= m_GrainDia)
     {
-        double burnDist = (m_rNot + m_rErosive) * timestep;
+        double burnDist = GetBurnRate() * timestep;
         
         m_CoreDia += (2 * burnDist);
         m_GrainLen -= burnDist * (2 - m_NumInhibited);

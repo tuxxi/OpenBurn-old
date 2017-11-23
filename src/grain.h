@@ -14,7 +14,8 @@ public:
     virtual double GetDiameter();
     virtual int GetInhibitedFaces();
     virtual OpenBurnPropellant& GetPropellantType();
-    
+    virtual double GetBurnRate();
+
     virtual void SetLength(double length);
     virtual void SetDiameter(double dia);
     virtual void SetInhibitedFaces(int faces);
@@ -22,6 +23,10 @@ public:
 
     virtual bool GetIsBurnedOut();
     virtual double GetBurningSurfaceArea() = 0; //return the burning surface area of the propellant
+
+    //burning surface area "upstream" of this x value
+    //should return GetBurningSurfaceArea(void) if xVal is greater than grainLen
+    virtual double GetBurningSurfaceArea(double xVal) = 0;
 
     virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
@@ -55,6 +60,7 @@ public:
     virtual ~CylindricalGrain() = default;
     
     virtual double GetBurningSurfaceArea() override;
+    virtual double GetBurningSurfaceArea(double xVal) override;
     virtual double GetPortArea() override;
     virtual double GetVolume() override;
     virtual double GetHydraulicDiameter() override;

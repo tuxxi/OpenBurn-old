@@ -68,6 +68,8 @@ void MotorSim::RunSim(MotorSimSettings* settings)
                 numBurnedOut++;
             }
         }
+        newDataPoint->massflux = CalcCoreMassFlux(newDataPoint->motor);
+
         m_SimResultData.push_back(newDataPoint);
         if (iterations > int(1e5))
         {
@@ -77,21 +79,40 @@ void MotorSim::RunSim(MotorSimSettings* settings)
     }
     emit SimulationFinished(true);
 }
-//mdot A.K.A Mass flux at given crossflow mach number and port area
-double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double machNumber, double portArea)
+
+//mdot A.K.A Mass flux at given motor X value
+double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double xVal)
+{
+    OpenBurnGrain* grain = motor->GetGrainAtX(xVal);
+    if (grain)
+    {
+        double burnRate = grain->GetBurnRate();
+        double burningSurface = motor->GetUpstreamBurningSurfaceArea(xVal);
+        double portArea = grain->GetPortArea();
+        double propDensity = grain->GetPropellantType().GetDensity();
+
+        return (burningSurface * burnRate * propDensity ) / portArea;
+    }
+    return 0;
+}
+double MotorSim::CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFlux)
 {
     //mdot = M * A * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
     //P_0 = gas pressure, T_0 = gas temperature, k = ratio specific heats (cp/cv), M = mach number, R = gas constant
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
-
-    double temp = motor->GetAvgPropellant().GetAdiabaticFlameTemp();
-    double k = motor->GetAvgPropellant().GetSpecificHeatRatio();
-    double A = machNumber * portArea * CalcChamberPressure(motor) * qSqrt( (k / (temp * g_kGasConstantR)) );
-    double B = 1.0f + (k - 1) / 2 * machNumber * machNumber;
-    double C = (k - 1.0f) / 2;
-    return A * qPow(B, -1.0f*C);
+    return 0;
 }
+//bottom of the last grain
+double MotorSim::CalcCoreMassFlux(OpenBurnMotor* motor)
+{
+    return CalcMassFlux(motor, 0);
+}
+double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
+{
+    return CalcMachNumber(motor, 0, coreMassFlux);
+}
+
 //Calculates the exit mach number from the area ratio.
 //https://www.grc.nasa.gov/www/k-12/airplane/rktthsum.html
 double MotorSim::CalcExitMachNumber(OpenBurnMotor* motor)
@@ -180,7 +201,6 @@ double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettin
     double kOverItselfTerm = (k + 1.f) / (k - 1.f);
     double kMinusOne = (k - 1.f) / k;
 
-    //assuming exit pressure = ambient pressure for now.
     double exitMach = CalcExitMachNumber(motor);
     double exitPressure = CalcExitPressure(motor, chamberPressure, exitMach);
     double pRatio = exitPressure / chamberPressure;
@@ -214,7 +234,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
 
     //For these calculations we need LOTS of new variables!
     double beta =  53; //(experimental, chosen by Lenoir and Robillard)
-    double G = CalcMassFlux(motor, machNumber, grain->GetPortArea()); // mass flux
+    double G = CalcMassFlux(motor, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
     double rho = OpenBurnUnits::ConvertMass(
@@ -254,7 +274,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-std::vector<MotorSimDataPoint*> MotorSim::GetResults()
+std::vector<MotorSimDataPoint*>& MotorSim::GetResults()
 {
     return m_SimResultData;
 }
@@ -277,6 +297,16 @@ double MotorSim::GetMaxPressure() const
         }
     }
     return maxPressure;
+}
+double MotorSim::GetMaxMassFlux() const
+{
+    double maxMassFlux = 0;
+    for (auto i : m_SimResultData)
+    {
+        if (i->massflux > maxMassFlux)
+            maxMassFlux = i->massflux;
+    }
+    return maxMassFlux;
 }
 double MotorSim::GetAvgThrust() const
 {

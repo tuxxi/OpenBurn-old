@@ -29,9 +29,16 @@ public:
     MotorSim(OpenBurnMotor* initialDesign);
 
     ~MotorSim();
-    //per unit area:
-    double CalcMassFlux(OpenBurnMotor* motor, double machNumber, double portArea);
 
+    void RunSim(MotorSimSettings* settings);
+
+    //per unit area:
+    double CalcMassFlux(OpenBurnMotor* motor, double xVal);
+    double CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFlux);
+
+    //bottom of the last grain
+    double CalcCoreMassFlux(OpenBurnMotor* motor);
+    double CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux);
     //per grain:
     //calculates linear burn rate for a given grain
     double CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain); //based on saint robert's law. No erosive burning
@@ -41,17 +48,16 @@ public:
     double CalcChamberPressure(OpenBurnMotor* motor);
     double CalcExitMachNumber(OpenBurnMotor* motor);
     double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
-    //
     double CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
     double CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
-    void RunSim(MotorSimSettings* settings);
 
     double GetTotalBurnTime() const;
-    double GetMaxPressure() const;
-
     double GetAvgThrust() const;
     double GetTotalImpulse() const;
-    std::vector<MotorSimDataPoint*> GetResults();
+
+    double GetMaxPressure() const;
+    double GetMaxMassFlux() const;
+    std::vector<MotorSimDataPoint*>& GetResults();
 
 signals:
     void SimulationStarted();

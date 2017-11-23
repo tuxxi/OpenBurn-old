@@ -41,7 +41,7 @@ void NozzleGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         if (nozz)
         {        
             double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
-            double throatLen = 20.0f; //nozz->GetThroatLen();
+            double throatLen = m_NozzleHeight * 0.2; //nozz->GetThroatLen();
         
             double divergentLen = exitRadius * (1.0f / qTan(qDegreesToRadians(divergentAngle))); //cot
             m_NozzleLength = convergentLen + throatLen + divergentLen;
@@ -89,7 +89,7 @@ QRectF NozzleGraphicsItem::boundingRect() const
         double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));
 
         double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
-        double throatLen = 20.0f; //nozz->GetThroatLen();
+        double throatLen = m_NozzleHeight * 0.2; //nozz->GetThroatLen();
         double divergentLen = exitRadius * (1.0f / qTan(qDegreesToRadians(divergentAngle))); //cot
 
         nozzleLen = convergentLen + throatLen + divergentLen;

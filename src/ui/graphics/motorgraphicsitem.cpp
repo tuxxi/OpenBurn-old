@@ -27,7 +27,7 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     //draw the outline of the motor
     if (m_MotorLen > 0)
     {
-        painter->setPen(QPen(Qt::black, 5, Qt::DashDotDotLine, Qt::RoundCap, Qt::RoundJoin));
+        painter->setPen(QPen(Qt::black, m_ScaleFactor / 20.0, Qt::DashDotDotLine, Qt::RoundCap, Qt::RoundJoin));
         double len = m_MotorLen + (m_gfxNozzle ? m_gfxNozzle->boundingRect().width() : 0);
         painter->drawLine(0, 0, 0, m_MotorHeight); //forward end of motor
         painter->drawLine(0, 0, len, 0); //bottom line

@@ -22,41 +22,40 @@ void SimSettingsDialog::SetupUI()
 
     layout->addWidget(new QLabel(tr("Ambient Pressure")), 0, 0);
     layout->addWidget(m_sbAmbientPressure = new QDoubleSpinBox, 0, 1);
-    m_sbAmbientPressure->setValue(14.7);
     m_sbAmbientPressure->setSingleStep(0.1f);
     m_sbAmbientPressure->setMinimum(0.0f);
+    m_sbAmbientPressure->setValue(m_Settings->ambientPressure);
     m_unitsAmbientPressure = new PressureUnitsComboBox(this, m_sbAmbientPressure);
     layout->addWidget(m_unitsAmbientPressure, 0, 2);
 
     layout->addWidget(new QLabel(tr("Ambient Temperature")), 1, 0);
     layout->addWidget(m_sbAmbientTemp = new QDoubleSpinBox, 1, 1);
-    m_sbAmbientTemp->setValue(70.0f);
     m_sbAmbientTemp->setSingleStep(0.1f);
     m_sbAmbientTemp->setMinimum(0.0f);
+    m_sbAmbientTemp->setValue(m_Settings->ambientTemp);
     m_unitsAmbientTemp = new TemperatureUnitsComboBox(this, m_sbAmbientTemp);
     layout->addWidget(m_unitsAmbientTemp, 1, 2);
 
     layout->addWidget(new QLabel(tr("Two-phase flow efficiency (%)")), 2, 0);
     layout->addWidget(m_sbTwoPhaseFlow = new QDoubleSpinBox, 2, 1);
-    m_sbTwoPhaseFlow->setValue(85.0f);
     m_sbTwoPhaseFlow->setMaximum(100.0f);
     m_sbTwoPhaseFlow->setMinimum(0.0f);
     m_sbTwoPhaseFlow->setSingleStep(0.25f);
+    m_sbTwoPhaseFlow->setValue(m_Settings->twoPhaseFlowEfficency * 100.0);
 
     layout->addWidget(new QLabel(tr("Nozzle skin friction efficiency (%)")), 3, 0);
     layout->addWidget(m_sbSkinFriction = new QDoubleSpinBox, 3, 1);
-    m_sbSkinFriction->setValue(98.0f);
     m_sbSkinFriction->setMaximum(100.0f);
     m_sbSkinFriction->setMinimum(0.0f);
     m_sbSkinFriction->setSingleStep(0.1f);
+    m_sbSkinFriction->setValue(m_Settings->skinFrictionEfficency * 100.0);
 
     layout->addWidget(new QLabel(tr("Simulation time step")), 4, 0);
     layout->addWidget(m_sbTimeStep = new QDoubleSpinBox, 4, 1);
-    m_sbTimeStep->setValue(0.01f);
     m_sbTimeStep->setDecimals(4);
-    m_sbTimeStep->setMaximum(0.25);
-    m_sbTimeStep->setMinimum(0.001f);
+    m_sbTimeStep->setRange(0.001f, 0.25f);
     m_sbTimeStep->setSingleStep(0.001f);
+    m_sbTimeStep->setValue(m_Settings->timeStep);
 
     m_btnApply = new QPushButton(tr("Apply"), this);
     m_btnCancel = new QPushButton(tr("Close"), this);
@@ -77,6 +76,7 @@ void SimSettingsDialog::ApplySettings()
         m_Settings->twoPhaseFlowEfficency = m_sbTwoPhaseFlow->value() * 0.01f; //precent
         m_Settings->skinFrictionEfficency = m_sbSkinFriction->value() * 0.01f; //percent
         m_Settings->timeStep = m_sbTimeStep->value();
+        emit m_Settings->SettingsChanged();
     }
 }
 void SimSettingsDialog::OnApplyButtonClicked()

@@ -85,7 +85,19 @@ size_t OpenBurnMotor::GetNumGrains() const { return m_Grains.size(); }
 GrainVector OpenBurnMotor::GetGrains() { return m_Grains;}
 OpenBurnNozzle* OpenBurnMotor::GetNozzle() { return m_Nozzle; }
 const OpenBurnPropellant& OpenBurnMotor::GetAvgPropellant() { return m_AvgPropellant; }
-
+OpenBurnGrain* OpenBurnMotor::GetGrainAtX(double x)
+{
+    double currentX = 0;
+    for (size_t i = GetNumGrains() - 1; i >= 0; --i)
+    {
+        currentX += m_Grains[i]->GetLength();
+        if (currentX >= x)
+        {
+            return m_Grains[i];
+        }
+    }
+    return nullptr;
+}
 double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
 {
     double surfaceArea = 0;
@@ -134,16 +146,39 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
 }
 double OpenBurnMotor::CalcKn()
 {
+
+    return GetBurningSurfaceArea() / m_Nozzle->GetNozzleThroatArea();
+}
+double OpenBurnMotor::GetBurningSurfaceArea()
+{
     double surfaceArea = 0;
     for (auto i : m_Grains)
     {
         if (!i->GetIsBurnedOut())
         {
-            surfaceArea += i->GetBurningSurfaceArea();            
+            surfaceArea += i->GetBurningSurfaceArea();
         }
     }
-    return surfaceArea / m_Nozzle->GetNozzleThroatArea();
+    return surfaceArea;
 }
+//returns the burning surface area upstream of this point
+//x=0 at nozzle entrance
+double OpenBurnMotor::GetUpstreamBurningSurfaceArea(double xVal)
+{
+    double surfaceArea = 0;
+    double currentX = 0;
+    for (auto grain : m_Grains)
+    {
+        currentX += grain->GetLength();
+        if (currentX >= xVal)
+        {
+            //GetBurningSurfaceArea(double) will return GetBurningSurfaceArea(void) if xval > grain len
+            surfaceArea += grain->GetBurningSurfaceArea(currentX - xVal);
+        }
+    }
+    return surfaceArea;
+}
+
 bool OpenBurnMotor::HasNozzle() const
 {
     return m_Nozzle != nullptr;
