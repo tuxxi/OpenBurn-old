@@ -32,6 +32,7 @@ public:
     ~MainWindow();
 protected:
     virtual void closeEvent(QCloseEvent*) override;
+    virtual void resizeEvent(QResizeEvent*) override;
 private slots:
     void OnMenuQuit();
     void OnMenuOpen();
@@ -44,6 +45,7 @@ private slots:
     void OnSimulationFinished(bool success);
     void OnPropellantsUpdated();
     void OnSettingsChanged();
+    void OnTabChanged(int index);
 private:
     void SetupUI();
     void SaveFile(QString filename);

@@ -24,7 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::OnPropellantsUpdated);
     connect(m_GlobalSettings, &OpenBurnSettings::SettingsChanged,
             this, &MainWindow::OnSettingsChanged);
-
+    connect(m_TabWidget, &QTabWidget::currentChanged,
+            this, &MainWindow::OnTabChanged);
 }
 MainWindow::~MainWindow()
 {
@@ -132,6 +133,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         event->accept();
     }
+}
+void MainWindow::resizeEvent(QResizeEvent * event)
+{
+    QApplication::sendEvent(m_DesignTab, event);
+    QApplication::sendEvent(m_SimTab, event);
 }
 void MainWindow::OnMenuNew()
 {
@@ -311,4 +317,19 @@ void MainWindow::OnSettingsChanged()
 
     emit m_DesignMotor->DesignUpdated();
     m_SimTab->UpdateResults();
+}
+void MainWindow::OnTabChanged(int index)
+{
+    DesignTab* designTab = qobject_cast<DesignTab*>(m_TabWidget->widget(index));
+    SimulationTab* simTab = qobject_cast<SimulationTab*>(m_TabWidget->widget(index));
+
+    //a bit of a wonky hack, force the tabs to resize
+    if (designTab)
+    {
+        designTab->resizeEvent(new QResizeEvent(designTab->size(), designTab->size()));
+    }
+    if (simTab)
+    {
+        simTab->resizeEvent(new QResizeEvent(simTab->size(), simTab->size()));
+    }
 }

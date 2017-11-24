@@ -16,6 +16,8 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
       m_gfxMotor(nullptr)
 {
     SetupUI();
+    m_SimSettings = new MotorSimSettings;
+
     connect(m_Motor, &OpenBurnMotor::DesignReady,
             this, &SimulationTab::OnDesignReady);
     connect(m_Motor, &OpenBurnMotor::DesignUpdated,
@@ -24,7 +26,6 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
             this, &SimulationTab::OnRunSimButtonClicked);
     connect(m_btnSimSettings, &QPushButton::clicked,
             this, &SimulationTab::OnSimSettingsButtonClicked);
-    m_SimSettings = new MotorSimSettings;
     connect(m_SimSettings, &MotorSimSettings::SettingsChanged,
             this, &SimulationTab::OnSimSettingsChanged);
     connect(m_sldBurnTimeScrubBar, &QSlider::valueChanged,
@@ -261,10 +262,18 @@ void SimulationTab::OnMotorSliceChanged(int sliceIndex)
 {
     if (m_Simulator->GetResults().empty()) return;
     OpenBurnMotor* motor = m_Simulator->GetResults()[sliceIndex]->motor;
-
+    UpdateGraphics(motor);
+}
+void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
+{
+    if (m_Simulator->GetResults().empty()) return;
+    if (motor == nullptr)
+    {
+         motor = m_Simulator->GetResults()[m_sldBurnTimeScrubBar->value()]->motor;
+    }
     if (!m_gfxMotor)
     {
-        m_gfxMotor = new MotorGraphicsItem(20);
+        m_gfxMotor = new MotorGraphicsItem(100);
         m_MotorDisplayScene->addItem(m_gfxMotor);
         if (motor->HasGrains())
         {
@@ -285,10 +294,6 @@ void SimulationTab::OnMotorSliceChanged(int sliceIndex)
 
     //update again just in case
     repaint();
-}
-void SimulationTab::UpdateGraphics()
-{
-    OnMotorSliceChanged(m_sldBurnTimeScrubBar->value());
 }
 void SimulationTab::resizeEvent(QResizeEvent* event)
 {

@@ -18,7 +18,7 @@ public:
 
     void UpdateSimulation();
     void UpdateResults();
-protected:
+    void UpdateGraphics(OpenBurnMotor* motor = nullptr);
     void resizeEvent(QResizeEvent* event) override;
 private slots:
     void OnRunSimButtonClicked();
@@ -35,7 +35,6 @@ private:
     void SetGraphNames();
     void SetupPlotter();
     void UpdatePlotter();
-    void UpdateGraphics();
 
     //gfx
     MotorGraphicsItem* m_gfxMotor;

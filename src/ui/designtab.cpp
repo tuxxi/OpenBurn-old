@@ -222,7 +222,7 @@ void DesignTab::UpdateGraphics()
 {
     if (!m_gfxMotor)
     {
-        m_gfxMotor = new MotorGraphicsItem(20);
+        m_gfxMotor = new MotorGraphicsItem(100);
         m_MotorDisplayScene->addItem(m_gfxMotor);
     }
     if (m_Motor->HasGrains())

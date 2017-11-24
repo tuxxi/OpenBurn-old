@@ -21,7 +21,8 @@ public:
     explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~DesignTab();
     void UpdateDesign();  
-protected:
+    void UpdateGraphics();
+
     void resizeEvent(QResizeEvent* event) override;
 public slots:
     void OnNewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
@@ -43,7 +44,6 @@ private slots:
 private:
     void SetSeed(OpenBurnGrain* grain);
     void SetupUI();
-    void UpdateGraphics();  
     
     //grain design overview - static
     QLabel *m_lblMotorMajorDia, *m_lblMotorLen, *m_lblNumGrains, *m_lblPropellantMass, *m_lblVolumeLoading;

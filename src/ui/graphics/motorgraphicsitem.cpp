@@ -106,8 +106,8 @@ void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
     for (int i = 0; i < m_gfxGrains.size(); i++)
     {
         //we want the grain to stay in the middle of it's current location
-        double pixelDiff = 0.5 * m_ScaleFactor * (m_gfxGrains[i]->GetGrain()->GetLength() - grains[i]->GetLength());
-        m_gfxGrains[i]->UpdateGrain(grains[i]);
+        double pixelDiff = .5 * m_ScaleFactor * (m_gfxGrains[i]->GetGrain()->GetLength() - grains[i]->GetLength());
         m_gfxGrains[i]->setPos(m_gfxGrains[i]->pos().x() + pixelDiff, m_gfxGrains[i]->pos().y());
+        m_gfxGrains[i]->UpdateGrain(grains[i]);
     }
 }
