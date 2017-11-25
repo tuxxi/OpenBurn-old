@@ -164,14 +164,14 @@ void DesignTab::UpdateDesign()
             OpenBurnUnits::ConvertLength(
                 OpenBurnUnits::LengthUnits_T::inches,
                 m_GlobalSettings->m_LengthUnits,
-                m_Motor->GetMotorLength())) +
+                m_Motor->GetMotorLength()), 'f', 2) +
             " " +
             OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
         m_lblMotorMajorDia->setText(QString::number(
             OpenBurnUnits::ConvertLength(
                 OpenBurnUnits::LengthUnits_T::inches,
                 m_GlobalSettings->m_LengthUnits,
-                m_Motor->GetMotorMajorDiameter())) +
+                m_Motor->GetMotorMajorDiameter()), 'f', 2) +
             " " +
             OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
         m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
@@ -179,10 +179,10 @@ void DesignTab::UpdateDesign()
             OpenBurnUnits::ConvertMass(
                 OpenBurnUnits::MassUnits_T::pounds_mass,
                 m_GlobalSettings->m_MassUnits,
-                m_Motor->GetMotorPropellantMass() ), 'g', 2) +
+                m_Motor->GetMotorPropellantMass() ), 'f', 2) +
             " " +
             OpenBurnUnits::GetMassUnitSymbol(m_GlobalSettings->m_MassUnits));
-        m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'g', 2) + '%');
+        m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'f', 2) + '%');
         if (m_Motor->HasNozzle())
         {
             QString initialKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_INITIAL)));
@@ -190,7 +190,7 @@ void DesignTab::UpdateDesign()
             QString finalKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_FINAL)));
     
             m_lblKn->setText(initialKn + "-" + maxKn);
-            m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'g', 2));
+            m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'f', 2));
             emit(m_Motor->DesignReady()); //design is ready, so anyone who is listening knows they can use it now!
         }
     }
@@ -200,17 +200,17 @@ void DesignTab::UpdateDesign()
             OpenBurnUnits::ConvertLength(
                 OpenBurnUnits::LengthUnits_T::inches,
                 m_GlobalSettings->m_LengthUnits,
-                m_Motor->GetNozzle()->GetNozzleThroat())) +
+                m_Motor->GetNozzle()->GetNozzleThroat()), 'f', 2) +
             " " +
             OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
         m_lblNozzleExitDia->setText(QString::number(
             OpenBurnUnits::ConvertLength(
                 OpenBurnUnits::LengthUnits_T::inches,
                 m_GlobalSettings->m_LengthUnits,
-                m_Motor->GetNozzle()->GetNozzleExit()))+
+                m_Motor->GetNozzle()->GetNozzleExit()), 'f', 2) +
             " " +
             OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
-        m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'g', 3));
+        m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'f', 2));
     }
     UpdateGraphics(); 
 }

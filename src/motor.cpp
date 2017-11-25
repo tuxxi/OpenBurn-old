@@ -186,6 +186,17 @@ double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
     }
     return massFlow;
 }
+double OpenBurnMotor::GetTotalMassFlow()
+{
+    double massFlow = 0;
+    for (auto* grain : m_Grains)
+    {
+        massFlow += grain->GetBurningSurfaceArea() * 
+            grain->GetPropellantType().GetDensity() * 
+            grain->GetBurnRate();
+    }
+    return massFlow;
+}
 
 bool OpenBurnMotor::HasNozzle() const
 {

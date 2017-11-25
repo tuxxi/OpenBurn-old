@@ -103,6 +103,13 @@ double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
 {
     return CalcMachNumber(motor, motor->GetMotorLength(), coreMassFlux);
 }
+double MotorSim::CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings)
+{
+    //Isp = F / mdot * g
+    double massFlow = motor->GetTotalMassFlow();
+    double thrust = CalcThrust(motor, settings, CalcChamberPressure(motor));
+    return thrust / massFlow;
+}
 
 //Calculates the exit mach number from the area ratio.
 //https://www.grc.nasa.gov/www/k-12/airplane/rktthsum.html

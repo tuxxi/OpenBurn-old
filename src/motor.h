@@ -30,6 +30,7 @@ public:
     double CalcStaticKn(KN_STATIC_CALC_TYPE type); //static kn calc based on regression derivitiave
     double CalcKn(); //instantaneous Kn calc for the current motor configuration
 
+    double GetTotalMassFlow();
     double GetUpstreamMassFlow(double xVal);
     double GetBurningSurfaceArea();
     //if (copy), clones the grain objects and sets the grains as these new objects

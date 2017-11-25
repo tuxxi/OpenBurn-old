@@ -10,16 +10,16 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 - Grain regression and chamber pressure are calculated for a steady-state chamber based on Saint Robert's law `r = aP^n`. 
 - OpenBurn will additionally calculate thrust and total impulse for the motor using the isentropic flow models, accounting for two-phase flow, skin friction, and divergent shape losses in the nozzle expansion cone.
 - Support for many different units
+- Animated cross section view of the motor burn
 
 ### OpenBurn Design
 ![OpenBurn main screen](https://i.imgur.com/afWFBhU.png)
 
 ### OpenBurn Simulation
-![OpenBurn results screen](https://i.imgur.com/poPY1MT.png)
+![OpenBurn results screen](https://i.imgur.com/7noiiTj.png)
 
 ## Planned/In-Progress Features (\* - in progress)
 
-- \*Animated cross section view of the motor burn
 - \*Mass flux at any point in the chamber
 - Every major 2D port (core) geometry
 - A 2D geometric-based regression model allowing for any arbitrary 2D grain shape. 

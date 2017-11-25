@@ -35,6 +35,8 @@ private:
     void SetGraphNames();
     void SetupPlotter();
     void UpdatePlotter();
+    void UpdatePlotterLine();
+    void UpdateCurrentChamber(int currentSlice);
 
     //gfx
     MotorGraphicsItem* m_gfxMotor;
@@ -43,7 +45,10 @@ private:
     QSlider* m_sldBurnTimeScrubBar;
 
     QLabel* m_lblMaxpressure, *m_lblBurnTime, *m_lblTotalImpulse, *m_lblMotorDesignation, *m_lblCoreMassFlux, *m_lblIsp;
+    QLabel* m_lblCurrentPressure, *m_lblCurrentCoreMassFlux, *m_lblCurrentThrust, *m_lblCurrentIsp;
+
     QCustomPlot* m_Plotter;
+    QCPItemLine* m_lineGraphTime;
     QPushButton* m_btnRunSim, *m_btnSimSettings, *m_btnPlayAnimation;
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;

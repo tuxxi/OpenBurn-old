@@ -50,6 +50,7 @@ public:
     double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
     double CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
     double CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
+    double CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings);
 
     double GetTotalBurnTime() const;
     double GetAvgThrust() const;
