@@ -22,14 +22,15 @@ public:
 signals:
     void NozzleChanged(OpenBurnNozzle*);
 private slots:
-    virtual void accept() override;
-
-    bool OnApplyButtonClicked();
+    void OnApplyButtonClicked();
+    void OnOkButtonClicked();
     void OnCloseButtonClicked();
     void OnDesignUpdated();
 
 private:
     void SetupUI();
+    void Accept();
+
     QGroupBox* m_gbFrame;
 
     QPushButton *m_btnApply, *m_btnOK, *m_btnClose;

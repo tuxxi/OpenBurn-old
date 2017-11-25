@@ -49,7 +49,7 @@ public:
     static double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
     static double CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
     static double CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
-    static double CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure);
+    static double CalcIsp(OpenBurnMotor* motor, double thrust);
 
     void RunSim(MotorSimSettings* settings);
 

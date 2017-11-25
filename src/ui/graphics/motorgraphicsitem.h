@@ -5,6 +5,7 @@
 #include <QGraphicsSceneEvent>
 #include <QtCore>
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
 
 #include <vector>
 #include "src/ui/graphics/graingraphicsitem.h"
@@ -16,8 +17,9 @@
 //this class represents the 2D cross sectional view of the whole motor
 class MotorGraphicsItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
-    MotorGraphicsItem(int scale_factor, QGraphicsItem *parent = nullptr);
+    MotorGraphicsItem(int scale_factor, bool allowSlices = false, QGraphicsItem *parent = nullptr);
     ~MotorGraphicsItem() = default;
 
     QRectF boundingRect() const override;
@@ -30,12 +32,19 @@ public:
     void RemoveAllGrains();
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_ScaleFactor; }
+    double GetCurrentXPosSlice();
+signals:
+    void MotorXPosSliceUpdated(double slice);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
     void CalculateMotorHeight();
     int m_ScaleFactor;
     std::vector<GrainGraphicsItem*> m_gfxGrains;
     NozzleGraphicsItem* m_gfxNozzle;
-    double m_MotorLen, m_MotorHeight; //in pixnels    
+    double m_MotorLen, m_MotorHeight; //in pixnels
+    double m_currentSliceLocation;
+    bool m_bAllowSlice;
 };
 

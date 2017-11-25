@@ -13,7 +13,7 @@ NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettin
     setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
     connect(m_btnOK, &QPushButton::clicked,
-            this, &NozzleDialog::accept);
+            this, &NozzleDialog::OnOkButtonClicked);
     connect(m_btnClose, &QPushButton::clicked,
             this, &NozzleDialog::OnCloseButtonClicked);
     connect(m_btnApply, &QPushButton::clicked,
@@ -68,7 +68,20 @@ void NozzleDialog::OnDesignUpdated()
         }
     }
 }
-bool NozzleDialog::OnApplyButtonClicked()
+void NozzleDialog::OnApplyButtonClicked()
+{
+    Accept();
+}
+void NozzleDialog::OnCloseButtonClicked()
+{
+    close();
+}
+void NozzleDialog::OnOkButtonClicked()
+{
+    Accept();
+    close();
+}
+void NozzleDialog::Accept()
 {
     //OPENBURN_TODO: make this a small warning below the buttons or something rather than a msg box
     if (qFuzzyIsNull(m_NozzleDesign->GetThroatDiameter())) 
@@ -76,27 +89,15 @@ bool NozzleDialog::OnApplyButtonClicked()
         QMessageBox::warning(this, tr("OpenBurn: Warning!"),
         tr("Nozzle Throat Diameter cannot be 0!\n"),
         QMessageBox::Ok, QMessageBox::Ok);
-        return false;
+        return;
     }
     if (qFuzzyIsNull(m_NozzleDesign->GetExitDiameter())) 
     {
         QMessageBox::warning(this, tr("OpenBurn: Warning!"),
         tr("Nozzle Exit Diameter cannot be 0!\n"),
         QMessageBox::Ok, QMessageBox::Ok);
-        return false;
+        return;
     }
     OnDesignUpdated();    
     emit NozzleChanged(m_Nozzle);
-    return true;    
-}
-void NozzleDialog::accept()
-{
-    if (OnApplyButtonClicked())
-    {
-        OnCloseButtonClicked();        
-    }
-}
-void NozzleDialog::OnCloseButtonClicked()
-{
-    close();
 }

@@ -46,13 +46,10 @@ void MotorSim::RunSim(MotorSimSettings* settings)
             //after we've run the sim for one time step, use the previous result as initial condition
             newDataPointMotor->SetGrains(m_SimResultData[iterations-1]->motor->GetGrains(), true);
         }
-        m_TotalBurnTime += settings->timeStep;
-        newDataPoint->time = m_TotalBurnTime;
-        newDataPoint->motor = newDataPointMotor;        
+        newDataPoint->motor = newDataPointMotor;
         newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
-        newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
-        newDataPoint->isp = CalcIsp(newDataPoint->motor, settings, newDataPoint->pressure);
-        m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
+        newDataPoint->time = m_TotalBurnTime;
+
         for (auto* i : newDataPointMotor->GetGrains())
         {
             newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
@@ -64,7 +61,11 @@ void MotorSim::RunSim(MotorSimSettings* settings)
                 numBurnedOut++;
             }
         }
+        newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
         newDataPoint->massflux = CalcCoreMassFlux(newDataPoint->motor);
+        newDataPoint->isp = CalcIsp(newDataPoint->motor, newDataPoint->thrust);
+        m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
+        m_TotalBurnTime += settings->timeStep;
 
         m_SimResultData.push_back(newDataPoint);
         if (m_TotalBurnTime > 1000.0) //failure state - 1000 second burn time
@@ -105,12 +106,10 @@ double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
 {
     return CalcMachNumber(motor, motor->GetMotorLength(), coreMassFlux);
 }
-double MotorSim::CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure)
+double MotorSim::CalcIsp(OpenBurnMotor* motor, double thrust)
 {
     //Isp = F / mdot * g
-    double massFlow = motor->GetTotalMassFlow();
-    double thrust = CalcThrust(motor, settings, chamberPressure);
-    return thrust / massFlow;
+    return thrust /  motor->GetTotalMassFlow();
 }
 
 //Calculates the exit mach number from the area ratio.

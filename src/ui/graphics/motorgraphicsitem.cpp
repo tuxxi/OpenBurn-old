@@ -1,14 +1,16 @@
 #include "src/ui/graphics/motorgraphicsitem.h"
 
 
-MotorGraphicsItem::MotorGraphicsItem(int scale_factor, QGraphicsItem *parent)
+MotorGraphicsItem::MotorGraphicsItem(int scale_factor, bool allowSlice, QGraphicsItem *parent)
     : QGraphicsObject(parent),
-      m_ScaleFactor(scale_factor),
-      m_gfxNozzle(nullptr),
-      m_MotorLen(0.0f),
-      m_MotorHeight(0.0f)
+    m_ScaleFactor(scale_factor),
+    m_gfxNozzle(nullptr),
+    m_MotorLen(0),
+    m_MotorHeight(0),
+    m_currentSliceLocation(0),
+    m_bAllowSlice(allowSlice)
 {
-    
+
 }
 QRectF MotorGraphicsItem::boundingRect() const
 {
@@ -18,6 +20,21 @@ QRectF MotorGraphicsItem::boundingRect() const
         nozzleLen = m_gfxNozzle->boundingRect().width();
     }
     return QRectF(0, 0, m_MotorLen + nozzleLen, m_MotorHeight);
+}
+void MotorGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    double newX = event->pos().x();
+    if (newX >= m_MotorLen) { //we clicked off the nozzle end
+        m_currentSliceLocation = m_MotorLen;
+    }
+    else if (newX <= pos().x()) { //off the fwd end
+        m_currentSliceLocation = 0;
+    }
+    else { //somewhere in the motor
+        m_currentSliceLocation = newX;
+    }
+    emit MotorXPosSliceUpdated(GetCurrentXPosSlice());
+    update(boundingRect());
 }
 void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -32,6 +49,12 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->drawLine(0, 0, 0, m_MotorHeight); //forward end of motor
         painter->drawLine(0, 0, len, 0); //bottom line
         painter->drawLine(0, m_MotorHeight, len, m_MotorHeight); //top line    
+    }
+    //draw current slice indicator
+    if (m_currentSliceLocation > 0 && m_bAllowSlice)
+    {
+        painter->setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        painter->drawLine(m_currentSliceLocation, -50, m_currentSliceLocation, m_MotorHeight + 50);
     }
 }
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
@@ -110,4 +133,8 @@ void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
         m_gfxGrains[i]->setPos(m_gfxGrains[i]->pos().x() + pixelDiff, m_gfxGrains[i]->pos().y());
         m_gfxGrains[i]->UpdateGrain(grains[i]);
     }
+}
+double MotorGraphicsItem::GetCurrentXPosSlice()
+{
+    return m_currentSliceLocation / m_ScaleFactor;
 }

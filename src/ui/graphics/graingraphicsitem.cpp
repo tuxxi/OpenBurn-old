@@ -7,6 +7,7 @@ GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, boo
       m_ScaleFactor(scale_factor),
       m_isCrossSectionView(crossSection)
 {
+    setFlag(QGraphicsItem::ItemStacksBehindParent);
     setAcceptDrops(true);
 }
 void GrainGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

@@ -169,8 +169,7 @@ double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
     double currentX = 0;
     for (auto* grain : m_Grains)
     {
-        double grainLen = grain->GetLength();
-        currentX += grainLen;
+        currentX += grain->GetLength();
         if (currentX >= GetMotorLength() - xVal)
         {
             double burningSurface = 0;

@@ -10,7 +10,7 @@ NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle, int scale_factor,
       m_isCrossSectionView(crossSection),
       m_scaleFactor(scale_factor)
 {
-
+    setFlag(QGraphicsItem::ItemStacksBehindParent);
 }
 void NozzleGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
