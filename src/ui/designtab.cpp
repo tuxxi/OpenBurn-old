@@ -7,10 +7,6 @@
 
 #include "src/ui/designtab.h"
 
-#ifdef Q_OS_WIN
-#include <Windows.h>
-#endif
-
 DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, OpenBurnSettings* settings, QWidget* parent)
     : QWidget(parent),
       m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
@@ -363,7 +359,7 @@ void DesignTab::OnGrainTableCellClicked(int row, int column)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    //m_seed_grain = m_sim->m_Grains[row];
+    SetSeed(m_Motor->GetGrains()[row]);
     m_btnDeleteGrain->setEnabled(true);
     m_btnEditGrain->setEnabled(true);
     m_btntMoveGrainUp->setEnabled(true);

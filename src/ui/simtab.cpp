@@ -9,11 +9,11 @@ static const QString massFluxUnits = QObject::tr("lbs/sec/inch²"); //todo: make
 
 SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent)
     : QWidget(parent),
-      m_Motor(motor),
-      m_Simulator(sim),
-      m_GlobalSettings(settings),
-      m_SimSettingsDialog(nullptr),
-      m_gfxMotor(nullptr)
+    m_gfxMotor(nullptr),
+    m_Motor(motor),
+    m_Simulator(sim),
+    m_GlobalSettings(settings),
+    m_SimSettingsDialog(nullptr)
 {
     SetupUI();
     m_SimSettings = new MotorSimSettings;
@@ -155,8 +155,6 @@ void SimulationTab::OnDesignReady()
 }
 void SimulationTab::OnDesignUpdated()
 {
-    delete m_gfxMotor;
-    m_gfxMotor = nullptr;
     UpdateGraphics();
 }
 void SimulationTab::OnSimSettingsButtonClicked()
@@ -271,7 +269,7 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     {
          motor = m_Simulator->GetResults()[m_sldBurnTimeScrubBar->value()]->motor;
     }
-    if (!m_gfxMotor)
+    if (m_gfxMotor == nullptr)
     {
         m_gfxMotor = new MotorGraphicsItem(100);
         m_MotorDisplayScene->addItem(m_gfxMotor);

@@ -53,13 +53,13 @@ void GrainGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         }
         else
         {
+            painter->setPen(pen);
             painter->drawEllipse(0, 0, wid, wid);
             if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(m_Grain))
             {
                 double corewid = bates->GetCoreDiameter() * m_ScaleFactor;
                 //"cut out" core using white brush
                 painter->setBrush(Qt::white);
-                painter->setPen(pen);    
                 painter->drawEllipse((wid - corewid) /2.0f, (wid - corewid) / 2.0f, corewid, corewid);
             }
             else

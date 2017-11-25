@@ -103,7 +103,7 @@ void MotorGraphicsItem::CalculateMotorHeight()
 }
 void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
 {
-    for (int i = 0; i < m_gfxGrains.size(); i++)
+    for (size_t i = 0; i < m_gfxGrains.size(); i++)
     {
         //we want the grain to stay in the middle of it's current location
         double pixelDiff = .5 * m_ScaleFactor * (m_gfxGrains[i]->GetGrain()->GetLength() - grains[i]->GetLength());

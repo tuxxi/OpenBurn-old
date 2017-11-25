@@ -99,7 +99,7 @@ void GrainDialog::OnDesignUpdated()
         }
         else
         {
-            for (auto* i : m_GrainsToEdit)
+            for (auto& i : m_GrainsToEdit)
             {
                 CylindricalGrain* grain = static_cast<CylindricalGrain*>(i);
                 grain->SetDiameter(design->GetDiameter());
@@ -168,7 +168,7 @@ void GrainDialog::OnApplyButtonClicked()
     }
     else
     {
-        for (auto* i : m_GrainsToEdit)
+        for (auto i : m_GrainsToEdit)
         {
             emit GrainAdded(i);            
         }    

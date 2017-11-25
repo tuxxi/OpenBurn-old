@@ -141,6 +141,7 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 }
 void MainWindow::OnMenuNew()
 {
+    int currentIndex = m_TabWidget->currentIndex();
     if (m_DesignMotor)
     {
         delete m_DesignMotor;
@@ -153,13 +154,17 @@ void MainWindow::OnMenuNew()
     {
         delete m_SimTab;
     }
+    if (m_Simulator)
+    {
+        delete m_Simulator;
+    }
     m_DesignMotor = new OpenBurnMotor;
-    m_Simulator->SetDesignMotor(m_DesignMotor);
+    m_Simulator = new MotorSim(m_DesignMotor);
     m_DesignTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
     m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator, m_GlobalSettings);
     m_TabWidget->insertTab(0, m_DesignTab, tr("Design"));
     m_TabWidget->insertTab(1, m_SimTab, tr("Simulation"));
-    m_TabWidget->setCurrentIndex(0);
+    m_TabWidget->setCurrentIndex(currentIndex);
 }
 void MainWindow::OnMenuOpen()
 {

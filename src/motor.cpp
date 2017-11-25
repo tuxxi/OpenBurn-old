@@ -15,8 +15,9 @@ OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
 }
 OpenBurnMotor::~OpenBurnMotor()
 {
-    for (auto i : m_Grains)
+    for (auto& i : m_Grains)
     {
+        i = nullptr;
         delete i;
     }
     m_Grains.clear();
