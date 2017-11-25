@@ -2,6 +2,8 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSlider>
+#include <QPropertyAnimation>
+#include <QToolButton>
 
 #include "src/motorsim.h"
 #include "src/settings.h"
@@ -24,7 +26,8 @@ private slots:
     void OnRunSimButtonClicked();
     void OnSimSettingsButtonClicked();
     void OnPlayAnimationButtonClicked();
-
+    void OnToBeginningButtonClicked();
+    void OnAnimationFinished();
     void OnDesignReady();
     void OnDesignUpdated();
 
@@ -42,14 +45,17 @@ private:
     MotorGraphicsItem* m_gfxMotor;
     QGraphicsView* m_MotorDisplayView;
     QGraphicsScene* m_MotorDisplayScene;
-    QSlider* m_sldBurnTimeScrubBar;
 
+    QSlider* m_sldBurnTimeScrubBar;
+    QPropertyAnimation *m_animation;
     QLabel* m_lblMaxpressure, *m_lblBurnTime, *m_lblTotalImpulse, *m_lblMotorDesignation, *m_lblCoreMassFlux, *m_lblIsp;
     QLabel* m_lblCurrentPressure, *m_lblCurrentCoreMassFlux, *m_lblCurrentThrust, *m_lblCurrentIsp;
+    QPushButton* m_btnRunSim, *m_btnSimSettings, *m_btnPlayAnimation;
+    QToolButton* m_btntToBeginning;
 
     QCustomPlot* m_Plotter;
     QCPItemLine* m_lineGraphTime;
-    QPushButton* m_btnRunSim, *m_btnSimSettings, *m_btnPlayAnimation;
+
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
     MotorSimSettings* m_SimSettings;

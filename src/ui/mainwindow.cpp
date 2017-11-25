@@ -120,26 +120,7 @@ void MainWindow::SetupUI()
     m_TabWidget->addTab(m_PropellantTab, tr("Propellants"));
     setCentralWidget(m_TabWidget);
 }
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    QMessageBox::StandardButton resBtn =
-            QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
-            QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes)
-    {
-        event->ignore();
-    }
-    else
-    {
-        event->accept();
-    }
-}
-void MainWindow::resizeEvent(QResizeEvent * event)
-{
-    QApplication::sendEvent(m_DesignTab, event);
-    QApplication::sendEvent(m_SimTab, event);
-}
-void MainWindow::OnMenuNew()
+void MainWindow::ResetCurrentDesign()
 {
     int currentIndex = m_TabWidget->currentIndex();
     if (m_DesignMotor)
@@ -166,8 +147,34 @@ void MainWindow::OnMenuNew()
     m_TabWidget->insertTab(1, m_SimTab, tr("Simulation"));
     m_TabWidget->setCurrentIndex(currentIndex);
 }
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn =
+            QMessageBox::question( this, "OpenBurn", tr("Are you sure?\n"),
+            QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes)
+    {
+        event->ignore();
+    }
+    else
+    {
+        event->accept();
+    }
+}
+void MainWindow::resizeEvent(QResizeEvent * event)
+{
+    QApplication::sendEvent(m_DesignTab, event);
+    QApplication::sendEvent(m_SimTab, event);
+}
+void MainWindow::OnMenuNew()
+{
+    ResetCurrentDesign();
+}
 void MainWindow::OnMenuOpen()
 {
+    //todo: if (changes)
+    ResetCurrentDesign();
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
             tr("OpenBurn File (*.obm)"));
 

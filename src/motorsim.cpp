@@ -51,6 +51,7 @@ void MotorSim::RunSim(MotorSimSettings* settings)
         newDataPoint->motor = newDataPointMotor;        
         newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
         newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
+        newDataPoint->isp = CalcIsp(newDataPoint->motor, settings, newDataPoint->pressure);
         m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
         for (auto* i : newDataPointMotor->GetGrains())
         {
@@ -66,9 +67,9 @@ void MotorSim::RunSim(MotorSimSettings* settings)
         newDataPoint->massflux = CalcCoreMassFlux(newDataPoint->motor);
 
         m_SimResultData.push_back(newDataPoint);
-        if (iterations > int(1e5))
+        if (m_TotalBurnTime > 1000.0) //failure state - 1000 second burn time
         {
-            emit SimulationFinished(false);            
+            emit SimulationFinished(false);
             break;
         }
         iterations++;
@@ -77,6 +78,7 @@ void MotorSim::RunSim(MotorSimSettings* settings)
 }
 
 //mdot A.K.A Mass flux at given motor X value
+//x = 0 at motor head end 
 double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double xVal)
 {
     OpenBurnGrain* grain = motor->GetGrainAtX(xVal);
@@ -84,7 +86,7 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double xVal)
     {
         return motor->GetUpstreamMassFlow(xVal) / grain->GetPortArea();
     }
-    return 0;
+    return 0; //grain now found!
 }
 double MotorSim::CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFlux)
 {
@@ -103,11 +105,11 @@ double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
 {
     return CalcMachNumber(motor, motor->GetMotorLength(), coreMassFlux);
 }
-double MotorSim::CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings)
+double MotorSim::CalcIsp(OpenBurnMotor* motor, MotorSimSettings* settings, double chamberPressure)
 {
     //Isp = F / mdot * g
     double massFlow = motor->GetTotalMassFlow();
-    double thrust = CalcThrust(motor, settings, CalcChamberPressure(motor));
+    double thrust = CalcThrust(motor, settings, chamberPressure);
     return thrust / massFlow;
 }
 
@@ -272,7 +274,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-std::vector<MotorSimDataPoint*>& MotorSim::GetResults()
+const std::vector<MotorSimDataPoint*>& MotorSim::GetResults() const
 {
     return m_SimResultData;
 }

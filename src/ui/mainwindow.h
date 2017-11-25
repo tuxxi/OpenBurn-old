@@ -49,7 +49,7 @@ private slots:
 private:
     void SetupUI();
     void SaveFile(QString filename);
-
+    void ResetCurrentDesign();
     bool LoadSettings(const QString& filename);
     bool SaveSettings();
 

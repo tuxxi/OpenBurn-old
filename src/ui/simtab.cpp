@@ -1,6 +1,5 @@
 #include <QGroupBox>
 #include <QGridLayout>
-#include <QPropertyAnimation>
 #include <QPen>
 
 #include "simtab.h"
@@ -34,6 +33,10 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
             this, &SimulationTab::OnMotorSliceChanged);
     connect(m_btnPlayAnimation, &QPushButton::clicked,
             this, &SimulationTab::OnPlayAnimationButtonClicked);
+    connect(m_btntToBeginning, &QToolButton::clicked,
+            this, &SimulationTab::OnToBeginningButtonClicked);
+    connect(m_animation, &QPropertyAnimation::finished,
+            this, &SimulationTab::OnAnimationFinished);
 
 }
 SimulationTab::~SimulationTab()
@@ -78,7 +81,14 @@ void SimulationTab::SetupUI()
     m_MotorDisplayView->setScene(m_MotorDisplayScene);
     m_MotorDisplayView->show();
     m_sldBurnTimeScrubBar = new QSlider(Qt::Horizontal);
+    m_sldBurnTimeScrubBar->setValue(0);
+
     m_btnPlayAnimation = new QPushButton(tr("Burn!"));
+    m_btntToBeginning = new QToolButton();
+    m_btntToBeginning->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
+    QHBoxLayout* buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(m_btntToBeginning);
+    buttonsLayout->addWidget(m_btnPlayAnimation);
     UpdateGraphics();
 
     QGridLayout* chamberLayout = new QGridLayout;
@@ -98,7 +108,7 @@ void SimulationTab::SetupUI()
     gbGridLayout->addWidget(gb_Controls, 0, 1);
     gbGridLayout->addWidget(gb_Results, 1, 1);
     gbGridLayout->addWidget(m_sldBurnTimeScrubBar, 2, 0);
-    gbGridLayout->addWidget(m_btnPlayAnimation, 2, 1);
+    gbGridLayout->addLayout(buttonsLayout, 2, 1);
     gbGridLayout->addWidget(m_MotorDisplayView, 3, 0);
     gbGridLayout->addWidget(gb_CurrentNumbers, 3, 1);
 
@@ -243,7 +253,7 @@ void SimulationTab::UpdateCurrentChamber(int currentSlice)
     m_lblCurrentThrust->setText(QString::number(currentThrust, 'f', 1) + " " + forceUnits);
     m_lblCurrentPressure->setText(QString::number(currentPressure, 'f', 1) +  " " + pressureUnits);
     m_lblCurrentCoreMassFlux->setText(QString::number(currentMassFlux, 'f', 3) + " " + massFluxUnits);
-    m_lblCurrentIsp->setText(QString::number(m_Simulator->CalcIsp(data->motor, m_SimSettings), 'f', 2));
+    m_lblCurrentIsp->setText(QString::number(data->isp, 'f', 2) + " s");
 }
 void SimulationTab::UpdatePlotter()
 {
@@ -347,12 +357,20 @@ void SimulationTab::OnSimSettingsChanged()
 }
 void SimulationTab::OnPlayAnimationButtonClicked()
 {
-    QPropertyAnimation *animation = new QPropertyAnimation(m_sldBurnTimeScrubBar,"sliderPosition");
-    animation->setDuration(1000.0 * m_Simulator->GetTotalBurnTime());
-    animation->setStartValue(m_sldBurnTimeScrubBar->minimum());
-    animation->setEndValue(m_sldBurnTimeScrubBar->maximum());
-    animation->setEasingCurve(QEasingCurve::Linear);
-    animation->start();
+    if (!m_animation)
+    {
+        m_animation = new QPropertyAnimation(m_sldBurnTimeScrubBar,"sliderPosition");
+    }
+    m_animation->setDuration(1000.0 * m_Simulator->GetTotalBurnTime());
+    m_animation->setStartValue(m_sldBurnTimeScrubBar->minimum());
+    m_animation->setEndValue(m_sldBurnTimeScrubBar->maximum());
+    m_animation->setEasingCurve(QEasingCurve::Linear);
+    m_animation->start(); 
+}
+void SimulationTab::OnToBeginningButtonClicked()
+{
+    if (m_animation) m_animation->stop();
+    m_sldBurnTimeScrubBar->setValue(0);
 }
 void SimulationTab::OnMotorSliceChanged(int sliceIndex)
 {
@@ -361,6 +379,11 @@ void SimulationTab::OnMotorSliceChanged(int sliceIndex)
     UpdatePlotterLine();
     UpdateCurrentChamber(sliceIndex);
     UpdateGraphics(motor);
+}
+void SimulationTab::OnAnimationFinished()
+{
+    delete m_animation;
+    m_animation = nullptr;
 }
 void SimulationTab::resizeEvent(QResizeEvent* event)
 {
