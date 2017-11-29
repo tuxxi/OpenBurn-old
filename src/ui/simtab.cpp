@@ -350,10 +350,11 @@ void SimulationTab::UpdateCurrentXPos(double xpos)
         xpos);
     double xSlice = xpos - (m_Motor->GetMotorLength() - GetCurrentSliceMotor()->GetMotorLength());
     const double massFluxAtX = MotorSim::CalcMassFlux(GetCurrentSliceMotor(), xSlice);
+    const double machNumberAtX = MotorSim::CalcMachNumber(GetCurrentSliceMotor(), xSlice);
     m_lblXPos->setText(QString::number(x, 'f', 2) + " " + lengthUnits);
 
     m_lblXPosMassFlux->setText(QString::number(massFluxAtX, 'f', 3) + " " + massFluxUnits);
-
+    m_lblXPosMachNumber->setText(QString::number(machNumberAtX, 'f', 3));
 }
 void SimulationTab::OnDesignReady()
 {

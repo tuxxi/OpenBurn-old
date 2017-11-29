@@ -43,8 +43,8 @@ double OpenBurnPropellant::GetDensity() const{ return m_density; }
 //ADVANCED
 double OpenBurnPropellant::GetPropellantSpecificHeat() const { return m_PropellantSpecificHeat; }
 double OpenBurnPropellant::GetSpecificHeatRatio() const { return m_specificHeatRatio; }
-double OpenBurnPropellant::GetSpecificHeatConstantPressure() const{ return m_specificHeatConstantPressure; }
-double OpenBurnPropellant::GetSpecificHeatConstantVolume() const{ return m_specificHeatConstantVolume; }
+double OpenBurnPropellant::GetCp() const{ return m_specificHeatConstantPressure; }
+double OpenBurnPropellant::GetCv() const{ return m_specificHeatConstantVolume; }
 double OpenBurnPropellant::GetAdiabaticFlameTemp() const{ return m_adiabaticFlameTemp; }
 double OpenBurnPropellant::GetMolarMass() const{ return m_molarMass; }
 double OpenBurnPropellant::GetGasViscosity() const{ return m_gasViscosity; }

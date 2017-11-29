@@ -87,24 +87,60 @@ double MotorSim::CalcMassFlux(OpenBurnMotor* motor, double xVal)
     {
         return motor->GetUpstreamMassFlow(xVal) / grain->GetPortArea();
     }
-    return 0; //grain now found!
+    return 0; //grain not found!
 }
-double MotorSim::CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFlux)
+//x = 0 at fwd end
+double MotorSim::CalcMachNumber(OpenBurnMotor* motor, double xVal)
 {
-    //mdot = M * A * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
+    //mdot = M * P_0 * sqrt(k / R * T_0) * (1 + (k - 1) / 2 * M^2) ^ - (k + 1) / (2(k-1))
     //P_0 = gas pressure, T_0 = gas temperature, k = ratio specific heats (cp/cv), M = mach number, R = gas constant
     //see https://spaceflightsystems.grc.nasa.gov/education/rocket/mflchk.html
     //and http://propulsion-skrishnan.com/pdf/Erosive%20Burning%20of%20Solid%20Propellants.pdf
-    return 0;
+    const OpenBurnPropellant& prop = motor->GetAvgPropellant();
+    double gamma = prop.GetSpecificHeatRatio();
+    double gm1 = gamma - 1;
+    double gp1 = gamma + 1;
+
+    double R = prop.GetCp() - prop.GetCv();
+    double SqrtTt = qSqrt(CalcTotalTemperature(motor));
+    double Pt = CalcChamberPressure(motor);
+    double massFlux = CalcMassFlux(motor, xVal);
+    double massFluxGuess = massFlux / 2.0;
+    double deriv = 0, massFluxNew = 0, machNumber = 0, machGuess = 0;
+
+    while (qAbs(massFlux - massFluxGuess) > .0001)
+    {
+        //run through ideal compressable gas eq with our mach guess to find mass flux
+        double coef = machGuess * (Pt / SqrtTt) * qSqrt(gamma / R);
+        double base = 1.0 + gm1/2.0 * machGuess * machGuess;
+        massFluxNew = coef * qPow(base, -(gp1 / (2.0*gm1) ));
+
+        //find change
+        deriv = (massFluxNew - massFluxGuess) / (machGuess - machNumber);
+
+        //update guesses
+        massFluxGuess = massFluxNew;
+        machNumber = machGuess;
+        machGuess = machNumber + (massFlux - massFluxGuess) / deriv;
+    }
+    return machNumber;
+}
+double MotorSim::CalcTotalTemperature(OpenBurnMotor* motor)
+{
+    //Tt = Tc/ (1 + k-1 / 2)
+    //http://www.braeunig.us/space/propuls.htm
+    double Tc = motor->GetAvgPropellant().GetAdiabaticFlameTemp();
+    double gmma = motor->GetAvgPropellant().GetSpecificHeatRatio();
+    return Tc / (1.0 + ((gmma - 1.0) / 2.0));
 }
 //bottom of the last grain
 double MotorSim::CalcCoreMassFlux(OpenBurnMotor* motor)
 {
     return CalcMassFlux(motor, motor->GetMotorLength());
 }
-double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux)
+double MotorSim::CalcCoreMachNumber(OpenBurnMotor* motor)
 {
-    return CalcMachNumber(motor, motor->GetMotorLength(), coreMassFlux);
+    return CalcMachNumber(motor, motor->GetMotorLength());
 }
 double MotorSim::CalcIsp(OpenBurnMotor* motor, double thrust)
 {
@@ -121,30 +157,35 @@ double MotorSim::CalcExitMachNumber(OpenBurnMotor* motor)
     double machNumber = 0;
     if (motor->GetNozzle()->GetNozzleExit() <= motor->GetNozzle()->GetNozzleThroat()) //sonic nozzle
     {
-        return 1.f;
+        return 1.0;
     }
     else
     {
-        machNumber = 2.2f; //supersonic
+        machNumber = 2.2; //supersonic
     }
     double gamma = motor->GetAvgPropellant().GetSpecificHeatRatio();
     double areaRatio = motor->GetNozzle()->GetNozzleExpansionRatio();
-    double gp1 = gamma + 1.f; //gamma plus 1
-    double gm1 = gamma -1.f ; //gamma minus 1
+    double gp1 = gamma + 1.0;
+    double gm1 = gamma -1.0 ;
 
     double deriv = 0, areaRatioNew = 0, fac = 0;
-    double exponent = gp1 / (2.f * gm1) ;
+    double exponent = gp1 / (2. * gm1) ;
 
-    double areaRatioGuess = areaRatio / 2.f; //initial guess
-    double machGuess = machNumber + .05f;
-    while (qAbs(areaRatio - areaRatioGuess) > .0001f)
+    double areaRatioGuess = areaRatio / 2.0; //initial guess
+    double machGuess = machNumber + .05;
+    while (qAbs(areaRatio - areaRatioGuess) > .0001)
     {
-       fac = 1.f + 0.5f * gm1 * machGuess * machGuess;
-       areaRatioNew = 1.f / (machGuess * qPow(fac, -exponent) * qPow(gp1/2.f, exponent));
-       deriv = (areaRatioNew - areaRatioGuess)/(machGuess-machNumber);
-       areaRatioGuess = areaRatioNew;
-       machNumber = machGuess;
-       machGuess = machNumber + (areaRatio - areaRatioGuess)/deriv;
+        //find area ratio with our guess
+        fac = 1.0 + 0.5 * gm1 * machGuess * machGuess;
+        areaRatioNew = 1.0 / (machGuess * qPow(fac, -exponent) * qPow(gp1/2.0, exponent));
+
+        //find change (deriv)
+        deriv = (areaRatioNew - areaRatioGuess)/(machGuess-machNumber);
+
+        //update guesses
+        areaRatioGuess = areaRatioNew;
+        machNumber = machGuess;
+        machGuess = machNumber + (areaRatio - areaRatioGuess)/deriv;
     }
     return machNumber;
 }
@@ -152,8 +193,8 @@ double MotorSim::CalcExitMachNumber(OpenBurnMotor* motor)
 double MotorSim::CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach)
 {
     double gamma = motor->GetAvgPropellant().GetSpecificHeatRatio();
-    double gm1 = gamma - 1;
-    double pRatio = qPow( (1.f + .5f *gm1 * exitMach * exitMach), -(gamma / gm1)); //exit pressure over chamber pressure
+    double gm1 = gamma - 1.0;
+    double pRatio = qPow( (1.0 + .5 *gm1 * exitMach * exitMach), -(gamma / gm1)); //exit pressure over chamber pressure
     return chamberPressure * pRatio;
 }
 double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
@@ -164,7 +205,7 @@ double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
         OpenBurnUnits::MassUnits_T::slugs,
         motor->GetAvgPropellant().GetDensity()); //propellant density
     double Cstar = motor->GetAvgPropellant().GetCharVelocity();
-    double exponent = 1.0f / (1.0f - motor->GetAvgPropellant().GetBurnRateExp());
+    double exponent = 1.0 / (1.0 - motor->GetAvgPropellant().GetBurnRateExp());
     double p1 = motor->CalcKn() * motor->GetAvgPropellant().GetBurnRateCoef() * rho * Cstar;
     return qPow(p1, exponent);
 }
@@ -182,7 +223,7 @@ double MotorSim::CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, do
     OpenBurnNozzle* nozzle =  motor->GetNozzle();
     double idealCoef = CalcIdealThrustCoefficient(motor, settings, chamberPressure);
     double divergenceLoss = nozzle->GetNozzleDivergenceLossFactor();
-    double skinFrictionLoss = (1.f - settings->skinFrictionEfficency);
+    double skinFrictionLoss = (1.0 - settings->skinFrictionEfficency);
     double realCoef = (divergenceLoss * settings->twoPhaseFlowEfficency *
         (settings->skinFrictionEfficency * idealCoef + skinFrictionLoss));
     
@@ -195,10 +236,10 @@ double MotorSim::CalcIdealThrustCoefficient(OpenBurnMotor* motor, MotorSimSettin
     //See Rocket Propulsion Elements, Eq. 3-29
     //A lot of this equation deals with k, so we'll do our best to simplify those first
     double k = motor->GetAvgPropellant().GetSpecificHeatRatio();
-    double kSquareTerm = (2.f * k * k) / (k - 1.f);
-    double twoOverKTerm = 2.f / (k + 1.f);
-    double kOverItselfTerm = (k + 1.f) / (k - 1.f);
-    double kMinusOne = (k - 1.f) / k;
+    double kSquareTerm = (2.0 * k * k) / (k - 1.0);
+    double twoOverKTerm = 2.0 / (k + 1.0);
+    double kOverItselfTerm = (k + 1.0) / (k - 1.0);
+    double kMinusOne = (k - 1.0) / k;
 
     double exitMach = CalcExitMachNumber(motor);
     double exitPressure = CalcExitPressure(motor, chamberPressure, exitMach);
@@ -240,7 +281,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
         OpenBurnUnits::MassUnits_T::pounds_mass, 
         OpenBurnUnits::MassUnits_T::slugs,
         prop.GetDensity()); //propellant density
-    double C_p = prop.GetSpecificHeatConstantPressure(); //specific heat of combustion products (gas at constant pressure)
+    double C_p = prop.GetCp(); //specific heat of combustion products (gas at constant pressure)
     double T_0 = prop.GetAdiabaticFlameTemp();// adiabatic flame temperature
     double mu = prop.GetGasViscosity(); //viscoisty of combustion products
     double Pr = prop.GetPrandtlNumber(); //prandtl number

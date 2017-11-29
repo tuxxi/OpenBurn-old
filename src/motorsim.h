@@ -33,17 +33,18 @@ public:
 
     //per unit area:
     static double CalcMassFlux(OpenBurnMotor* motor, double xVal);
-    static double CalcMachNumber(OpenBurnMotor* motor, double xVal, double massFlux);
+    static double CalcMachNumber(OpenBurnMotor* motor, double xVal);
 
     //bottom of the last grain
     static double CalcCoreMassFlux(OpenBurnMotor* motor);
-    static double CalcCoreMachNumber(OpenBurnMotor* motor, double coreMassFlux);
+    static double CalcCoreMachNumber(OpenBurnMotor* motor);
     //per grain:
     //calculates linear burn rate for a given grain
     static double CalcSteadyStateBurnRate(OpenBurnMotor* motor, OpenBurnGrain* grain); //based on saint robert's law. No erosive burning
     static double CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* grain, MotorSimSettings* settings, double machNumber);
 
     //whole chamber:
+    static double CalcTotalTemperature(OpenBurnMotor* motor);
     static double CalcChamberPressure(OpenBurnMotor* motor);
     static double CalcExitMachNumber(OpenBurnMotor* motor);
     static double CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, double exitMach);
