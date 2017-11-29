@@ -167,21 +167,23 @@ double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
 {
     double massFlow = 0;
     double currentX = 0;
-    for (auto* grain : m_Grains)
+    for (auto grain : m_Grains)
     {
-        currentX += grain->GetLength();
-        if (currentX >= GetMotorLength() - xVal)
+        double grainLen = grain->GetLength();
+        if (currentX <= xVal) //we are still fwd of the sliced grain
         {
             double burningSurface = 0;
-            if (currentX < xVal) {
+            if (std::ceil(currentX) < std::ceil(xVal - grainLen))
+            {
                 burningSurface = grain->GetBurningSurfaceArea();
             }
-            else {
-                burningSurface = grain->GetBurningSurfaceArea(currentX - xVal);
+            else
+            {
+                burningSurface = grain->GetBurningSurfaceArea((currentX + grainLen) - xVal);
             }
-            //mass flow = burning surface area * propellant density * burn rate
             massFlow += burningSurface * grain->GetPropellantType().GetDensity() * grain->GetBurnRate();
         }
+        currentX += grainLen;
     }
     return massFlow;
 }

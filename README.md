@@ -11,6 +11,7 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 - OpenBurn will additionally calculate thrust and total impulse for the motor using the isentropic flow models, accounting for two-phase flow, skin friction, and divergent shape losses in the nozzle expansion cone.
 - Support for many different units
 - Animated cross section view of the motor burn
+- Mass flux at any point in the chamber
 
 ### OpenBurn Design
 ![OpenBurn main screen](https://i.imgur.com/afWFBhU.png)
@@ -20,7 +21,6 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 
 ## Planned/In-Progress Features (\* - in progress)
 
-- \*Mass flux at any point in the chamber
 - Every major 2D port (core) geometry
 - A 2D geometric-based regression model allowing for any arbitrary 2D grain shape. 
 - An internal chemical equilibrium solver for shifting or frozen equlibrium, so the user can easily

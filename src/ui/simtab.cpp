@@ -365,6 +365,8 @@ void SimulationTab::OnDesignReady()
 }
 void SimulationTab::OnDesignUpdated()
 {
+    delete m_gfxMotor;
+    m_gfxMotor = nullptr;
     UpdateGraphics();
 }
 void SimulationTab::OnSimSettingsButtonClicked()
