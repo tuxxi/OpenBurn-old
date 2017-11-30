@@ -74,12 +74,12 @@ void GlobalSettingsDialog::ApplySettings()
 {
     if (m_GlobalSettings)
     {
-        m_GlobalSettings->m_LengthUnits = m_unitsLength->GetCurrentUnits();
-        m_GlobalSettings->m_AngleUnits = m_unitsAngle->GetCurrentUnits();
-        m_GlobalSettings->m_PressureUnits = m_unitsPressure->GetCurrentUnits();
-        m_GlobalSettings->m_TemperatureUnits = m_unitsTemperature->GetCurrentUnits();
-        m_GlobalSettings->m_ForceUnits = m_unitsForce->GetCurrentUnits();
-        m_GlobalSettings->m_MassUnits = m_unitsMass->GetCurrentUnits();
+        m_GlobalSettings->m_LengthUnits = m_unitsLength->GetCurrentUnits().unit;
+        m_GlobalSettings->m_AngleUnits = m_unitsAngle->GetCurrentUnits().unit;
+        m_GlobalSettings->m_PressureUnits = m_unitsPressure->GetCurrentUnits().unit;
+        m_GlobalSettings->m_TemperatureUnits = m_unitsTemperature->GetCurrentUnits().unit;
+        m_GlobalSettings->m_ForceUnits = m_unitsForce->GetCurrentUnits().unit;
+        m_GlobalSettings->m_MassUnits = m_unitsMass->GetCurrentUnits().unit;
         m_GlobalSettings->m_redrawOnChanges = m_chbxReSimOnChanges->isChecked();
         emit m_GlobalSettings->SettingsChanged();
     }

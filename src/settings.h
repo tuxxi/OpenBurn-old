@@ -15,12 +15,12 @@ public:
     void ReadJSON(const QJsonObject& object);
     void WriteJSON(QJsonObject &object);
     
-    OpenBurnUnits::LengthUnits_T m_LengthUnits;
-    OpenBurnUnits::AngleUnits_T m_AngleUnits;
-    OpenBurnUnits::TemperatureUnits_T m_TemperatureUnits;
-    OpenBurnUnits::PressureUnits_T m_PressureUnits;
-    OpenBurnUnits::ForceUnits_T m_ForceUnits;
-    OpenBurnUnits::MassUnits_T m_MassUnits;
+    OpenBurnUnits::LengthUnits m_LengthUnits;
+    OpenBurnUnits::AngleUnits m_AngleUnits;
+    OpenBurnUnits::TemperatureUnits m_TemperatureUnits;
+    OpenBurnUnits::PressureUnits m_PressureUnits;
+    OpenBurnUnits::ForceUnits m_ForceUnits;
+    OpenBurnUnits::MassUnits m_MassUnits;
 
     bool m_redrawOnChanges;
 signals:

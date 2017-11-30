@@ -200,7 +200,7 @@ double MotorSim::CalcExitPressure(OpenBurnMotor* motor, double chamberPressure, 
 double MotorSim::CalcChamberPressure(OpenBurnMotor* motor)
 {
     //p = (Kn * a * rho * C* )^(1/(1-n))
-    double rho = OpenBurnUnits::ConvertMass(
+    double rho = OpenBurnUnits::MassUnits::Convert(
         OpenBurnUnits::MassUnits_T::pounds_mass,
         OpenBurnUnits::MassUnits_T::slugs,
         motor->GetAvgPropellant().GetDensity()); //propellant density
@@ -277,8 +277,8 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double G = CalcMassFlux(motor, grain->GetPortArea()); // mass flux
     double D = grain->GetHydraulicDiameter(); // = hydraulic diameter, 4* area / perimeter
     double C_s = prop.GetPropellantSpecificHeat(); // specific heat of propellant (NOT combustion gas)
-    double rho = OpenBurnUnits::ConvertMass(
-        OpenBurnUnits::MassUnits_T::pounds_mass, 
+    double rho = OpenBurnUnits::MassUnits::Convert(
+        OpenBurnUnits::MassUnits_T::pounds_mass,
         OpenBurnUnits::MassUnits_T::slugs,
         prop.GetDensity()); //propellant density
     double C_p = prop.GetCp(); //specific heat of combustion products (gas at constant pressure)

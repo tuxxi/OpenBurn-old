@@ -55,27 +55,23 @@ void OpenBurnDesignNozzle::SeedValues()
 {
     if (m_nozzleSeed)
     {
-        m_sbThroatDia->setValue(OpenBurnUnits::ConvertLength(
+        m_sbThroatDia->setValue(m_unitsThroatDia->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches, 
-            m_unitsThroatDia->GetCurrentUnits(),
             m_nozzleSeed->GetNozzleThroat()));
-        m_sbExitDia->setValue(OpenBurnUnits::ConvertLength(
+        m_sbExitDia->setValue(m_unitsExitDia->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches, 
-            m_unitsExitDia->GetCurrentUnits(),
             m_nozzleSeed->GetNozzleExit()));
     }
 }
 double OpenBurnDesignNozzle::GetThroatDiameter()
 {
-    return OpenBurnUnits::ConvertLength(
-        m_unitsThroatDia->GetCurrentUnits(),
+    return m_unitsThroatDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches,
         m_sbThroatDia->value());
 }
 double OpenBurnDesignNozzle::GetExitDiameter()
 {
-    return OpenBurnUnits::ConvertLength(
-        m_unitsExitDia->GetCurrentUnits(),
+    return m_unitsExitDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches,
         m_sbExitDia->value());
 }
@@ -116,15 +112,14 @@ void ConicalNozzleDesign::SeedValues()
 {
     if ( ConicalNozzle* nozz = (dynamic_cast<ConicalNozzle*>(m_nozzleSeed)))
     {
-        m_sbHalfAngle->setValue(OpenBurnUnits::ConvertAngle(
+        m_sbHalfAngle->setValue(m_unitsHalfAngle->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::AngleUnits_T::degrees, 
-            m_unitsHalfAngle->GetCurrentUnits(),
             nozz->GetHalfAngle()));
     }
 }
 double ConicalNozzleDesign::GetDivergentHalfAngle()
 {
-    return OpenBurnUnits::ConvertAngle(m_unitsHalfAngle->GetCurrentUnits(),
+    return m_unitsHalfAngle->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::AngleUnits_T::degrees,
         m_sbHalfAngle->value());
 }

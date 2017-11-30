@@ -92,13 +92,11 @@ void OpenBurnDesignGrain::SeedValues()
 {
     if (m_grainSeed)
     {
-        m_sbGrainLen->setValue(OpenBurnUnits::ConvertLength(
+        m_sbGrainLen->setValue(m_unitsGrainLen->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches,
-            m_unitsGrainLen->GetCurrentUnits(), 
             m_grainSeed->GetLength()));
-        m_sbGrainDia->setValue(OpenBurnUnits::ConvertLength(
+        m_sbGrainDia->setValue(m_unitsGrainLen->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches, 
-            m_unitsGrainLen->GetCurrentUnits(),
             m_grainSeed->GetDiameter()));
         m_sbGrainInhibit->setValue(m_grainSeed->GetInhibitedFaces());
         //propellant ..     
@@ -106,15 +104,13 @@ void OpenBurnDesignGrain::SeedValues()
 }
 double OpenBurnDesignGrain::GetLength()
 {
-    return OpenBurnUnits::ConvertLength(
-        m_unitsGrainLen->GetCurrentUnits(),
+    return m_unitsGrainLen->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 
         m_sbGrainLen->value());
 }
 double OpenBurnDesignGrain::GetDiameter()
 {
-    return OpenBurnUnits::ConvertLength(
-        m_unitsGrainDia->GetCurrentUnits(),
+    return m_unitsGrainDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 
         m_sbGrainDia->value());
 }
@@ -165,8 +161,7 @@ CylindricalGrainDesign::CylindricalGrainDesign(
 }
 double CylindricalGrainDesign::GetCoreDiameter()
 {
-    return OpenBurnUnits::ConvertLength(
-        m_unitsGrainCoreDia->GetCurrentUnits(),
+    return m_unitsGrainCoreDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 
         m_sbGrainCoreDia->value());
 }
@@ -175,9 +170,8 @@ void CylindricalGrainDesign::SeedValues()
     OpenBurnDesignGrain::SeedValues();
     if (CylindricalGrain* seed = dynamic_cast<CylindricalGrain*>(m_grainSeed))
     {
-        m_sbGrainCoreDia->setValue(OpenBurnUnits::ConvertLength(
+        m_sbGrainCoreDia->setValue(m_unitsGrainCoreDia->GetCurrentUnits().ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches, 
-            m_unitsGrainCoreDia->GetCurrentUnits(),
             seed->GetCoreDiameter()));
     }
 }

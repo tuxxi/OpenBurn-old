@@ -14,8 +14,6 @@
 
 #include "src/propellant.h"
 
-typedef std::pair<QComboBox*, QLineEdit*> IngredientLine;
-
 class PropellantTab : public QWidget
 {
     Q_OBJECT
@@ -48,8 +46,6 @@ private:
     QPushButton* m_btnSaveProp, *m_btnDeleteProp, *m_btnNewProp, *m_btnCalculate;
     QLineEdit* m_lnePropName;
 
-    //ingredients
-    std::vector<IngredientLine> m_ingredients;
     //Propellant Gas Properties
     //basic
     QLineEdit* m_lnePropBRCoef, *m_lnePropBRExp, *m_lnePropDensity, *m_lnePropCStar;

@@ -158,30 +158,29 @@ void DesignTab::SetupUI()
 //this MUST be called AFTER we setup the basic UI layout.
 void DesignTab::UpdateDesign()
 {
+    const QString lengthUnitSymbol = m_GlobalSettings->m_LengthUnits.GetUnitSymbol();
+    const QString massUnitSymbol = m_GlobalSettings->m_MassUnits.GetUnitSymbol();
     if (m_Motor->HasGrains())
     {        
         m_lblMotorLen->setText(QString::number(
-            OpenBurnUnits::ConvertLength(
+            m_GlobalSettings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_GlobalSettings->m_LengthUnits,
                 m_Motor->GetMotorLength()), 'f', 2) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+           lengthUnitSymbol);
         m_lblMotorMajorDia->setText(QString::number(
-            OpenBurnUnits::ConvertLength(
+            m_GlobalSettings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_GlobalSettings->m_LengthUnits,
                 m_Motor->GetMotorMajorDiameter()), 'f', 2) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+            lengthUnitSymbol);
         m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
         m_lblPropellantMass->setText(QString::number(
-            OpenBurnUnits::ConvertMass(
+            m_GlobalSettings->m_MassUnits.ConvertFrom(
                 OpenBurnUnits::MassUnits_T::pounds_mass,
-                m_GlobalSettings->m_MassUnits,
                 m_Motor->GetMotorPropellantMass() ), 'f', 2) +
             " " +
-            OpenBurnUnits::GetMassUnitSymbol(m_GlobalSettings->m_MassUnits));
+            massUnitSymbol);
         m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'f', 2) + '%');
         if (m_Motor->HasNozzle())
         {
@@ -197,19 +196,17 @@ void DesignTab::UpdateDesign()
     if (m_Motor->HasNozzle())
     {
         m_lblNozzleThroatDia->setText(QString::number(
-            OpenBurnUnits::ConvertLength(
+           m_GlobalSettings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_GlobalSettings->m_LengthUnits,
                 m_Motor->GetNozzle()->GetNozzleThroat()), 'f', 2) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+            lengthUnitSymbol);
         m_lblNozzleExitDia->setText(QString::number(
-            OpenBurnUnits::ConvertLength(
+            m_GlobalSettings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_GlobalSettings->m_LengthUnits,
                 m_Motor->GetNozzle()->GetNozzleExit()), 'f', 2) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_GlobalSettings->m_LengthUnits));
+            lengthUnitSymbol);
         m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'f', 2));
     }
     UpdateGraphics(); 

@@ -34,24 +34,24 @@ void OpenBurnSettings::ReadJSON(const QJsonObject& object)
     if (unitsObject.isEmpty() || settingsObject.isEmpty())
         return;
         
-    m_LengthUnits = OpenBurnUnits::LengthUnits_T(unitsObject["lengthunits"].toInt());
-    m_AngleUnits = OpenBurnUnits::AngleUnits_T(unitsObject["angleunits"].toInt());
-    m_TemperatureUnits = OpenBurnUnits::TemperatureUnits_T(unitsObject["temperatureunits"].toInt());
-    m_PressureUnits = OpenBurnUnits::PressureUnits_T(unitsObject["pressureunits"].toInt());
-    m_ForceUnits = OpenBurnUnits::ForceUnits_T(unitsObject["forceunits"].toInt()); 
-    m_MassUnits = OpenBurnUnits::MassUnits_T(unitsObject["massunits"].toInt()); 
+    m_LengthUnits = OpenBurnUnits::LengthUnits(unitsObject["lengthunits"].toInt());
+    m_AngleUnits = OpenBurnUnits::AngleUnits(unitsObject["angleunits"].toInt());
+    m_TemperatureUnits = OpenBurnUnits::TemperatureUnits(unitsObject["temperatureunits"].toInt());
+    m_PressureUnits = OpenBurnUnits::PressureUnits(unitsObject["pressureunits"].toInt());
+    m_ForceUnits = OpenBurnUnits::ForceUnits(unitsObject["forceunits"].toInt());
+    m_MassUnits = OpenBurnUnits::MassUnits(unitsObject["massunits"].toInt());
 
     m_redrawOnChanges = settingsObject["redrawOnChanges"].toBool();
 }   
 void OpenBurnSettings::WriteJSON(QJsonObject &object)
 {
     QJsonObject units, settings;
-    units["lengthunits"] = int(m_LengthUnits);
-    units["angleunits"] = int(m_AngleUnits);
-    units["temperatureunits"] = int(m_TemperatureUnits);
-    units["pressureunits"] = int(m_PressureUnits);
-    units["forceunits"] = int(m_ForceUnits);
-    units["massunits"] = int(m_MassUnits);
+    units["lengthunits"] = int(m_LengthUnits.unit);
+    units["angleunits"] = int(m_AngleUnits.unit);
+    units["temperatureunits"] = int(m_TemperatureUnits.unit);
+    units["pressureunits"] = int(m_PressureUnits.unit);
+    units["forceunits"] = int(m_ForceUnits.unit);
+    units["massunits"] = int(m_MassUnits.unit);
 
     settings["redrawOnChanges"] = m_redrawOnChanges;
     object["units"] = units;

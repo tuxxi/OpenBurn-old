@@ -60,21 +60,6 @@ void PropellantTab::SetupUI()
     topRowEdit->addWidget(m_btnSaveProp = new QPushButton(tr("Save")), 1);
     topRowEdit->addStretch();
 
-    //ingredients
-    QGroupBox* gb_ingredients = new QGroupBox(tr("Ingredients"));
-    //add ingredient table or combobox or whatever 
-    QGridLayout* ingredientsLayout = new QGridLayout;
-    for (int i = 0; i < numIngredients; i++)
-    {   
-        QComboBox* ingredient = new QComboBox;
-        QLineEdit* mass = new QLineEdit;
-        ingredientsLayout->addWidget(ingredient , i, 0);
-        ingredientsLayout->addWidget(mass, i, 1);
-        m_ingredients.push_back(IngredientLine(ingredient, mass));
-    }
-    gb_ingredients->setLayout(ingredientsLayout);
-    gb_ingredients->setEnabled(false); //disabled for now
-
     //propellant properties
     QGroupBox* gb_properties = new QGroupBox(tr("Internal Balistic Parameters"));
 
@@ -107,8 +92,7 @@ void PropellantTab::SetupUI()
     gb_properties->setLayout(propertiesLayout);
     QGridLayout* controlsLayout = new QGridLayout;
     controlsLayout->addLayout(topRowEdit, 0, 0, 1, 2);
-    controlsLayout->addWidget(gb_ingredients, 3, 0, 4, 1);
-    controlsLayout->addWidget(gb_properties, 3, 1, 4, 1);
+    controlsLayout->addWidget(gb_properties, 1, 1, 4, 1);
     
     m_gbEdit->setLayout(controlsLayout);
     QGridLayout* masterLayout = new QGridLayout;

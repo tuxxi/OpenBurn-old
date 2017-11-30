@@ -43,6 +43,7 @@ void GrainTableWidget::resizeEvent(QResizeEvent* event)
 }
 void GrainTableWidget::OnMotorUpdated()
 {
+    const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
     setRowCount(0);
     for (auto grain : m_Motor->GetGrains())
     {
@@ -50,20 +51,18 @@ void GrainTableWidget::OnMotorUpdated()
         setRowCount(numItems+1);
     
         setItem(numItems, 0, new QTableWidgetItem(QString::number(
-            OpenBurnUnits::ConvertLength(
+            m_Settings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_Settings->m_LengthUnits,
-                grain->GetLength())) +
+                grain->GetLength()), 'f', 3) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
+            lengthUnits));
         
         setItem(numItems, 1, new QTableWidgetItem(QString::number(
-            OpenBurnUnits::ConvertLength(
+            m_Settings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_Settings->m_LengthUnits,
-                grain->GetDiameter())) +
+                grain->GetDiameter()), 'f', 3) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
+            lengthUnits));
 
         
         setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
@@ -72,12 +71,11 @@ void GrainTableWidget::OnMotorUpdated()
         if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
         {
             setItem(numItems, 2, new QTableWidgetItem(QString::number(
-                            OpenBurnUnits::ConvertLength(
+                m_Settings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
-                m_Settings->m_LengthUnits,
-                bates->GetCoreDiameter())) +
+                bates->GetCoreDiameter()), 'f', 3) +
             " " +
-            OpenBurnUnits::GetLengthUnitSymbol(m_Settings->m_LengthUnits)));
+            lengthUnits));
         }    
     }
 }
