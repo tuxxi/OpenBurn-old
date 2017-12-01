@@ -54,7 +54,7 @@ UnitsComboBox<T, K>::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
 {
     m_prevUnits = OpenBurnUnits::OpenBurnUnit<T, K>(currentIndex());
     m_currentUnits = m_prevUnits;
-    addItems(m_currentUnits.GetUnits());
+    addItems(K::GetUnits());
     if (m_buddyBox)
     {
         m_buddyBox->setMinimum(0.0);

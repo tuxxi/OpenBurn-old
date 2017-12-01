@@ -30,6 +30,16 @@ namespace OpenBurnUnits
         {
             return K::GetAllUnitNames();
         }
+        static const QStringList GetUnits()
+        {
+            QStringList list = QStringList();
+            for (int i = 0; i < GetAllUnitNames().size(); i++)
+            {
+                list << GetAllUnitNames()[i] + "(" + GetAllUnitSymbols()[i] + ")";
+            }
+            return list;
+        }
+
         double ConvertTo(T newUnits, double value)
         {
             return Convert(unit, newUnits, value);
@@ -45,15 +55,6 @@ namespace OpenBurnUnits
         const QString GetUnitName()
         {
             return GetAllUnitNames().at(int(unit));
-        }
-        const QStringList GetUnits()
-        {
-            QStringList list = QStringList();
-            for (int i = 0; i < GetAllUnitNames().size(); i++)
-            {
-                list << GetAllUnitNames()[i] + "(" + GetAllUnitSymbols()[i] + ")";
-            }
-            return list;
         }
         operator int() const { return int(unit); }
         T unit;
@@ -72,11 +73,7 @@ namespace OpenBurnUnits
     class LengthUnits : public OpenBurnUnit<LengthUnits_T, LengthUnits>
     {
     public:
-        LengthUnits() {}
-        LengthUnits(int u)
-            : OpenBurnUnit<LengthUnits_T, LengthUnits>(u) {}
-        LengthUnits(const LengthUnits_T& u)
-            : OpenBurnUnit<LengthUnits_T, LengthUnits>(u) {}
+        using OpenBurnUnit::OpenBurnUnit;
         static double Convert(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
         {
             switch(newUnits)
@@ -235,12 +232,7 @@ namespace OpenBurnUnits
     class AngleUnits : public OpenBurnUnit<AngleUnits_T, AngleUnits>
     {
     public:
-        AngleUnits() {}
-        AngleUnits(int u)
-            : OpenBurnUnit<AngleUnits_T, AngleUnits>(u) {}
-        AngleUnits(const AngleUnits_T& u)
-            : OpenBurnUnit<AngleUnits_T, AngleUnits>(u) {}
-
+        using OpenBurnUnit::OpenBurnUnit;
         static double AngleUnits::Convert(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
         {
             switch (oldUnits)
@@ -302,11 +294,7 @@ namespace OpenBurnUnits
     class PressureUnits : public OpenBurnUnit<PressureUnits_T, PressureUnits>
     {
     public:
-        PressureUnits() {}
-        PressureUnits(int u)
-            : OpenBurnUnit<PressureUnits_T, PressureUnits>(u) {}
-        PressureUnits(const PressureUnits_T& u)
-            : OpenBurnUnit<PressureUnits_T, PressureUnits>(u) {}
+        using OpenBurnUnit::OpenBurnUnit;
         static double PressureUnits::Convert(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
         {
             switch(oldUnits)
@@ -437,11 +425,7 @@ namespace OpenBurnUnits
     class TemperatureUnits : public OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>
     {
     public:
-        TemperatureUnits() {}
-        TemperatureUnits(int u)
-            : OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>(u) {}
-        TemperatureUnits(const TemperatureUnits_T& u)
-            : OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>(u) {}
+        using OpenBurnUnit::OpenBurnUnit;
         static double TemperatureUnits::Convert(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
         {
             switch(oldUnits)
@@ -531,11 +515,7 @@ namespace OpenBurnUnits
     class ForceUnits : public OpenBurnUnit<ForceUnits_T, ForceUnits>
     {
     public:
-        ForceUnits() {}
-        ForceUnits(int u)
-            : OpenBurnUnit<ForceUnits_T, ForceUnits>(u) {}
-        ForceUnits(const ForceUnits_T& u)
-            : OpenBurnUnit<ForceUnits_T, ForceUnits>(u) {}
+        using OpenBurnUnit::OpenBurnUnit;
         static double ForceUnits::Convert(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
         {
             switch (oldUnits)
@@ -599,11 +579,7 @@ namespace OpenBurnUnits
     class MassUnits : public OpenBurnUnit<MassUnits_T, MassUnits>
     {
     public:
-        MassUnits() {}
-        MassUnits(int u)
-            : OpenBurnUnit<MassUnits_T, MassUnits>(u) {}
-        MassUnits(const MassUnits_T& u)
-            : OpenBurnUnit<MassUnits_T, MassUnits>(u) {}
+        using OpenBurnUnit::OpenBurnUnit;
         static double MassUnits::Convert(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
         {
             switch(oldUnits)
