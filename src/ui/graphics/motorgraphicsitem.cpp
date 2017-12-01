@@ -23,18 +23,22 @@ QRectF MotorGraphicsItem::boundingRect() const
 }
 void MotorGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    double newX = event->pos().x();
-    if (newX >= m_MotorLen) { //we clicked off the nozzle end
-        m_currentSliceLocation = m_MotorLen;
+    SetXPos(event->pos().x());
+}
+void MotorGraphicsItem::SetXPos(double xPos)
+{
+    if (xPos >= m_MotorLen) { //we clicked off the nozzle end
+        m_currentSliceLocation = std::ceil(m_MotorLen);
     }
-    else if (newX <= pos().x()) { //off the fwd end
+    else if (xPos <= pos().x()) { //off the fwd end
         m_currentSliceLocation = 0;
     }
     else { //somewhere in the motor
-        m_currentSliceLocation = newX;
+        m_currentSliceLocation = xPos;
     }
     emit MotorXPosSliceUpdated(GetCurrentXPosSlice());
     update(boundingRect());
+
 }
 void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

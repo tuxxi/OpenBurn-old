@@ -233,7 +233,7 @@ namespace OpenBurnUnits
     {
     public:
         using OpenBurnUnit::OpenBurnUnit;
-        static double AngleUnits::Convert(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
+        static double Convert(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
         {
             switch (oldUnits)
             {
@@ -268,13 +268,13 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList AngleUnits::GetAllUnitSymbols()
+        static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
                 QString("°") <<
                 QString("rad");
         }
-        static const QStringList AngleUnits::GetAllUnitNames()
+        static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
                 QObject::tr("Degrees") <<
@@ -295,7 +295,7 @@ namespace OpenBurnUnits
     {
     public:
         using OpenBurnUnit::OpenBurnUnit;
-        static double PressureUnits::Convert(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
+        static double Convert(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
         {
             switch(oldUnits)
             {
@@ -382,7 +382,7 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList PressureUnits::GetAllUnitSymbols()
+        static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
                 QString("psi") <<
@@ -390,7 +390,7 @@ namespace OpenBurnUnits
                 QString("kPa") <<
                 QString("torr");
         }
-        static const QStringList PressureUnits::GetAllUnitNames()
+        static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
                 QObject::tr("Pounds / inch²") <<
@@ -426,7 +426,7 @@ namespace OpenBurnUnits
     {
     public:
         using OpenBurnUnit::OpenBurnUnit;
-        static double TemperatureUnits::Convert(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
+        static double Convert(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
         {
             switch(oldUnits)
             {
@@ -484,14 +484,14 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList TemperatureUnits::GetAllUnitSymbols()
+        static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
                 QString("°F") <<
                 QString("°C") <<
                 QString("°K");
         }
-        static const QStringList TemperatureUnits::GetAllUnitNames()
+        static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
                 QObject::tr("Fahrenheit") <<
@@ -516,7 +516,7 @@ namespace OpenBurnUnits
     {
     public:
         using OpenBurnUnit::OpenBurnUnit;
-        static double ForceUnits::Convert(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
+        static double Convert(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
         {
             switch (oldUnits)
             {
@@ -551,13 +551,13 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList ForceUnits::GetAllUnitSymbols()
+        static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
                 QString("lbs") <<
                 QString("N");
         }
-        static const QStringList ForceUnits::GetAllUnitNames()
+        static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
                 QObject::tr("Pounds") <<
@@ -580,7 +580,7 @@ namespace OpenBurnUnits
     {
     public:
         using OpenBurnUnit::OpenBurnUnit;
-        static double MassUnits::Convert(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
+        static double Convert(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
         {
             switch(oldUnits)
             {
@@ -639,14 +639,14 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList MassUnits::GetAllUnitSymbols()
+        static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
                 QString("lbm") <<
                 QString("kg") <<
                 QString("slug");
         }
-        static const QStringList MassUnits::GetAllUnitNames()
+        static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
                 QObject::tr("Pounds-mass") <<

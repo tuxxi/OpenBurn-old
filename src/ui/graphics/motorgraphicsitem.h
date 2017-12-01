@@ -33,6 +33,7 @@ public:
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_ScaleFactor; }
     double GetCurrentXPosSlice();
+    void SetXPos(double xpos);
 signals:
     void MotorXPosSliceUpdated(double slice);
 protected:

@@ -7,7 +7,9 @@
 #include "src/units.h"
 
 static const QString massFluxUnits = QObject::tr("lbs/sec/inch²"); //todo: make more mass flux units?
-static const double multiplier = 1.10;
+static const double pressureMultiplier = 1.10;
+static const double motorLenMultiplier = 100;
+
 SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettings* settings, QWidget* parent)
     : QWidget(parent),
     m_gfxMotor(nullptr),
@@ -38,6 +40,8 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
             this, &SimulationTab::OnPlayAnimationButtonClicked);
     connect(m_btntToBeginning, &QToolButton::clicked,
             this, &SimulationTab::OnToBeginningButtonClicked);
+    connect(m_sldCurrentXPos, &QSlider::valueChanged,
+            this, &SimulationTab::OnXPosChanged);
 }
 SimulationTab::~SimulationTab()
 {
@@ -106,16 +110,19 @@ void SimulationTab::SetupUI()
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
     chamberLayout->addWidget(line, 4, 0, 1, 2); //add a dividing line
-    chamberLayout->addWidget(new QLabel(tr("Current X Pos:")), 5, 0);
-    chamberLayout->addWidget(m_lblXPos = new QLabel, 5, 1);
-    chamberLayout->addWidget(new QLabel(tr("Mass Flux:")), 6, 0);
-    chamberLayout->addWidget(m_lblXPosMassFlux = new QLabel, 6, 1);
-    chamberLayout->addWidget(new QLabel(tr("Mach Number:")), 7, 0);
-    chamberLayout->addWidget(m_lblXPosMachNumber = new QLabel, 7, 1);
+    m_sldCurrentXPos = new QSlider(Qt::Horizontal);
+
+    chamberLayout->addWidget(m_sldCurrentXPos, 5, 0, 1, 2);
+    chamberLayout->addWidget(new QLabel(tr("Current X Pos:")), 6, 0);
+    chamberLayout->addWidget(m_lblXPos = new QLabel, 6, 1);
+    chamberLayout->addWidget(new QLabel(tr("Mass Flux:")), 7, 0);
+    chamberLayout->addWidget(m_lblXPosMassFlux = new QLabel, 7, 1);
+    chamberLayout->addWidget(new QLabel(tr("Mach Number:")), 8, 0);
+    chamberLayout->addWidget(m_lblXPosMachNumber = new QLabel, 8, 1);
 
     gb_CurrentNumbers->setLayout(chamberLayout);
 
-    QGridLayout* gbGridLayout = new QGridLayout;    
+    QGridLayout* gbGridLayout = new QGridLayout;
     gbGridLayout->addWidget(m_Plotter, 0, 0, 2, 1);
     gbGridLayout->addWidget(gb_Controls, 0, 1);
     gbGridLayout->addWidget(gb_Results, 1, 1);
@@ -235,7 +242,7 @@ void SimulationTab::UpdatePlotterLine()
 
     double xPos = m_sldBurnTimeScrubBar->value() * m_SimSettings->timeStep;
     bool dummy;
-    double yPos = multiplier * m_Plotter->graph(0)->getValueRange(dummy).upper;
+    double yPos = pressureMultiplier * m_Plotter->graph(0)->getValueRange(dummy).upper;
     m_lineGraphTime->start->setCoords(xPos, 0);
     m_lineGraphTime->end->setCoords(xPos, yPos);
     m_Plotter->replot();
@@ -277,7 +284,7 @@ void SimulationTab::UpdatePlotter()
         OpenBurnUnits::PressureUnits_T::psi,
         m_Simulator->GetMaxPressure());
 
-    const double maxPressureScale = multiplier * maxPressure;
+    const double maxPressureScale = pressureMultiplier * maxPressure;
     const double massFluxScale = 300.0f;
 
     QVector<double> time(numPoints), pressure(numPoints), massflux(numPoints);
@@ -312,7 +319,7 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     {
         m_gfxMotor = new MotorGraphicsItem(100, true);
         connect(m_gfxMotor, &MotorGraphicsItem::MotorXPosSliceUpdated,
-            this, &SimulationTab::OnMotorXPosSliceUpdated);
+            this, &SimulationTab::OnXPosClicked);
         m_MotorDisplayScene->addItem(m_gfxMotor);
         if (motor->HasGrains())
         {
@@ -357,6 +364,7 @@ void SimulationTab::OnDesignReady()
         UpdateSimulation();
     }
     m_btnRunSim->setEnabled(true);
+    m_sldCurrentXPos->setRange(0, m_Motor->GetMotorLength() * motorLenMultiplier);
 }
 void SimulationTab::OnDesignUpdated()
 {
@@ -373,6 +381,7 @@ void SimulationTab::OnSimSettingsButtonClicked()
     m_SimSettingsDialog->show();
     m_SimSettingsDialog->activateWindow();
     m_SimSettingsDialog->raise();
+    m_sldCurrentXPos->setRange(0, m_Motor->GetMotorLength() * motorLenMultiplier);
 }
 void SimulationTab::OnRunSimButtonClicked()
 {
@@ -410,16 +419,25 @@ void SimulationTab::OnMotorSliceChanged(int sliceIndex)
     UpdateGraphics(motor);
     UpdateCurrentXPos(m_currentXPos);
 }
+void SimulationTab::OnXPosChanged(int xPos)
+{
+    if (m_gfxMotor)
+    {
+        m_gfxMotor->SetXPos(double(xPos));
+    }
+    UpdateCurrentXPos(m_currentXPos);
+}
 void SimulationTab::OnAnimationFinished()
 {
     delete m_animation;
     m_animation = nullptr;
 }
-void SimulationTab::OnMotorXPosSliceUpdated(double newXPos)
+void SimulationTab::OnXPosClicked(double newXPos)
 {
     m_currentXPos = newXPos;
-    UpdateCurrentXPos(m_currentXPos);
+    m_sldCurrentXPos->setValue(newXPos * motorLenMultiplier);
 }
+
 void SimulationTab::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);

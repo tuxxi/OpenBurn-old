@@ -31,10 +31,11 @@ private slots:
     void OnAnimationFinished();
     void OnDesignReady();
     void OnDesignUpdated();
-    void OnMotorXPosSliceUpdated(double newXPos);
+    void OnXPosClicked(double newXPos);
 
     void OnSimSettingsChanged();
     void OnMotorSliceChanged(int sliceIndex); //scrubber bar
+    void OnXPosChanged(int xPos);
 private:
     void SetupUI();
     void SetGraphNames();
@@ -49,7 +50,7 @@ private:
     QGraphicsScene* m_MotorDisplayScene;
     double m_currentXPos;
 
-    QSlider* m_sldBurnTimeScrubBar;
+    QSlider* m_sldBurnTimeScrubBar, *m_sldCurrentXPos;
     QPropertyAnimation *m_animation;
     QLabel* m_lblMaxpressure, *m_lblBurnTime, *m_lblTotalImpulse, *m_lblMotorDesignation, *m_lblCoreMassFlux, *m_lblIsp;
     QLabel* m_lblCurrentPressure, *m_lblCurrentCoreMassFlux, *m_lblCurrentThrust, *m_lblCurrentIsp;
