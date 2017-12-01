@@ -18,7 +18,7 @@ protected slots:
     virtual void OnUnitsUpdated(int newIdx);
 
 };
-template<class T>
+template<typename T, class K>
 class UnitsComboBox : public virtual UnitsComboBoxBase
 {
 public:
@@ -29,30 +29,30 @@ public:
     void SetBuddyDoubleSpinBox(QDoubleSpinBox* box);
     QDoubleSpinBox* GetBuddyDoubleSpinBox();
 
-    void SetUnits(OpenBurnUnits::OpenBurnUnits<T> units);
-    OpenBurnUnits::OpenBurnUnits<T> GetCurrentUnits();
-    OpenBurnUnits::OpenBurnUnits<T> GetPrevUnits();
+    void SetUnits(OpenBurnUnits::OpenBurnUnit<T, K> units);
+    OpenBurnUnits::OpenBurnUnit<T, K> GetCurrentUnits();
+    OpenBurnUnits::OpenBurnUnit<T, K> GetPrevUnits();
 
 protected:
     virtual void OnUnitsUpdated(int newIdx) override;
-    OpenBurnUnits::OpenBurnUnits<T> m_prevUnits;
-    OpenBurnUnits::OpenBurnUnits<T> m_currentUnits;
+    OpenBurnUnits::OpenBurnUnit<T, K> m_prevUnits;
+    OpenBurnUnits::OpenBurnUnit<T, K> m_currentUnits;
     QDoubleSpinBox* m_buddyBox;
 };
-typedef UnitsComboBox<OpenBurnUnits::LengthUnits_T> LengthUnitsComboBox;
-typedef UnitsComboBox<OpenBurnUnits::AngleUnits_T> AngleUnitsComboBox;
-typedef UnitsComboBox<OpenBurnUnits::TemperatureUnits_T> TemperatureUnitsComboBox;
-typedef UnitsComboBox<OpenBurnUnits::PressureUnits_T> PressureUnitsComboBox;
-typedef UnitsComboBox<OpenBurnUnits::ForceUnits_T> ForceUnitsComboBox;
-typedef UnitsComboBox<OpenBurnUnits::MassUnits_T> MassUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::LengthUnits_T, OpenBurnUnits::LengthUnits> LengthUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::AngleUnits_T, OpenBurnUnits::AngleUnits> AngleUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::TemperatureUnits_T, OpenBurnUnits::TemperatureUnits> TemperatureUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::PressureUnits_T, OpenBurnUnits::PressureUnits> PressureUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::ForceUnits_T, OpenBurnUnits::ForceUnits> ForceUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::MassUnits_T, OpenBurnUnits::MassUnits> MassUnitsComboBox;
 
 //These template definitions have to be in the header file so the linker knows what to look for
-template<class T>
-UnitsComboBox<T>::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
+template<typename T, class K>
+UnitsComboBox<T, K>::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
     : UnitsComboBoxBase(parent),
       m_buddyBox(buddy)
 {
-    m_prevUnits = OpenBurnUnits::OpenBurnUnits<T>(currentIndex());
+    m_prevUnits = OpenBurnUnits::OpenBurnUnit<T, K>(currentIndex());
     m_currentUnits = m_prevUnits;
     addItems(m_currentUnits.GetUnits());
     if (m_buddyBox)
@@ -63,34 +63,34 @@ UnitsComboBox<T>::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
         m_buddyBox->setSingleStep(0.25f);
     }
 }
-template<class T>
-void UnitsComboBox<T>::SetBuddyDoubleSpinBox(QDoubleSpinBox* box)
+template<typename T, class K>
+void UnitsComboBox<T, K>::SetBuddyDoubleSpinBox(QDoubleSpinBox* box)
 {
     if (box != nullptr) m_buddyBox = box;
 }
-template<class T> 
-QDoubleSpinBox* UnitsComboBox<T>::GetBuddyDoubleSpinBox() { return m_buddyBox; }
+template<typename T, class K>
+QDoubleSpinBox* UnitsComboBox<T, K>::GetBuddyDoubleSpinBox() { return m_buddyBox; }
 
-template<class T>
-void UnitsComboBox<T>::SetUnits(OpenBurnUnits::OpenBurnUnits<T> units)
+template<typename T, class K>
+void UnitsComboBox<T, K>::SetUnits(OpenBurnUnits::OpenBurnUnit<T, K> units)
 {
     setCurrentIndex(int(units));
 }
-template<class T>
-OpenBurnUnits::OpenBurnUnits<T> UnitsComboBox<T>::GetCurrentUnits()
+template<typename T, class K>
+OpenBurnUnits::OpenBurnUnit<T, K> UnitsComboBox<T, K>::GetCurrentUnits()
 {
     return m_currentUnits;
 }
-template<class T>
-OpenBurnUnits::OpenBurnUnits<T> UnitsComboBox<T>::GetPrevUnits()
+template<typename T, class K>
+OpenBurnUnits::OpenBurnUnit<T, K> UnitsComboBox<T, K>::GetPrevUnits()
 {
     return m_prevUnits;
 }
-template<class T>
-void UnitsComboBox<T>::OnUnitsUpdated(int newIdx)
+template<typename T, class K>
+void UnitsComboBox<T, K>::OnUnitsUpdated(int newIdx)
 {
     m_prevUnits = m_currentUnits;
-    m_currentUnits = OpenBurnUnits::OpenBurnUnits<T>(newIdx);
+    m_currentUnits = OpenBurnUnits::OpenBurnUnit<T, K>(newIdx);
     if (m_buddyBox)
     {
         m_buddyBox->setValue(

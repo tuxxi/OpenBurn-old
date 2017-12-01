@@ -5,23 +5,31 @@
 
 namespace OpenBurnUnits
 {
-    template<class T>
-    class OpenBurnUnits
+    //uses CRTP for compile-time static polymorphism
+    template<typename T, class K>
+    class OpenBurnUnit
     {
     public:
-        OpenBurnUnits()
+        OpenBurnUnit()
         {}
-        OpenBurnUnits(const T u)
+        OpenBurnUnit(const T& u)
             : unit(u)
         {}
-        OpenBurnUnits(int u)
+        OpenBurnUnit(int u)
             : unit(T(u))
         {}
-
-        static double Convert(T prevUnits, T newUnits, double value);
-        static const QStringList GetAllUnitSymbols();
-        static const QStringList GetAllUnitNames();
-
+        static double Convert(T prevUnits, T newUnits, double value)
+        {
+            return K::Convert(prevUnits, newUnits, value);
+        }
+        static const QStringList GetAllUnitSymbols()
+        {
+            return K::GetAllUnitSymbols();
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return K::GetAllUnitNames();
+        }
         double ConvertTo(T newUnits, double value)
         {
             return Convert(unit, newUnits, value);
@@ -36,7 +44,7 @@ namespace OpenBurnUnits
         }
         const QString GetUnitName()
         {
-            return GetAllNames().at(int(unit));
+            return GetAllUnitNames().at(int(unit));
         }
         const QStringList GetUnits()
         {
@@ -53,10 +61,6 @@ namespace OpenBurnUnits
 //=============================================================================
 //*************LENGTH UNITS********************
 //=============================================================================
-    static const double MM_PER_INCH = 25.4;
-    static const double INCHES_PER_MM = 1 / MM_PER_INCH;
-    static const double INCHES_PER_FOOT = 12.0;
-    static const double FEET_PER_INCH = 1.0 / INCHES_PER_FOOT;
     enum class LengthUnits_T
     {
         inches,
@@ -65,30 +69,14 @@ namespace OpenBurnUnits
         feet,
         meters
     };
-    static const QStringList kLengthUnitSymbols = (QStringList() <<
-        QString("in") <<
-        QString("mm") <<
-        QString("cm") <<
-        QString("ft") <<
-        QString("m"));
-    static const QStringList kLengthUnitNames = (QStringList() <<
-        QObject::tr("Inches") <<
-        QObject::tr("Millimeters") <<
-        QObject::tr("Centimeters") <<
-        QObject::tr("Feet") <<
-        QObject::tr("Meters"));
-
-    class LengthUnits : public OpenBurnUnits<LengthUnits_T>
+    class LengthUnits : public OpenBurnUnit<LengthUnits_T, LengthUnits>
     {
     public:
-        LengthUnits() = default;
+        LengthUnits() {}
         LengthUnits(int u)
-            : OpenBurnUnits<LengthUnits_T>(u)
-        {}
+            : OpenBurnUnit<LengthUnits_T, LengthUnits>(u) {}
         LengthUnits(const LengthUnits_T& u)
-            : OpenBurnUnits<LengthUnits_T>(u)
-        {}
-
+            : OpenBurnUnit<LengthUnits_T, LengthUnits>(u) {}
         static double Convert(LengthUnits_T prevUnits, LengthUnits_T newUnits, double value)
         {
             switch(newUnits)
@@ -211,8 +199,29 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList GetAllUnitSymbols() { return kLengthUnitSymbols; }
-        static const QStringList GetAllUnitNames() { return kLengthUnitNames; }
+        static const QStringList GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("in") <<
+                QString("mm") <<
+                QString("cm") <<
+                QString("ft") <<
+                QString("m");
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Inches") <<
+                QObject::tr("Millimeters") <<
+                QObject::tr("Centimeters") <<
+                QObject::tr("Feet") <<
+                QObject::tr("Meters");
+        }
+    private:
+        static constexpr double MM_PER_INCH = 25.4;
+        static constexpr double INCHES_PER_MM = 1 / MM_PER_INCH;
+        static constexpr double INCHES_PER_FOOT = 12.0;
+        static constexpr double FEET_PER_INCH = 1.0 / INCHES_PER_FOOT;
     };
 
 //=============================================================================
@@ -223,21 +232,14 @@ namespace OpenBurnUnits
         degrees,
         radians
     };
-    static const QStringList kAngleUnitSymbols = (QStringList() <<
-        QString("°") << 
-        QString("rad"));
-    static const QStringList kAngleUnitNames = (QStringList() <<
-        QObject::tr("Degrees") << 
-        QObject::tr("Radians"));
-
-    class AngleUnits : public OpenBurnUnits<AngleUnits_T>
+    class AngleUnits : public OpenBurnUnit<AngleUnits_T, AngleUnits>
     {
     public:
         AngleUnits() {}
         AngleUnits(int u)
-            : OpenBurnUnits<AngleUnits_T>(u) {}
+            : OpenBurnUnit<AngleUnits_T, AngleUnits>(u) {}
         AngleUnits(const AngleUnits_T& u)
-            : OpenBurnUnits<AngleUnits_T>(u) {}
+            : OpenBurnUnit<AngleUnits_T, AngleUnits>(u) {}
 
         static double AngleUnits::Convert(AngleUnits_T oldUnits, AngleUnits_T newUnits, double value)
         {
@@ -274,26 +276,22 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList AngleUnits::GetAllUnitSymbols() { return kAngleUnitSymbols; }
-        static const QStringList AngleUnits::GetAllUnitNames() { return kAngleUnitNames; }
+        static const QStringList AngleUnits::GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("°") <<
+                QString("rad");
+        }
+        static const QStringList AngleUnits::GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Degrees") <<
+                QObject::tr("Radians");
+        }
     };
 //=============================================================================
 //*************PRESSURE UNITS********************
 //=============================================================================
-    static const double KPA_PER_ATM = 101.325;
-    static const double KPA_PER_TORR = 133.3224;
-    static const double KPA_PER_PSI = 6.89476;
-    static const double ATM_PER_TORR = 760;
-    static const double TORR_PER_PSI = 51.7149;
-    static const double PSI_PER_ATM = 14.6959;
-
-    static const double ATM_PER_PSI = 1.0 / PSI_PER_ATM;
-    static const double ATM_PER_KPA = 1.0 / KPA_PER_ATM;
-    static const double PSI_PER_TORR = 1.0 / TORR_PER_PSI;
-    static const double PSI_PER_KPA = 1.0 / KPA_PER_PSI;
-    static const double TORR_PER_ATM = 1.0 / ATM_PER_TORR;
-    static const double TORR_PER_KPA = 1.0 / KPA_PER_TORR;
-
     enum class PressureUnits_T
     {
         psi,
@@ -301,25 +299,14 @@ namespace OpenBurnUnits
         kilopascals,
         torr
     };
-    static const QStringList kPressureUnitSymbols = (QStringList() <<
-        QString("psi") <<
-        QString("atm") <<
-        QString("kPa") <<
-        QString("torr"));
-    static const QStringList kPressureUnitNames = (QStringList() <<
-        QObject::tr("Pounds / inch²") <<
-        QObject::tr("Atmospheres") <<
-        QObject::tr("Kilopascals") <<
-        QObject::tr("Torr"));
-
-    class PressureUnits : public OpenBurnUnits<PressureUnits_T>
+    class PressureUnits : public OpenBurnUnit<PressureUnits_T, PressureUnits>
     {
     public:
         PressureUnits() {}
         PressureUnits(int u)
-            : OpenBurnUnits<PressureUnits_T>(u) {}
+            : OpenBurnUnit<PressureUnits_T, PressureUnits>(u) {}
         PressureUnits(const PressureUnits_T& u)
-            : OpenBurnUnits<PressureUnits_T>(u) {}
+            : OpenBurnUnit<PressureUnits_T, PressureUnits>(u) {}
         static double PressureUnits::Convert(PressureUnits_T oldUnits, PressureUnits_T newUnits, double value)
         {
             switch(oldUnits)
@@ -407,39 +394,54 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList PressureUnits::GetAllUnitSymbols() { return kPressureUnitSymbols; }
-        static const QStringList PressureUnits::GetAllUnitNames() { return kPressureUnitNames; }
+        static const QStringList PressureUnits::GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("psi") <<
+                QString("atm") <<
+                QString("kPa") <<
+                QString("torr");
+        }
+        static const QStringList PressureUnits::GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Pounds / inch²") <<
+                QObject::tr("Atmospheres") <<
+                QObject::tr("Kilopascals") <<
+                QObject::tr("Torr");
+        }
+    private:
+        static constexpr double KPA_PER_ATM = 101.325;
+        static constexpr double KPA_PER_TORR = 133.3224;
+        static constexpr double KPA_PER_PSI = 6.89476;
+        static constexpr double ATM_PER_TORR = 760;
+        static constexpr double TORR_PER_PSI = 51.7149;
+        static constexpr double PSI_PER_ATM = 14.6959;
+
+        static constexpr double ATM_PER_PSI = 1.0 / PSI_PER_ATM;
+        static constexpr double ATM_PER_KPA = 1.0 / KPA_PER_ATM;
+        static constexpr double PSI_PER_TORR = 1.0 / TORR_PER_PSI;
+        static constexpr double PSI_PER_KPA = 1.0 / KPA_PER_PSI;
+        static constexpr double TORR_PER_ATM = 1.0 / ATM_PER_TORR;
+        static constexpr double TORR_PER_KPA = 1.0 / KPA_PER_TORR;
     };
 //=============================================================================
 //*************TEMPERATURE UNITS********************
 //=============================================================================
-    static const double CELSIUS_KELVIN_OFFSET = 273.15;
-    static const double FAHRENHEIT_CELSIUS_OFFSET = 32;
-    static const double FAHRENHEIT_TO_CELSIUS = 5.0 / 9.0;
-    static const double CELSIUS_TO_FAHRENHEIT = 1.0 / FAHRENHEIT_TO_CELSIUS;
     enum class TemperatureUnits_T
     {
         fahrenheit,
         celsius,
         kelvin
     };
-    static const QStringList kTemperatureUnitSymbols = (QStringList() <<
-        QString("°F") <<
-        QString("°C") <<
-        QString("°K"));
-    static const QStringList kTemperatureUnitNames = (QStringList() <<
-        QObject::tr("Fahrenheit") <<
-        QObject::tr("Celsius") <<
-        QObject::tr("Kelvin"));
-
-    class TemperatureUnits : public OpenBurnUnits<TemperatureUnits_T>
+    class TemperatureUnits : public OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>
     {
     public:
         TemperatureUnits() {}
         TemperatureUnits(int u)
-            : OpenBurnUnits<TemperatureUnits_T>(u) {}
+            : OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>(u) {}
         TemperatureUnits(const TemperatureUnits_T& u)
-            : OpenBurnUnits<TemperatureUnits_T>(u) {}
+            : OpenBurnUnit<TemperatureUnits_T, TemperatureUnits>(u) {}
         static double TemperatureUnits::Convert(TemperatureUnits_T oldUnits, TemperatureUnits_T newUnits, double value)
         {
             switch(oldUnits)
@@ -498,36 +500,42 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList TemperatureUnits::GetAllUnitSymbols() { return kTemperatureUnitSymbols; }
-        static const QStringList TemperatureUnits::GetAllUnitNames() { return kTemperatureUnitNames; }
-
-
+        static const QStringList TemperatureUnits::GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("°F") <<
+                QString("°C") <<
+                QString("°K");
+        }
+        static const QStringList TemperatureUnits::GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Fahrenheit") <<
+                QObject::tr("Celsius") <<
+                QObject::tr("Kelvin");
+        }
+    private:
+        static constexpr double CELSIUS_KELVIN_OFFSET = 273.15;
+        static constexpr double FAHRENHEIT_CELSIUS_OFFSET = 32;
+        static constexpr double FAHRENHEIT_TO_CELSIUS = 5.0 / 9.0;
+        static constexpr double CELSIUS_TO_FAHRENHEIT = 1.0 / FAHRENHEIT_TO_CELSIUS;
     };
     //=============================================================================
 //*************FORCE UNITS********************
 //=============================================================================
-    static const double NEWTONS_PER_POUND = 4.44822;
-    static const double POUNDS_PER_NEWTON = 1.0 / NEWTONS_PER_POUND;
     enum class ForceUnits_T
     {
         pounds_force,
         newtons
     };
-    static const QStringList kForceUnitSymbols = (QStringList() <<
-        QString("lbs") <<
-        QString("N"));
-    static const QStringList kForceUnitNames = (QStringList() <<
-        QObject::tr("Pounds") <<
-        QObject::tr("Newtons"));
-
-    class ForceUnits : public OpenBurnUnits<ForceUnits_T>
+    class ForceUnits : public OpenBurnUnit<ForceUnits_T, ForceUnits>
     {
     public:
         ForceUnits() {}
         ForceUnits(int u)
-            : OpenBurnUnits<ForceUnits_T>(u) {}
+            : OpenBurnUnit<ForceUnits_T, ForceUnits>(u) {}
         ForceUnits(const ForceUnits_T& u)
-            : OpenBurnUnits<ForceUnits_T>(u) {}
+            : OpenBurnUnit<ForceUnits_T, ForceUnits>(u) {}
         static double ForceUnits::Convert(ForceUnits_T oldUnits, ForceUnits_T newUnits, double value)
         {
             switch (oldUnits)
@@ -563,41 +571,39 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList ForceUnits::GetAllUnitSymbols() { return kForceUnitSymbols; }
-        static const QStringList ForceUnits::GetAllUnitNames() { return kForceUnitNames; }
+        static const QStringList ForceUnits::GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("lbs") <<
+                QString("N");
+        }
+        static const QStringList ForceUnits::GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Pounds") <<
+                QObject::tr("Newtons");
+        }
+    private:
+        static constexpr double NEWTONS_PER_POUND = 4.44822;
+        static constexpr double POUNDS_PER_NEWTON = 1.0 / NEWTONS_PER_POUND;
     };
 //=============================================================================
 //*************MASS UNITS********************
 //=============================================================================
-    static const double POUNDS_PER_KILOGRAM = 2.20462;
-    static const double POUNDS_PER_SLUG = 32.174;
-    static const double KILOGRAMS_PER_POUND = 1.0 / POUNDS_PER_KILOGRAM;
-    static const double KILOGRAMS_PER_SLUG = 1.0 / POUNDS_PER_KILOGRAM * POUNDS_PER_SLUG;
-    static const double SLUGS_PER_POUND = 1.0 / POUNDS_PER_SLUG;
-    static const double SLUGS_PER_KILOGRAM = 1.0 / KILOGRAMS_PER_SLUG;
     enum class MassUnits_T
     {
         pounds_mass,
         kilograms,
         slugs
     };
-    static const QStringList kMassUnitSymbols = (QStringList() <<
-        QString("lbm") <<
-        QString("kg") << 
-        QString("slug"));
-    static const QStringList kMassUnitNames = (QStringList() <<
-        QObject::tr("Pounds-mass") <<
-        QObject::tr("Kilograms") << 
-        QObject::tr("Slugs"));
-
-    class MassUnits : public OpenBurnUnits<MassUnits_T>
+    class MassUnits : public OpenBurnUnit<MassUnits_T, MassUnits>
     {
     public:
         MassUnits() {}
         MassUnits(int u)
-            : OpenBurnUnits<MassUnits_T>(u) {}
+            : OpenBurnUnit<MassUnits_T, MassUnits>(u) {}
         MassUnits(const MassUnits_T& u)
-            : OpenBurnUnits<MassUnits_T>(u) {}
+            : OpenBurnUnit<MassUnits_T, MassUnits>(u) {}
         static double MassUnits::Convert(MassUnits_T oldUnits, MassUnits_T newUnits, double value)
         {
             switch(oldUnits)
@@ -657,7 +663,26 @@ namespace OpenBurnUnits
                 }
             }
         }
-        static const QStringList MassUnits::GetAllUnitSymbols() { return kMassUnitSymbols; }
-        static const QStringList MassUnits::GetAllUnitNames() { return kMassUnitNames; }
+        static const QStringList MassUnits::GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("lbm") <<
+                QString("kg") <<
+                QString("slug");
+        }
+        static const QStringList MassUnits::GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Pounds-mass") <<
+                QObject::tr("Kilograms") <<
+                QObject::tr("Slugs");
+        }
+    private:
+        static constexpr double POUNDS_PER_KILOGRAM = 2.20462;
+        static constexpr double POUNDS_PER_SLUG = 32.174;
+        static constexpr double KILOGRAMS_PER_POUND = 1.0 / POUNDS_PER_KILOGRAM;
+        static constexpr double KILOGRAMS_PER_SLUG = 1.0 / POUNDS_PER_KILOGRAM * POUNDS_PER_SLUG;
+        static constexpr double SLUGS_PER_POUND = 1.0 / POUNDS_PER_SLUG;
+        static constexpr double SLUGS_PER_KILOGRAM = 1.0 / KILOGRAMS_PER_SLUG;
     };
 }
