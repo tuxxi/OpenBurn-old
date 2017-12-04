@@ -317,10 +317,10 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     }
     if (m_gfxMotor == nullptr)
     {
-        m_gfxMotor = new MotorGraphicsItem(100, true);
-        connect(m_gfxMotor, &MotorGraphicsItem::MotorXPosSliceUpdated,
+        m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, true);
+        connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
             this, &SimulationTab::OnXPosClicked);
-        m_MotorDisplayScene->addItem(m_gfxMotor);
+        m_MotorDisplayScene->addItem(m_gfxMotor.get());
         if (motor->HasGrains())
         {
             m_gfxMotor->SetGrains(motor->GetGrains());
@@ -368,8 +368,7 @@ void SimulationTab::OnDesignReady()
 }
 void SimulationTab::OnDesignUpdated()
 {
-    delete m_gfxMotor;
-    m_gfxMotor = nullptr;
+	m_gfxMotor.reset();
     UpdateGraphics();
 }
 void SimulationTab::OnSimSettingsButtonClicked()

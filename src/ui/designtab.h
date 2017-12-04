@@ -1,16 +1,15 @@
+#pragma once
+
 #include <QWidget>
-#include <QPushButton>
-#include <QGraphicsView>
 #include <QLabel>
-#include <QToolButton>
+
+#include <memory>
 
 #include "src/ui/graphics/motorgraphicsitem.h"
 
 #include "src/ui/dialogs/graindialog.h"
 #include "src/ui/dialogs/nozzledialog.h"
 #include "src/ui/widgets/graintablewidget.h"
-#include "src/util.h"
-#include "src/motor.h"
 #include "src/motorsim.h"
 #include "src/settings.h"
 
@@ -55,22 +54,22 @@ private:
     //simulated results - requires a sim to be run
     //for quick reference only- more detailed results are available on results tab
     //QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
+	GrainTableWidget* m_GrainTable;
 
     QPushButton* m_btnNozzleSettings;
 
     //grain settings
-    OpenBurnGrain* m_grainSeed; //stores settings to "seed" the dialog
+    std::unique_ptr<OpenBurnGrain> m_grainSeed; //stores settings to "seed" the dialog
     QPushButton *m_btnNewGrain, *m_btnDeleteGrain, *m_btnEditGrain;
 
     //controls
     QToolButton *m_btntMoveGrainUp, *m_btntMoveGrainDown;
 
-    GrainDialog* m_GrainDialog;
-    NozzleDialog* m_NozzleDialog;
-    GrainTableWidget* m_GrainTable;
+	GrainDialog* m_GrainDialog;
+	NozzleDialog* m_NozzleDialog;
 
     //gfx
-    MotorGraphicsItem* m_gfxMotor;
+    std::unique_ptr<MotorGraphicsItem> m_gfxMotor;
     QGraphicsView* m_MotorDisplayView;
     QGraphicsScene* m_MotorDisplayScene;
 

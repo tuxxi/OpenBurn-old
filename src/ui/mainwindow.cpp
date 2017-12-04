@@ -1,48 +1,37 @@
 #include <QFileDialog>
 #include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
-#include <QCloseEvent>
 
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    m_DesignMotor = new OpenBurnMotor();
-    m_Propellants = new PropellantList();
-    m_Simulator = new MotorSim(m_DesignMotor);
-    m_GlobalSettings = new OpenBurnSettings();
+	m_DesignMotor = std::make_unique<OpenBurnMotor>();
+    m_Propellants = std::make_unique<PropellantList>();
+    m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
+    m_GlobalSettings = std::make_unique<OpenBurnSettings>();
     LoadSettings("user/settings.json");
     SetupUI();
 
-    connect(m_Simulator, &MotorSim::SimulationStarted,
+    connect(m_Simulator.get(), &MotorSim::SimulationStarted,
             this, &MainWindow::OnSimulationStarted);
-    connect(m_Simulator, &MotorSim::SimulationFinished,
+    connect(m_Simulator.get(), &MotorSim::SimulationFinished,
             this, &MainWindow::OnSimulationFinished);
-    connect(m_PropellantTab, &PropellantTab::PropellantsUpdated,
+    connect(m_PropellantTab.get(), &PropellantTab::PropellantsUpdated,
             this, &MainWindow::OnPropellantsUpdated);
-    connect(m_GlobalSettings, &OpenBurnSettings::SettingsChanged,
+    connect(m_GlobalSettings.get(), &OpenBurnSettings::SettingsChanged,
             this, &MainWindow::OnSettingsChanged);
     connect(m_TabWidget, &QTabWidget::currentChanged,
             this, &MainWindow::OnTabChanged);
 }
 MainWindow::~MainWindow()
 {
-    delete m_DesignMotor;
-    delete m_Propellants;
-    delete m_Simulator;
-    delete m_GlobalSettings;
 }
 void MainWindow::SetupUI()
 {
-    if (objectName().isEmpty())
-        setObjectName(QStringLiteral("MainWindow"));
-
     setWindowTitle(tr("OpenBurn"));
     setGeometry(100, 100, 800, 600);
     m_MenuBar = new QMenuBar(this);
-    m_MenuBar->setGeometry(QRect(0, 0, 800, 20));
     setMenuBar(m_MenuBar);
     m_StatusBar = new QStatusBar;
     setStatusBar(m_StatusBar);
@@ -112,39 +101,28 @@ void MainWindow::SetupUI()
     setSizePolicy(sizePolicy);
     
     m_TabWidget = new QTabWidget(this);
-    m_DesignTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
-    m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator, m_GlobalSettings);
-    m_PropellantTab = new PropellantTab(m_Propellants);
-    m_TabWidget->addTab(m_DesignTab, tr("Design"));
-    m_TabWidget->addTab(m_SimTab, tr("Simulation"));
-    m_TabWidget->addTab(m_PropellantTab, tr("Propellants"));
+    m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get());
+    m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
+    m_PropellantTab = std::make_unique<PropellantTab>(m_Propellants.get());
+    m_TabWidget->addTab(m_DesignTab.get(), tr("Design"));
+    m_TabWidget->addTab(m_SimTab.get(), tr("Simulation"));
+    m_TabWidget->addTab(m_PropellantTab.get(), tr("Propellants"));
     setCentralWidget(m_TabWidget);
 }
 void MainWindow::ResetCurrentDesign()
 {
     int currentIndex = m_TabWidget->currentIndex();
-    if (m_DesignMotor)
-    {
-        delete m_DesignMotor;
-    }
-    if (m_DesignTab)
-    {
-        delete m_DesignTab;
-    }
-    if (m_SimTab)
-    {
-        delete m_SimTab;
-    }
-    if (m_Simulator)
-    {
-        delete m_Simulator;
-    }
-    m_DesignMotor = new OpenBurnMotor;
-    m_Simulator = new MotorSim(m_DesignMotor);
-    m_DesignTab = new DesignTab(m_DesignMotor, m_Propellants, m_GlobalSettings);
-    m_SimTab = new SimulationTab(m_DesignMotor, m_Simulator, m_GlobalSettings);
-    m_TabWidget->insertTab(0, m_DesignTab, tr("Design"));
-    m_TabWidget->insertTab(1, m_SimTab, tr("Simulation"));
+	m_DesignMotor.reset();
+	m_Simulator.reset();
+	m_DesignTab.reset();
+	m_SimTab.reset();
+	m_DesignMotor = std::make_unique<OpenBurnMotor>();
+	m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
+	m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get());
+	m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
+
+	m_TabWidget->insertTab(0, m_DesignTab.get(), tr("Design"));
+    m_TabWidget->insertTab(1, m_SimTab.get(), tr("Simulation"));
     m_TabWidget->setCurrentIndex(currentIndex);
 }
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -163,8 +141,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 void MainWindow::resizeEvent(QResizeEvent * event)
 {
-    QApplication::sendEvent(m_DesignTab, event);
-    QApplication::sendEvent(m_SimTab, event);
+    QApplication::sendEvent(m_DesignTab.get(), event);
+    QApplication::sendEvent(m_SimTab.get(), event);
 }
 void MainWindow::OnMenuNew()
 {
@@ -189,7 +167,7 @@ void MainWindow::OnMenuOpen()
         QByteArray data = file.readAll();
         QJsonDocument loadDoc(QJsonDocument::fromJson(data));
         QJsonObject motor = loadDoc.object();
-        m_DesignMotor->ReadJSON(motor, m_Propellants);
+        m_DesignMotor->ReadJSON(motor, m_Propellants.get());
         file.close();
     }
     m_CurrentDesignFilename = fileName;
@@ -230,7 +208,7 @@ void MainWindow::OnMenuQuit()
 void MainWindow::OnMenuSettings()
 {
     //we don't have to worry about memory managment because of WA_DeleteOnClose
-    GlobalSettingsDialog* dialog = new GlobalSettingsDialog(m_GlobalSettings);
+    GlobalSettingsDialog* dialog = new GlobalSettingsDialog(m_GlobalSettings.get());
     dialog->activateWindow();
     dialog->show();
     dialog->raise();

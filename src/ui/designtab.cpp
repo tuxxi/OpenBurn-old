@@ -1,8 +1,5 @@
-#include <QVBoxLayout>
 #include <QSizePolicy>
-#include <QFrame>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QDebug>
 
 #include "src/ui/designtab.h"
@@ -40,7 +37,6 @@ DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, Open
 }
 DesignTab::~DesignTab() 
 {
-    delete m_grainSeed;
 }
 void DesignTab::SetupUI()
 {
@@ -215,8 +211,8 @@ void DesignTab::UpdateGraphics()
 {
     if (!m_gfxMotor)
     {
-        m_gfxMotor = new MotorGraphicsItem(100);
-        m_MotorDisplayScene->addItem(m_gfxMotor);
+		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100);
+        m_MotorDisplayScene->addItem(m_gfxMotor.get());
     }
     if (m_Motor->HasGrains())
     {
@@ -248,20 +244,13 @@ void DesignTab::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
     UpdateGraphics();
 }
-// allocates a new ptr owned by *this so we can store "seed" values,
-// even if the grain used to set the seed values is deleted by the user.
+// allocates a new ptr owned by *this so we can store "seed" values
 void DesignTab::SetSeed(OpenBurnGrain* seed)
 {
-    CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(seed);
-    
-    if (m_grainSeed)
+	m_grainSeed.reset();
+    if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(seed))
     {
-        delete m_grainSeed;
-        m_grainSeed = nullptr;
-    }
-    if (bates)
-    {
-        m_grainSeed = new CylindricalGrain(*bates);
+		m_grainSeed = std::make_unique<CylindricalGrain>(*bates);
     }
 }
 //this allows us to mark the objects as null when they are destroyed (via attribute WA_DeleteOnClose),
@@ -298,7 +287,7 @@ void DesignTab::OnNewGrainButtonClicked()
     if (!m_GrainDialog) //only make one!!
     {
         m_GrainDialog = new GrainDialog(m_Propellants,
-                m_grainSeed,
+                m_grainSeed.get(),
                 m_GlobalSettings);
         connect(m_GrainDialog, SIGNAL(GrainAdded(OpenBurnGrain*)), this, SLOT(OnNewGrain(OpenBurnGrain*)));
         connect(m_GrainDialog, SIGNAL(destroyed()), this, SLOT(OnGrainDialogClosed()));
@@ -311,10 +300,12 @@ void DesignTab::OnEditGrainButtonClicked()
 {
     //we want to be able to click "edit" and edit differently selected grains, so we delete this every time
     //the edit button is clicked
-    if (m_GrainDialog)
-    {
-        m_GrainDialog->deleteLater();
-    }
+	if (m_GrainDialog)
+	{
+		delete m_GrainDialog;
+		m_GrainDialog = nullptr;
+	}
+
     m_GrainDialog = new GrainDialog(m_Propellants,
             m_GrainTable->GetSelectedGrains()[0],
             m_GlobalSettings,

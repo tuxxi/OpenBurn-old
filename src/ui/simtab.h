@@ -1,9 +1,11 @@
-#include <QWidget>
+#pragma once
 #include <QPushButton>
 #include <QLabel>
 #include <QSlider>
 #include <QPropertyAnimation>
 #include <QToolButton>
+
+#include <memory>
 
 #include "src/motorsim.h"
 #include "src/settings.h"
@@ -45,7 +47,7 @@ private:
     void UpdateCurrentChamber(int currentSlice);
     void UpdateCurrentXPos(double xpos);
     //gfx
-    MotorGraphicsItem* m_gfxMotor;
+    std::unique_ptr<MotorGraphicsItem> m_gfxMotor;
     QGraphicsView* m_MotorDisplayView;
     QGraphicsScene* m_MotorDisplayScene;
     double m_currentXPos;

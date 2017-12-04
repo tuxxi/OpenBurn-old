@@ -1,11 +1,22 @@
+#IDEs
+Win32/
+debug/
+release/
+x64/
+.vscode/
+.vs/
+*.sln
 *.pro.user
+*.qmake.stash
+*.vcxproj.*
+*.vcxproj
+
+#Build Products
+Makefile
+OpenBurn
 *.o
 moc_*.cpp
 ui_*.h
-*.qmake.stash
-Makefile
-OpenBurn
-.vscode/
 
-#OpenBurn Files1
+#OpenBurn Files
 *.obm

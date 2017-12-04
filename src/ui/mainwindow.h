@@ -1,17 +1,14 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QSizePolicy>
-#include <QAction>
-#include <QApplication>
-#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QTabWidget>
 #include <QWidget>
-#include <QVBoxLayout>
 #include <QStatusBar>
+
+#include <memory>
 
 #include "src/motor.h"
 #include "src/settings.h"
@@ -53,10 +50,10 @@ private:
     bool LoadSettings(const QString& filename);
     bool SaveSettings();
 
-    OpenBurnMotor* m_DesignMotor;
-    PropellantList* m_Propellants;
-    MotorSim* m_Simulator;
-    OpenBurnSettings* m_GlobalSettings;
+	std::unique_ptr<OpenBurnMotor> m_DesignMotor;
+	std::unique_ptr<PropellantList> m_Propellants;
+    std::unique_ptr<MotorSim> m_Simulator;
+    std::unique_ptr<OpenBurnSettings> m_GlobalSettings;
     QString m_CurrentDesignFilename;
 
     QString m_SettingsFileName;
@@ -73,8 +70,8 @@ private:
     QStatusBar *m_StatusBar;
 
     QTabWidget *m_TabWidget;
-    DesignTab *m_DesignTab;
-    SimulationTab* m_SimTab;
-    PropellantTab* m_PropellantTab;
+	std::unique_ptr<DesignTab> m_DesignTab;
+	std::unique_ptr<SimulationTab> m_SimTab;
+	std::unique_ptr<PropellantTab> m_PropellantTab;
 
 };
