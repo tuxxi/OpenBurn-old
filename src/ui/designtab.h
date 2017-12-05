@@ -40,6 +40,7 @@ private slots:
     void OnGrainDialogClosed();
     void OnNozzleDialogClosed();
     void OnGrainTableCellClicked(int row, int column);
+	void ToggleDesignButtons(bool on);
 private:
     void SetSeed(OpenBurnGrain* grain);
     void SetupUI();

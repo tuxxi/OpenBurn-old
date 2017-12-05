@@ -156,83 +156,72 @@ void DesignTab::UpdateDesign()
 {
     const QString lengthUnitSymbol = m_GlobalSettings->m_LengthUnits.GetUnitSymbol();
     const QString massUnitSymbol = m_GlobalSettings->m_MassUnits.GetUnitSymbol();
-    if (m_Motor->HasGrains())
-    {        
-        m_lblMotorLen->setText(QString::number(
-            m_GlobalSettings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                m_Motor->GetMotorLength()), 'f', 2) +
-            " " +
-           lengthUnitSymbol);
-        m_lblMotorMajorDia->setText(QString::number(
-            m_GlobalSettings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                m_Motor->GetMotorMajorDiameter()), 'f', 2) +
-            " " +
-            lengthUnitSymbol);
-        m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
-        m_lblPropellantMass->setText(QString::number(
-            m_GlobalSettings->m_MassUnits.ConvertFrom(
-                OpenBurnUnits::MassUnits_T::pounds_mass,
-                m_Motor->GetMotorPropellantMass() ), 'f', 2) +
-            " " +
-            massUnitSymbol);
-        m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'f', 2) + '%');
-        if (m_Motor->HasNozzle())
-        {
-            QString initialKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_INITIAL)));
-            QString maxKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_MAX)));
-            QString finalKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_FINAL)));
-    
-            m_lblKn->setText(initialKn + "-" + maxKn);
-            m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'f', 2));
-            emit(m_Motor->DesignReady()); //design is ready, so anyone who is listening knows they can use it now!
-        }
-    }
+
+	m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
+ 
+    m_lblMotorLen->setText(QString::number(
+        m_GlobalSettings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            m_Motor->GetMotorLength()), 'f', 2) +
+        " " +
+        lengthUnitSymbol);
+    m_lblMotorMajorDia->setText(QString::number(
+        m_GlobalSettings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            m_Motor->GetMotorMajorDiameter()), 'f', 2) +
+        " " +
+        lengthUnitSymbol);
+    m_lblPropellantMass->setText(QString::number(
+        m_GlobalSettings->m_MassUnits.ConvertFrom(
+            OpenBurnUnits::MassUnits_T::pounds_mass,
+            m_Motor->GetMotorPropellantMass() ), 'f', 2) +
+        " " +
+        massUnitSymbol);
+    m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'f', 2) + '%');
     if (m_Motor->HasNozzle())
     {
-        m_lblNozzleThroatDia->setText(QString::number(
-           m_GlobalSettings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                m_Motor->GetNozzle()->GetNozzleThroat()), 'f', 2) +
-            " " +
-            lengthUnitSymbol);
-        m_lblNozzleExitDia->setText(QString::number(
-            m_GlobalSettings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                m_Motor->GetNozzle()->GetNozzleExit()), 'f', 2) +
-            " " +
-            lengthUnitSymbol);
-        m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'f', 2));
+		m_lblNozzleThroatDia->setText(QString::number(
+			m_GlobalSettings->m_LengthUnits.ConvertFrom(
+				OpenBurnUnits::LengthUnits_T::inches,
+				m_Motor->GetNozzle()->GetNozzleThroat()), 'f', 2) +
+			" " +
+			lengthUnitSymbol);
+		m_lblNozzleExitDia->setText(QString::number(
+			m_GlobalSettings->m_LengthUnits.ConvertFrom(
+				OpenBurnUnits::LengthUnits_T::inches,
+				m_Motor->GetNozzle()->GetNozzleExit()), 'f', 2) +
+			" " +
+			lengthUnitSymbol);
+		m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'f', 2));
+
+        QString initialKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_INITIAL)));
+        QString maxKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_MAX)));
+        QString finalKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_FINAL)));
+    
+        m_lblKn->setText(initialKn + "-" + maxKn);
+        m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'f', 2));
     }
+    
     UpdateGraphics(); 
 }
 void DesignTab::UpdateGraphics()
 {
-    if (!m_gfxMotor)
+    if (m_gfxMotor == nullptr)
     {
-		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100);
+		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor);
         m_MotorDisplayScene->addItem(m_gfxMotor.get());
     }
-    if (m_Motor->HasGrains())
-    {
-        //ugly hack: it's easier to just remove everything and add all the grains back than it is to try
-        //to shift everything around and make the length / width work correctly.... 
-        m_gfxMotor->RemoveAllGrains();
-        m_gfxMotor->SetGrains(m_Motor->GetGrains());
-    }
-    else
-    {
-        m_gfxMotor->RemoveAllGrains();
-    }
-    if (m_Motor->HasNozzle())
-    {
-        m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
-    }
+
+	if (m_Motor->HasGrains())
+	{
+		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
+		if (m_Motor->HasNozzle()) m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
+	}
+
     //set the motor display scene to the middle of the view plus a bit of padding on the sides
-    m_MotorDisplayScene->setSceneRect(m_gfxMotor->boundingRect());
-    QRectF bounds = QRectF(m_gfxMotor->boundingRect().left(), m_gfxMotor->boundingRect().top(),
-        m_gfxMotor->boundingRect().width() + 50, m_gfxMotor->boundingRect().height() + 15);
+	const QRectF rect = m_gfxMotor->boundingRect();
+    m_MotorDisplayScene->setSceneRect(rect);
+    const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
 
     m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
@@ -326,9 +315,9 @@ void DesignTab::OnDeleteGrainButtonClicked()
     {
         m_Motor->RemoveGrain(i - count);
         count++;
-    }    
+    }
     //disable the button again since we no longer have anything selected
-    m_btnDeleteGrain->setEnabled(false);
+	ToggleDesignButtons(false);
     UpdateDesign();
 }
 void DesignTab::OnNozzleButtonClicked()
@@ -348,10 +337,15 @@ void DesignTab::OnGrainTableCellClicked(int row, int column)
     Q_UNUSED(column);
     Q_UNUSED(row);
     SetSeed(m_Motor->GetGrains()[row]);
-    m_btnDeleteGrain->setEnabled(true);
-    m_btnEditGrain->setEnabled(true);
-    m_btntMoveGrainUp->setEnabled(true);
-    m_btntMoveGrainDown->setEnabled(true);
+	ToggleDesignButtons(true);
+}
+
+void DesignTab::ToggleDesignButtons(bool on)
+{
+	m_btnDeleteGrain->setEnabled(on);
+	m_btnEditGrain->setEnabled(on);
+	m_btntMoveGrainUp->setEnabled(on);
+	m_btntMoveGrainDown->setEnabled(on);
 }
 void DesignTab::OnMoveGrainUpButtonClicked()
 {

@@ -315,28 +315,26 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     {
         motor = GetCurrentSliceMotor();
     }
-    if (m_gfxMotor == nullptr)
-    {
-        m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, true);
-        connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
-            this, &SimulationTab::OnXPosClicked);
-        m_MotorDisplayScene->addItem(m_gfxMotor.get());
-        if (motor->HasGrains())
-        {
-            m_gfxMotor->SetGrains(motor->GetGrains());
-        }
-        if (motor->HasNozzle())
-        {
-            m_gfxMotor->SetNozzle(motor->GetNozzle());
-        }
-    }
-    m_gfxMotor->UpdateGrains(motor->GetGrains());
-    //set the motor display scene to the middle of the view plus a bit of padding on the sides
-    m_MotorDisplayScene->setSceneRect(m_gfxMotor->boundingRect());
-    QRectF bounds = QRectF(m_gfxMotor->boundingRect().left(), m_gfxMotor->boundingRect().top(),
-        m_gfxMotor->boundingRect().width() + 50, m_gfxMotor->boundingRect().height() + 15);
+	if (m_gfxMotor == nullptr)
+	{
+		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor, true);
+		connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
+			this, &SimulationTab::OnXPosClicked);
+		m_MotorDisplayScene->addItem(m_gfxMotor.get());
+	}
+	if (m_Motor->HasGrains())
+	{
+		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
+		if (m_Motor->HasNozzle()) m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
+	}
 
-    m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+	m_gfxMotor->BurnGrains(motor->GetGrains());
+
+	//set the motor display scene to the middle of the view plus a bit of padding on the sides
+	const QRectF rect = m_gfxMotor->boundingRect();
+	m_MotorDisplayScene->setSceneRect(rect);
+	const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
+	m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case
     repaint();
@@ -368,7 +366,6 @@ void SimulationTab::OnDesignReady()
 }
 void SimulationTab::OnDesignUpdated()
 {
-	m_gfxMotor.reset();
     UpdateGraphics();
 }
 void SimulationTab::OnSimSettingsButtonClicked()

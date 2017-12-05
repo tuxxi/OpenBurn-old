@@ -1,16 +1,30 @@
 #include "src/ui/graphics/motorgraphicsitem.h"
 
 
-MotorGraphicsItem::MotorGraphicsItem(int scale_factor, bool allowSlice, QGraphicsItem *parent)
+MotorGraphicsItem::MotorGraphicsItem(int scale_factor, OpenBurnMotor* motor, bool allowSlice, QGraphicsItem *parent)
     : QGraphicsObject(parent),
     m_ScaleFactor(scale_factor),
     m_gfxNozzle(nullptr),
+	m_Motor(motor),
     m_MotorLen(0),
     m_MotorHeight(0),
     m_currentSliceLocation(0),
     m_bAllowSlice(allowSlice)
 {
-
+	connect(m_Motor, &OpenBurnMotor::GrainAdded,
+		this, &MotorGraphicsItem::AddGrain);
+	connect(m_Motor, &OpenBurnMotor::GrainRemoved,
+		this, &MotorGraphicsItem::RemoveGrain);
+	connect(m_Motor, &OpenBurnMotor::DesignUpdated,
+		this, &MotorGraphicsItem::OnMotorUpdated);
+	if (m_Motor->HasGrains())
+	{
+		SetGrains(m_Motor->GetGrains());
+	}
+	if (m_Motor->HasNozzle())
+	{
+		SetNozzle(m_Motor->GetNozzle());
+	}
 }
 QRectF MotorGraphicsItem::boundingRect() const
 {
@@ -63,46 +77,49 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 }
 void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
 {  
-    //size_t i = !m_gfxGrains.empty() ? m_gfxGrains.size() : 0; i < grains.size(); ++i)
-    for (size_t i = 0; i < grains.size(); i++)
+    for (auto& i : grains)
     {
-        GrainGraphicsItem* newGrain = new GrainGraphicsItem(grains[i], m_ScaleFactor, true, this);
-        double len = newGrain->boundingRect().width();
-        newGrain->setPos(m_MotorLen, 0);
-        m_gfxGrains.push_back(newGrain);
-        m_MotorLen += len;
+		AddGrain(i);
     }
     CalculateMotorHeight();
-    update(boundingRect());
 }
-void MotorGraphicsItem::RemoveGrain(int index)
+void MotorGraphicsItem::AddGrain(OpenBurnGrain* grain)
 {
-    Q_UNUSED(index);
-    /*
-    int grainLen = m_gfxGrains[index]->boundingRect().width();  
-    m_MotorLen -= grainLen;
-    delete m_gfxGrains[index];
-    m_gfxGrains[index] = nullptr;
-    m_gfxGrains.erase(m_gfxGrains.begin() + index);
-
-    //shift grains after this one back in line
-    for (size_t i = index; i < m_gfxGrains.size(); i++)
-    {
-        QPointF currentPos = m_gfxGrains[i]->pos();
-        m_gfxGrains[i]->setPos(currentPos.rx() - grainLen, currentPos.ry());
-    }
-    CalculateMotorHeight();
-    */
+	auto newGrain = std::make_unique<GrainGraphicsItem>(grain, m_ScaleFactor, true, this);
+	newGrain->setPos(m_MotorLen, 0);
+	m_gfxGrains.push_back(std::move(newGrain));
+	m_MotorLen += m_gfxGrains.rbegin()->get()->boundingRect().width();
+	CalculateMotorHeight();
+}
+void MotorGraphicsItem::RemoveGrain(int idx)
+{
+	m_MotorLen -= m_gfxGrains[idx].get()->boundingRect().width();
+	m_gfxGrains.erase(m_gfxGrains.begin() + idx);
+}
+void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
+{
+	if (grains.size() > m_gfxGrains.size())
+	{
+		int diff = int(grains.size() - m_gfxGrains.size());
+		for (auto i = grains.rbegin(); i != grains.rbegin() + diff; ++i) //reverse iterator operator+() goes backwwards :<
+		{
+			AddGrain(*i);
+		}
+	}
+	m_MotorLen = 0;
+	for (size_t i = 0; i < grains.size(); i++)
+	{
+		m_gfxGrains[i]->UpdateGrain(grains[i]);
+		m_gfxGrains[i]->setPos(m_MotorLen, 0);
+		m_MotorLen += m_gfxGrains[i]->boundingRect().width();
+	}
+	CalculateMotorHeight();
 }
 void MotorGraphicsItem::RemoveAllGrains()
 {
-    for (size_t i = 0; i < m_gfxGrains.size(); i++)
-    {
-        delete m_gfxGrains[i];
-        m_gfxGrains[i] = nullptr;
-    }
     m_gfxGrains.clear();
     m_MotorLen = 0;
+	HideNozzle();
 }
 void MotorGraphicsItem::SetScaleFactor(int scale)
 {
@@ -112,25 +129,33 @@ void MotorGraphicsItem::SetNozzle(OpenBurnNozzle* nozzle)
 {
     if (!m_gfxNozzle)
     {
-        m_gfxNozzle = new NozzleGraphicsItem(nozzle, m_ScaleFactor, m_MotorHeight, true, this);
+        m_gfxNozzle = std::make_unique<NozzleGraphicsItem>(nozzle, m_ScaleFactor, m_MotorHeight, true, this);
     }
     m_gfxNozzle->UpdateNozzle(nozzle);    
     m_gfxNozzle->setPos(m_MotorLen, 0);
     update(boundingRect());
 }
+void MotorGraphicsItem::HideNozzle()
+{
+	m_gfxNozzle.reset();
+}
+
 //loops through all the grains in the motor and finds the _maximum_ diameter. this is the motor height.
 void MotorGraphicsItem::CalculateMotorHeight()
 {
     m_MotorHeight = 0.0f;
-    for (auto* i : m_gfxGrains)
+    for (auto& i : m_gfxGrains)
     {
         m_MotorHeight = qMax(i->boundingRect().height(), m_MotorHeight); //if one grain is larger, that's our new motor diameter.
     }
     if (m_gfxNozzle) m_gfxNozzle->UpdateHeight(m_MotorHeight);
+	update(boundingRect());
 }
-void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
+void MotorGraphicsItem::BurnGrains(const std::vector<OpenBurnGrain*>& grains)
 {
-    for (size_t i = 0; i < m_gfxGrains.size(); i++)
+	if (grains.size() != m_gfxGrains.size()) return;
+
+    for (size_t i = 0; i < grains.size(); i++)
     {
         //we want the grain to stay in the middle of it's current location
         double pixelDiff = .5 * m_ScaleFactor * (m_gfxGrains[i]->GetGrain()->GetLength() - grains[i]->GetLength());
@@ -141,4 +166,17 @@ void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
 double MotorGraphicsItem::GetCurrentXPosSlice()
 {
     return m_currentSliceLocation / m_ScaleFactor;
+}
+void MotorGraphicsItem::OnMotorUpdated()
+{
+	if (!m_Motor->HasGrains())
+	{
+		RemoveAllGrains();
+		HideNozzle();
+	}
+	else if (m_Motor->HasNozzle())
+	{
+		SetNozzle(m_Motor->GetNozzle());
+	}
+	UpdateGrains(m_Motor->GetGrains());
 }

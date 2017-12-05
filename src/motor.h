@@ -3,9 +3,6 @@
 #include <QJsonArray>
 
 #include <vector>
-#include <functional>
-#include <algorithm>
-#include <iterator>
 
 #include "grain.h"
 #include "nozzle.h"
@@ -45,8 +42,8 @@ public:
 
     GrainVector& GetGrains();
     OpenBurnGrain* GetGrainAtX(double x);
-    OpenBurnNozzle* GetNozzle();
-    const OpenBurnPropellant& GetAvgPropellant();
+    OpenBurnNozzle* GetNozzle() const;
+    const OpenBurnPropellant GetAvgPropellant() const;
 
     bool HasNozzle() const;
     bool HasGrains() const;
@@ -64,8 +61,12 @@ public:
 
 signals:
     void DesignReady();
+	void DesignNotReady();
     void DesignUpdated();
+	void GrainAdded(OpenBurnGrain*);
+	void GrainRemoved(int);
 private:
+	void UpdateDesign();
     OpenBurnNozzle* m_Nozzle;
     GrainVector m_Grains;
 
