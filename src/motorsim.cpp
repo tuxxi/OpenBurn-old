@@ -12,10 +12,10 @@ MotorSim::MotorSim()
 }
 MotorSim::MotorSim(OpenBurnMotor* motor)
     : m_InitialDesignMotor(motor),
-      m_TotalBurnTime(0),
-      m_TotalImpulse(0)
+    m_TotalBurnTime(0),
+    m_TotalImpulse(0)
 {
-
+    ClearAllData();
 }
 MotorSim::~MotorSim()
 {
@@ -354,15 +354,16 @@ std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsEn
 {
 	return m_SimResultData.end();
 }
-
 MotorSimDataPoint* MotorSim::GetResult(int index)
 {
-	return m_SimResultData[index].get();
+    if (GetResultsEmpty())
+        return nullptr;
+    return m_SimResultData[index].get();
 }
 
 bool MotorSim::GetResultsEmpty() const
 {
-	return m_SimResultData.empty();
+	return qFuzzyIsNull(m_TotalBurnTime) || m_SimResultData.empty();
 }
 double MotorSim::GetAvgThrust() const
 {

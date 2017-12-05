@@ -95,9 +95,9 @@ QList<int> GrainTableWidget::GetSelectedGrainIndices()
     }
     return selectedList;
 }
-QList<OpenBurnGrain*> GrainTableWidget::GetSelectedGrains()
+GrainVector GrainTableWidget::GetSelectedGrains()
 {
-    QList<OpenBurnGrain*> selectedList;
+    GrainVector selectedList;
     int counter = 0;    
     for (auto* i : selectedItems())
     {
@@ -105,7 +105,7 @@ QList<OpenBurnGrain*> GrainTableWidget::GetSelectedGrains()
         counter++;
         if (idx != -1 && counter % columnCount() == 0)
         {
-            selectedList.push_back(m_Motor->GetGrains()[idx].get());
+            selectedList.emplace_back(m_Motor->GetGrains()[idx]);
         }  
     }
     return selectedList;

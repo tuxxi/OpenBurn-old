@@ -291,15 +291,14 @@ void DesignTab::OnEditGrainButtonClicked()
 {
     //we want to be able to click "edit" and edit differently selected grains, so we delete this every time
     //the edit button is clicked
-	/*
+	
 	if (m_GrainDialog)
 	{
 		delete m_GrainDialog;
 		m_GrainDialog = nullptr;
 	}
-	*/
     m_GrainDialog = new GrainDialog(m_Propellants,
-            m_GrainTable->GetSelectedGrains()[0],
+            m_GrainTable->GetSelectedGrains()[0].get(),
             m_GlobalSettings,
             m_GrainTable->GetSelectedGrains());
 	connect(m_GrainDialog, &GrainDialog::GrainEdited

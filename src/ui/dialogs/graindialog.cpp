@@ -10,18 +10,15 @@
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
-	const QList<OpenBurnGrain*>& grains, QWidget *parent)
+	const GrainVector& grains, QWidget *parent)
     : QDialog(parent),
     m_gfxGrain(nullptr),
+    m_grainsToEdit(grains),
     m_Propellants(prop),
     m_GlobalSettings(settings),
     m_isNewGrainWindow(grains.empty())
 {
-	for (auto& i : grains)
-	{
-		m_grainsToEdit.push_back(std::shared_ptr<OpenBurnGrain>(i));
-	}
-    //setAttribute(Qt::WA_DeleteOnClose);
+    setAttribute(Qt::WA_DeleteOnClose);
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
     connect(m_btnCancel, &QPushButton::clicked,
@@ -88,7 +85,7 @@ void GrainDialog::OnDesignUpdated()
     {
         if (m_isNewGrainWindow && m_grainsToEdit.empty())
         {
-			auto grain = std::make_unique<CylindricalGrain>(
+			auto grain = std::make_shared<CylindricalGrain>(
                 design->GetDiameter(),
                 design->GetCoreDiameter(),
                 design->GetLength(),
@@ -168,7 +165,7 @@ void GrainDialog::OnApplyButtonClicked()
     {
         for (auto& i : m_grainsToEdit)
         {
-            emit GrainEdited(std::move(i));
+            emit GrainEdited(i);
         }
     }
 }

@@ -310,7 +310,10 @@ void SimulationTab::UpdatePlotter()
 }
 void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
 {
-    if (m_Simulator->GetResultsEmpty()) return;
+    if (m_Simulator->GetResultsEmpty())
+    {
+        return;
+    }
     if (motor == nullptr)
     {
         motor = GetCurrentSliceMotor();

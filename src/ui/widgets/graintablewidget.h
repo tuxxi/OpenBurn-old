@@ -19,7 +19,7 @@ public:
     ~GrainTableWidget() = default;
 
     QList<int>GetSelectedGrainIndices();
-    QList<OpenBurnGrain*>GetSelectedGrains();
+    GrainVector GetSelectedGrains();
 
 public slots:
     void OnMotorUpdated();

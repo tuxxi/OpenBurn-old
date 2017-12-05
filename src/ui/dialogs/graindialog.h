@@ -23,7 +23,7 @@ public:
     explicit GrainDialog(PropellantList* propellants,
         OpenBurnGrain* seedValues = nullptr, 
         OpenBurnSettings* settings = nullptr,
-        const QList<OpenBurnGrain*>& grains = QList<OpenBurnGrain*>(),
+        const GrainVector& grains = GrainVector(),
         QWidget* parent = nullptr
         );
     ~GrainDialog() = default;
