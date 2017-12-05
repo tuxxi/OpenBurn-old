@@ -183,7 +183,7 @@ void SimulationTab::UpdateSimulation()
     UpdateResults();
     UpdatePlotterLine();
     int idx = m_sldBurnTimeScrubBar->value();
-    OpenBurnMotor* motor = m_Simulator->GetResults()[idx]->motor;
+    OpenBurnMotor* motor = m_Simulator->GetResult(idx)->motor.get();
     UpdateCurrentChamber(idx);
     UpdateGraphics(motor);
     UpdateCurrentXPos(m_currentXPos);
@@ -249,11 +249,11 @@ void SimulationTab::UpdatePlotterLine()
 }
 void SimulationTab::UpdateCurrentChamber(int currentSlice)
 {
-    if (m_Simulator->GetResults().empty())
+    if (m_Simulator->GetResultsEmpty())
     {
         return;
     }
-    MotorSimDataPoint* data = m_Simulator->GetResults()[currentSlice];
+    MotorSimDataPoint* data = m_Simulator->GetResult(currentSlice);
 
     const QString pressureUnits = m_GlobalSettings->m_PressureUnits.GetUnitSymbol();
     const QString forceUnits = m_GlobalSettings->m_ForceUnits.GetUnitSymbol();
@@ -274,7 +274,7 @@ void SimulationTab::UpdateCurrentChamber(int currentSlice)
 }
 void SimulationTab::UpdatePlotter()
 {
-    if (m_Simulator->GetResults().empty())
+    if (m_Simulator->GetResultsEmpty())
     {
         return;
     }
@@ -290,11 +290,11 @@ void SimulationTab::UpdatePlotter()
     QVector<double> time(numPoints), pressure(numPoints), massflux(numPoints);
     for (int i=0; i<numPoints; ++i)
     {
-        time[i] = m_Simulator->GetResults()[i]->time;
+        time[i] = m_Simulator->GetResult(i)->time;
         pressure[i] = m_GlobalSettings->m_PressureUnits.ConvertFrom(
             OpenBurnUnits::PressureUnits_T::psi,
-            m_Simulator->GetResults()[i]->pressure);
-        massflux[i] = massFluxScale * m_Simulator->GetResults()[i]->massflux;
+            m_Simulator->GetResult(i)->pressure);
+        massflux[i] = massFluxScale * m_Simulator->GetResult(i)->massflux;
     }
     m_Plotter->graph(0)->setData(time, pressure);
     m_Plotter->graph(1)->setData(time, massflux);
@@ -310,7 +310,7 @@ void SimulationTab::UpdatePlotter()
 }
 void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
 {
-    if (m_Simulator->GetResults().empty()) return;
+    if (m_Simulator->GetResultsEmpty()) return;
     if (motor == nullptr)
     {
         motor = GetCurrentSliceMotor();
@@ -411,8 +411,8 @@ void SimulationTab::OnToBeginningButtonClicked()
 }
 void SimulationTab::OnMotorSliceChanged(int sliceIndex)
 {
-    if (m_Simulator->GetResults().empty()) return;
-    OpenBurnMotor* motor = m_Simulator->GetResults()[sliceIndex]->motor;
+    if (m_Simulator->GetResultsEmpty()) return;
+    OpenBurnMotor* motor = m_Simulator->GetResult(sliceIndex)->motor.get();
     UpdatePlotterLine();
     UpdateCurrentChamber(sliceIndex);
     UpdateGraphics(motor);
@@ -444,7 +444,7 @@ void SimulationTab::resizeEvent(QResizeEvent* event)
 }
 OpenBurnMotor* SimulationTab::GetCurrentSliceMotor()
 {
-    if (m_Simulator->GetResults().empty()) 
+    if (m_Simulator->GetResultsEmpty()) 
         return nullptr;
-    return m_Simulator->GetResults()[m_sldBurnTimeScrubBar->value()]->motor;
+    return m_Simulator->GetResult(m_sldBurnTimeScrubBar->value())->motor.get();
 }

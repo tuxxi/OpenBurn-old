@@ -33,8 +33,8 @@ void MotorSim::RunSim(MotorSimSettings* settings)
     emit SimulationStarted();
     while(numBurnedOut < m_InitialDesignMotor->GetNumGrains())
     {
-        MotorSimDataPoint* newDataPoint = new MotorSimDataPoint;
-        OpenBurnMotor* newDataPointMotor = new OpenBurnMotor;
+        auto newDataPoint = std::make_unique<MotorSimDataPoint>();
+		auto newDataPointMotor = std::make_unique<OpenBurnMotor>();
         newDataPointMotor->SetNozzle(m_InitialDesignMotor->GetNozzle());
 
         if (iterations == 0) //start with initial conditions
@@ -46,13 +46,13 @@ void MotorSim::RunSim(MotorSimSettings* settings)
             //after we've run the sim for one time step, use the previous result as initial condition
             newDataPointMotor->SetGrains(m_SimResultData[iterations-1]->motor->GetGrains(), true);
         }
-        newDataPoint->motor = newDataPointMotor;
-        newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor);
+        newDataPoint->motor = std::move(newDataPointMotor);
+        newDataPoint->pressure = CalcChamberPressure(newDataPoint->motor.get());
         newDataPoint->time = m_TotalBurnTime;
 
-        for (auto* i : newDataPointMotor->GetGrains())
+        for (auto& i : newDataPoint->motor->GetGrains())
         {
-            newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPointMotor, i);
+            newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPoint->motor.get(), i);
             i->SetBurnRate(newDataPoint->burnRate);
 
             //OpenBurnGrain::Burn should return false if the grain burned out
@@ -61,13 +61,13 @@ void MotorSim::RunSim(MotorSimSettings* settings)
                 numBurnedOut++;
             }
         }
-        newDataPoint->thrust = CalcThrust(newDataPoint->motor, settings, newDataPoint->pressure);
-        newDataPoint->massflux = CalcCoreMassFlux(newDataPoint->motor);
-        newDataPoint->isp = CalcIsp(newDataPoint->motor, newDataPoint->thrust);
+        newDataPoint->thrust = CalcThrust(newDataPoint->motor.get(), settings, newDataPoint->pressure);
+        newDataPoint->massflux = CalcCoreMassFlux(newDataPoint->motor.get());
+        newDataPoint->isp = CalcIsp(newDataPoint->motor.get(), newDataPoint->thrust);
         m_TotalImpulse += (newDataPoint->thrust * settings->timeStep);
         m_TotalBurnTime += settings->timeStep;
 
-        m_SimResultData.push_back(newDataPoint);
+        m_SimResultData.push_back(std::move(newDataPoint));
         if (m_TotalBurnTime > 1000.0) //failure state - 1000 second burn time
         {
             emit SimulationFinished(false);
@@ -314,10 +314,7 @@ double MotorSim::CalcErosiveBurnRateFactor(OpenBurnMotor* motor, OpenBurnGrain* 
     double R_e = R_total - R_0 - R_diff;
     return R_e;
 }
-const std::vector<MotorSimDataPoint*>& MotorSim::GetResults() const
-{
-    return m_SimResultData;
-}
+
 double MotorSim::GetTotalBurnTime() const
 {
     return m_TotalBurnTime;
@@ -329,7 +326,7 @@ double MotorSim::GetTotalImpulse() const
 double MotorSim::GetMaxPressure() const
 {
     double maxPressure = 0;
-    for (auto i : m_SimResultData)
+    for (auto& i : m_SimResultData)
     {
         if (i->pressure > maxPressure)
         {
@@ -341,12 +338,31 @@ double MotorSim::GetMaxPressure() const
 double MotorSim::GetMaxMassFlux() const
 {
     double maxMassFlux = 0;
-    for (auto i : m_SimResultData)
+    for (auto& i : m_SimResultData)
     {
         if (i->massflux > maxMassFlux)
             maxMassFlux = i->massflux;
     }
     return maxMassFlux;
+}
+
+std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsBegin()
+{
+	return m_SimResultData.begin();
+}
+std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsEnd()
+{
+	return m_SimResultData.end();
+}
+
+MotorSimDataPoint* MotorSim::GetResult(int index)
+{
+	return m_SimResultData[index].get();
+}
+
+bool MotorSim::GetResultsEmpty() const
+{
+	return m_SimResultData.empty();
 }
 double MotorSim::GetAvgThrust() const
 {
@@ -354,10 +370,6 @@ double MotorSim::GetAvgThrust() const
 }
 void MotorSim::ClearAllData()
 {
-    for (auto& i : m_SimResultData)
-    {
-        delete i;
-    }
     m_SimResultData.clear();
 }
 void MotorSim::SetDesignMotor(OpenBurnMotor *motor)

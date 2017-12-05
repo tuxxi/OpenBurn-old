@@ -8,7 +8,7 @@
 
 struct MotorSimDataPoint
 {
-    OpenBurnMotor* motor;
+    std::unique_ptr<OpenBurnMotor> motor;
     double pressure;
     double massflux;
     double burnRate;
@@ -18,10 +18,6 @@ struct MotorSimDataPoint
     MotorSimDataPoint() 
         : motor(nullptr), pressure(0), massflux(0), burnRate(0), time(0), thrust(0), isp(0)
     {}
-    ~MotorSimDataPoint()
-    {
-        delete motor;
-    }
 };
 class MotorSim : public QObject
 {
@@ -61,8 +57,10 @@ public:
 
     double GetMaxPressure() const;
     double GetMaxMassFlux() const;
-    const std::vector<MotorSimDataPoint*>& GetResults() const;
-
+    std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsBegin();
+	std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsEnd();
+	MotorSimDataPoint* GetResult(int index);
+	bool GetResultsEmpty() const;
     void SetDesignMotor(OpenBurnMotor* motor);
 signals:
     void SimulationStarted();
@@ -70,7 +68,7 @@ signals:
     void SimulationFinished(bool success);
 private:
     void ClearAllData();
-    std::vector<MotorSimDataPoint*> m_SimResultData;
+    std::vector<std::unique_ptr<MotorSimDataPoint>> m_SimResultData;
     OpenBurnMotor* m_InitialDesignMotor;
 
     double m_TotalBurnTime;
