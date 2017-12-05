@@ -52,7 +52,7 @@ void MotorSim::RunSim(MotorSimSettings* settings)
 
         for (auto& i : newDataPoint->motor->GetGrains())
         {
-            newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPoint->motor.get(), i);
+            newDataPoint->burnRate = CalcSteadyStateBurnRate(newDataPoint->motor.get(), i.get());
             i->SetBurnRate(newDataPoint->burnRate);
 
             //OpenBurnGrain::Burn should return false if the grain burned out

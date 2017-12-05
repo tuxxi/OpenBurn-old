@@ -75,11 +75,11 @@ void MotorGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->drawLine(m_currentSliceLocation, -50, m_currentSliceLocation, m_MotorHeight + 50);
     }
 }
-void MotorGraphicsItem::SetGrains(const std::vector<OpenBurnGrain*>& grains)
+void MotorGraphicsItem::SetGrains(const GrainVector& grains)
 {  
-    for (auto& i : grains)
+    for (auto& grain : grains)
     {
-		AddGrain(i);
+		AddGrain(grain.get());
     }
     CalculateMotorHeight();
 }
@@ -96,20 +96,20 @@ void MotorGraphicsItem::RemoveGrain(int idx)
 	m_MotorLen -= m_gfxGrains[idx].get()->boundingRect().width();
 	m_gfxGrains.erase(m_gfxGrains.begin() + idx);
 }
-void MotorGraphicsItem::UpdateGrains(const std::vector<OpenBurnGrain*>& grains)
+void MotorGraphicsItem::UpdateGrains(const GrainVector& grains)
 {
 	if (grains.size() > m_gfxGrains.size())
 	{
 		int diff = int(grains.size() - m_gfxGrains.size());
 		for (auto i = grains.rbegin(); i != grains.rbegin() + diff; ++i) //reverse iterator operator+() goes backwwards :<
 		{
-			AddGrain(*i);
+			AddGrain(i->get());
 		}
 	}
 	m_MotorLen = 0;
 	for (size_t i = 0; i < grains.size(); i++)
 	{
-		m_gfxGrains[i]->UpdateGrain(grains[i]);
+		m_gfxGrains[i]->UpdateGrain(grains[i].get());
 		m_gfxGrains[i]->setPos(m_MotorLen, 0);
 		m_MotorLen += m_gfxGrains[i]->boundingRect().width();
 	}
@@ -151,7 +151,7 @@ void MotorGraphicsItem::CalculateMotorHeight()
     if (m_gfxNozzle) m_gfxNozzle->UpdateHeight(m_MotorHeight);
 	update(boundingRect());
 }
-void MotorGraphicsItem::BurnGrains(const std::vector<OpenBurnGrain*>& grains)
+void MotorGraphicsItem::BurnGrains(const GrainVector& grains)
 {
 	if (grains.size() != m_gfxGrains.size()) return;
 
@@ -160,7 +160,7 @@ void MotorGraphicsItem::BurnGrains(const std::vector<OpenBurnGrain*>& grains)
         //we want the grain to stay in the middle of it's current location
         double pixelDiff = .5 * m_ScaleFactor * (m_gfxGrains[i]->GetGrain()->GetLength() - grains[i]->GetLength());
         m_gfxGrains[i]->setPos(m_gfxGrains[i]->pos().x() + pixelDiff, m_gfxGrains[i]->pos().y());
-        m_gfxGrains[i]->UpdateGrain(grains[i]);
+        m_gfxGrains[i]->UpdateGrain(grains[i].get());
     }
 }
 double MotorGraphicsItem::GetCurrentXPosSlice()

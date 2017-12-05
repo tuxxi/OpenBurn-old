@@ -24,8 +24,8 @@ public:
 
     void resizeEvent(QResizeEvent* event) override;
 public slots:
-    void OnNewGrain(OpenBurnGrain* grain); //recieved from the grain dialog
-    void OnGrainModified(OpenBurnGrain* grain); //recieved from the grain dialog
+    void OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain); //recieved from the grain dialog
+    void OnGrainModified(const std::shared_ptr<OpenBurnGrain>& grain); //recieved from the grain dialog
     void OnNozzleUpdated(OpenBurnNozzle* nozz);
     void OnDesignUpdated();
 private slots:

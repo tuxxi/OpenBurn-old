@@ -28,9 +28,9 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
-	void SetGrains(const std::vector<OpenBurnGrain*>& grains);
-	void BurnGrains(const std::vector<OpenBurnGrain*>& grains);
-    void UpdateGrains(const std::vector<OpenBurnGrain*>& grains);
+	void SetGrains(const GrainVector& grains);
+	void BurnGrains(const GrainVector& grains);
+    void UpdateGrains(const GrainVector& grains);
 	void RemoveAllGrains();
 
     void SetNozzle(OpenBurnNozzle* nozzle);

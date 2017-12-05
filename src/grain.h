@@ -1,7 +1,10 @@
 #pragma once
-#include "src/propellant.h"
 #include <QtMath>
 #include <QJsonObject>
+
+#include <memory>
+
+#include "src/propellant.h"
 
 //represents a single propellant grain in a motor
 class OpenBurnGrain
@@ -35,7 +38,7 @@ public:
     //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
     virtual bool Burn(double timestep) = 0;
     virtual bool IsBurnedOut() = 0;
-    virtual OpenBurnGrain* Clone() = 0;
+    virtual std::shared_ptr<OpenBurnGrain> Clone() = 0;
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
 
     virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) = 0;
@@ -66,7 +69,7 @@ public:
     virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
     virtual bool IsBurnedOut() override;
-    virtual CylindricalGrain* Clone() override;
+    virtual std::shared_ptr<OpenBurnGrain> Clone() override;
     
     virtual double GetCoreDiameter();
     virtual void SetCoreDiameter(double dia);

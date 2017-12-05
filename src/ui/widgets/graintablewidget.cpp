@@ -45,7 +45,7 @@ void GrainTableWidget::OnMotorUpdated()
 {
     const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
     setRowCount(0);
-    for (auto grain : m_Motor->GetGrains())
+    for (auto& grain : m_Motor->GetGrains())
     {
         int numItems = rowCount();
         setRowCount(numItems+1);
@@ -68,7 +68,7 @@ void GrainTableWidget::OnMotorUpdated()
         setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
         setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
     
-        if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
+        if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain.get()))
         {
             setItem(numItems, 2, new QTableWidgetItem(QString::number(
                 m_Settings->m_LengthUnits.ConvertFrom(
@@ -105,7 +105,7 @@ QList<OpenBurnGrain*> GrainTableWidget::GetSelectedGrains()
         counter++;
         if (idx != -1 && counter % columnCount() == 0)
         {
-            selectedList.push_back(m_Motor->GetGrains()[idx]);
+            selectedList.push_back(m_Motor->GetGrains()[idx].get());
         }  
     }
     return selectedList;

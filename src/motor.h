@@ -3,6 +3,7 @@
 #include <QJsonArray>
 
 #include <vector>
+#include <memory>
 
 #include "grain.h"
 #include "nozzle.h"
@@ -13,7 +14,7 @@ enum KN_STATIC_CALC_TYPE
     KN_CALC_FINAL
 };
 
-typedef std::vector<OpenBurnGrain*> GrainVector;
+typedef std::vector<std::shared_ptr<OpenBurnGrain>> GrainVector;
 
 //we inherit from QObject in order to use signals and slots
 class OpenBurnMotor : public QObject
@@ -34,13 +35,12 @@ public:
     void SetGrains(const GrainVector& grains, bool copy = false);
     void SetNozzle(OpenBurnNozzle* nozz);
 
-    void AddGrain(OpenBurnGrain* grain);
-    void UpdateGrain(OpenBurnGrain* grain, int index);
+    void AddGrain(const std::shared_ptr<OpenBurnGrain>&);
     void SwapGrains(int idx1, int idx2);
     void RemoveGrain(OpenBurnGrain* grain);
     void RemoveGrain(int index);
 
-    GrainVector& GetGrains();
+    GrainVector GetGrains() const;
     OpenBurnGrain* GetGrainAtX(double x);
     OpenBurnNozzle* GetNozzle() const;
     const OpenBurnPropellant GetAvgPropellant() const;

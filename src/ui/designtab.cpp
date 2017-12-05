@@ -253,15 +253,15 @@ void DesignTab::OnGrainDialogClosed()
     m_GrainDialog = nullptr;
 }
 
-void DesignTab::OnNewGrain(OpenBurnGrain* grain)
+void DesignTab::OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 {
-    m_Motor->AddGrain(grain);
-    SetSeed(grain);
+    m_Motor->AddGrain(std::move(grain));
+    SetSeed(grain.get());
 }
-void DesignTab::OnGrainModified(OpenBurnGrain* grain)
+void DesignTab::OnGrainModified(const std::shared_ptr<OpenBurnGrain>& grain)
 {
     emit m_Motor->DesignUpdated();
-    SetSeed(grain);    
+    SetSeed(grain.get());
 }
 void DesignTab::OnNozzleUpdated(OpenBurnNozzle* nozz)
 {
@@ -278,8 +278,10 @@ void DesignTab::OnNewGrainButtonClicked()
         m_GrainDialog = new GrainDialog(m_Propellants,
                 m_grainSeed.get(),
                 m_GlobalSettings);
-        connect(m_GrainDialog, SIGNAL(GrainAdded(OpenBurnGrain*)), this, SLOT(OnNewGrain(OpenBurnGrain*)));
-        connect(m_GrainDialog, SIGNAL(destroyed()), this, SLOT(OnGrainDialogClosed()));
+        connect(m_GrainDialog, &GrainDialog::GrainAdded
+			, this, &DesignTab::OnNewGrain);
+        connect(m_GrainDialog, &GrainDialog::destroyed, 
+			this, &DesignTab::OnGrainDialogClosed);
     }
     m_GrainDialog->show();
     m_GrainDialog->activateWindow();
@@ -289,18 +291,21 @@ void DesignTab::OnEditGrainButtonClicked()
 {
     //we want to be able to click "edit" and edit differently selected grains, so we delete this every time
     //the edit button is clicked
+	/*
 	if (m_GrainDialog)
 	{
 		delete m_GrainDialog;
 		m_GrainDialog = nullptr;
 	}
-
+	*/
     m_GrainDialog = new GrainDialog(m_Propellants,
             m_GrainTable->GetSelectedGrains()[0],
             m_GlobalSettings,
             m_GrainTable->GetSelectedGrains());
-    connect(m_GrainDialog, SIGNAL(GrainAdded(OpenBurnGrain*)), this, SLOT(OnGrainModified(OpenBurnGrain*)));
-    connect(m_GrainDialog, SIGNAL(destroyed()), this, SLOT(OnGrainDialogClosed()));
+	connect(m_GrainDialog, &GrainDialog::GrainEdited
+		, this, &DesignTab::OnGrainModified);
+	connect(m_GrainDialog, &GrainDialog::destroyed,
+		this, &DesignTab::OnGrainDialogClosed);
 
     m_GrainDialog->show();
     m_GrainDialog->activateWindow();
@@ -336,7 +341,7 @@ void DesignTab::OnGrainTableCellClicked(int row, int column)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    SetSeed(m_Motor->GetGrains()[row]);
+    SetSeed(m_Motor->GetGrains()[row].get());
 	ToggleDesignButtons(true);
 }
 

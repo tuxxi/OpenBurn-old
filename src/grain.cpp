@@ -92,9 +92,9 @@ bool CylindricalGrain::IsBurnedOut()
 {
     return m_CoreDia <= m_GrainDia;
 }
-CylindricalGrain* CylindricalGrain::Clone()
+std::shared_ptr<OpenBurnGrain> CylindricalGrain::Clone()
 {
-    return new CylindricalGrain(*this);
+	return std::make_shared<CylindricalGrain>(*this);
 }
 void CylindricalGrain::ReadJSON(const QJsonObject& object, QString& propellantNameReturn)
 {

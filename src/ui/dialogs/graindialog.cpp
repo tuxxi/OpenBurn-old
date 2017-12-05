@@ -1,6 +1,5 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QSpacerItem>
 #include <QFrame>
 #include <QLabel>
 #include <QMessageBox>
@@ -11,15 +10,18 @@
 #include "src/grain.h"
 
 GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
-                        QList<OpenBurnGrain*>grains, QWidget *parent)
+	const QList<OpenBurnGrain*>& grains, QWidget *parent)
     : QDialog(parent),
-      m_gfxGrain(nullptr),
-      m_GrainsToEdit(grains),
-      m_Propellants(prop),
-      m_GlobalSettings(settings),
-      m_isNewGrainWindow(m_GrainsToEdit.isEmpty())
+    m_gfxGrain(nullptr),
+    m_Propellants(prop),
+    m_GlobalSettings(settings),
+    m_isNewGrainWindow(grains.empty())
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+	for (auto& i : grains)
+	{
+		m_grainsToEdit.push_back(std::shared_ptr<OpenBurnGrain>(i));
+	}
+    //setAttribute(Qt::WA_DeleteOnClose);
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
     connect(m_btnCancel, &QPushButton::clicked,
@@ -31,10 +33,7 @@ GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBu
 }
 void GrainDialog::SetupUI(OpenBurnGrain* seed)
 {
-    if (objectName().isEmpty())
-    {
-        setObjectName(QStringLiteral("GrainDialog"));        
-    }
+	setObjectName(QStringLiteral("GrainDialog"));
 
     setWindowTitle(m_isNewGrainWindow ? tr("Add New Grain") : tr("Modify Grain"));        
     resize(400, 400);
@@ -87,27 +86,26 @@ void GrainDialog::OnDesignUpdated()
     CylindricalGrainDesign* design = dynamic_cast<CylindricalGrainDesign*>(m_GrainDesign);
     if (design)
     {
-        if (m_isNewGrainWindow && m_GrainsToEdit.isEmpty())
+        if (m_isNewGrainWindow && m_grainsToEdit.empty())
         {
-            OpenBurnGrain* grain = new CylindricalGrain(
+			auto grain = std::make_unique<CylindricalGrain>(
                 design->GetDiameter(),
                 design->GetCoreDiameter(),
                 design->GetLength(),
                 design->GetPropellant(),                    
-                design->GetInhibitedFaces());
-            m_GrainsToEdit.push_back(grain);
+				design->GetInhibitedFaces());
+				m_grainsToEdit.emplace_back(std::move(grain));
         }
         else
         {
-            for (auto& i : m_GrainsToEdit)
+            for (auto& i : m_grainsToEdit)
             {
-                CylindricalGrain* grain = static_cast<CylindricalGrain*>(i);
+                CylindricalGrain* grain = static_cast<CylindricalGrain*>(i.get());
                 grain->SetDiameter(design->GetDiameter());
                 grain->SetCoreDiameter(design->GetCoreDiameter());
                 grain->SetLength(design->GetLength());
                 grain->SetInhibitedFaces(design->GetInhibitedFaces());
                 grain->SetPropellantType(design->GetPropellant());
-                i = grain;
             }
         }
     }
@@ -117,8 +115,8 @@ void GrainDialog::UpdateGraphics()
 {
     if (!m_gfxGrain)
     {
-        m_gfxGrain = new GrainGraphicsItem(m_GrainsToEdit.front(), 100, false);
-        m_GraphicsScene->addItem(m_gfxGrain);
+        m_gfxGrain = std::make_unique<GrainGraphicsItem>(m_grainsToEdit.begin()->get(), 100, false);
+        m_GraphicsScene->addItem(m_gfxGrain.get());
     }
     m_gfxGrain->setPos(0, 0);    
     m_gfxGrain->update(m_gfxGrain->boundingRect());
@@ -163,14 +161,14 @@ void GrainDialog::OnApplyButtonClicked()
     OnDesignUpdated();
     if (m_isNewGrainWindow)
     {
-        emit GrainAdded(m_GrainsToEdit.front());
-        m_GrainsToEdit.pop_front();        
+        emit GrainAdded(std::move(*m_grainsToEdit.begin()));
+		m_grainsToEdit.pop_back();
     }
     else
     {
-        for (auto i : m_GrainsToEdit)
+        for (auto& i : m_grainsToEdit)
         {
-            emit GrainAdded(i);            
-        }    
+            emit GrainEdited(std::move(i));
+        }
     }
 }

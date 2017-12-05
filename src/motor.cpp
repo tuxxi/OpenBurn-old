@@ -15,19 +15,17 @@ OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
 }
 OpenBurnMotor::~OpenBurnMotor()
 {
-    for (auto& i : m_Grains)
-    {
-        i = nullptr;
-        delete i;
-    }
     m_Grains.clear();
 }
 void OpenBurnMotor::SetGrains(const GrainVector& grains, bool copy)
 {
     if (copy)
     {	//deep copy of grain pointers
-        std::transform(grains.begin(), grains.end(),
-                       std::back_inserter(m_Grains), std::mem_fun(&OpenBurnGrain::Clone));
+		m_Grains.reserve(grains.size());
+		for (const auto& grain : grains)
+		{
+			m_Grains.emplace_back(grain->Clone());
+		}
     }
     else
     {
@@ -40,26 +38,19 @@ void OpenBurnMotor::SetGrains(const GrainVector& grains, bool copy)
 		emit DesignReady();
 	}
 }
-void OpenBurnMotor::AddGrain(OpenBurnGrain* grain)
+void OpenBurnMotor::AddGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 {
-    m_Grains.push_back(grain);
-	emit GrainAdded(grain);
-	UpdateDesign();
-}
-void OpenBurnMotor::UpdateGrain(OpenBurnGrain* grain, int index)
-{
-    m_Grains[index] = grain;
+    m_Grains.emplace_back(std::move(grain));
+	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
 void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
 {
     for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
     {
-        if (*i == grain)
+        if (i->get() == grain)
         {
 			emit GrainRemoved(std::distance(m_Grains.begin(), i));
-            delete *i; 
-            *i = nullptr;         
             m_Grains.erase(i);
         }
     }
@@ -68,8 +59,6 @@ void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
 void OpenBurnMotor::RemoveGrain(int index)
 {
 	emit GrainRemoved(index);
-    delete m_Grains[index];
-    m_Grains[index] = nullptr;    
     m_Grains.erase(m_Grains.begin() + index);
 	UpdateDesign();
 }
@@ -86,12 +75,12 @@ void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
 OpenBurnGrain* OpenBurnMotor::GetGrainAtX(double x)
 {
     double currentX = 0;
-    for (auto* grain : m_Grains)
+    for (auto& grain : m_Grains)
     {
         currentX += grain->GetLength();
         if (currentX >= x)
         {
-            return grain;
+            return grain.get();
         }
     }
     return nullptr;
@@ -105,15 +94,15 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
     {
     default:
     case KN_CALC_INITIAL:
-        for (auto i : m_Grains)
+        for (const auto& grain : m_Grains)
         {
-            surfaceArea += i->GetBurningSurfaceArea();
+            surfaceArea += grain->GetBurningSurfaceArea();
         }
         break;
     case KN_CALC_MAX:
-        for (auto i : m_Grains)
+        for (const auto& grain : m_Grains)
         {
-            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(i))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain.get()))
             {
                 int inhibited = (2 - bates->GetInhibitedFaces());
                 double webRegression = float(1.0f/6.0f) * (bates->GetLength() - inhibited * bates->GetCoreDiameter());
@@ -129,9 +118,9 @@ double OpenBurnMotor::CalcStaticKn(KN_STATIC_CALC_TYPE type)
         }
         break;
     case KN_CALC_FINAL:
-        for (auto i : m_Grains)
+        for (const auto& grain : m_Grains)
         {
-            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(i))
+            if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain.get()))
             {
                 double web_thickness = 0.5f * (bates->GetDiameter() - bates->GetCoreDiameter());
                 double core_area = M_PI * bates->GetDiameter() * (bates->GetLength() - 2 * web_thickness);
@@ -149,7 +138,7 @@ double OpenBurnMotor::CalcKn()
 double OpenBurnMotor::GetBurningSurfaceArea()
 {
     double surfaceArea = 0;
-    for (const auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         if (!grain->GetIsBurnedOut())
         {
@@ -164,7 +153,7 @@ double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
 {
     double massFlow = 0;
     double currentX = 0;
-    for (auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         double grainLen = grain->GetLength();
         if (currentX <= xVal) //we are still fwd of the sliced grain
@@ -187,7 +176,7 @@ double OpenBurnMotor::GetUpstreamMassFlow(double xVal)
 double OpenBurnMotor::GetTotalMassFlow()
 {
     double massFlow = 0;
-    for (auto* grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         massFlow += grain->GetBurningSurfaceArea() * 
             grain->GetPropellantType().GetDensity() * 
@@ -207,7 +196,7 @@ bool OpenBurnMotor::HasGrains() const
 double OpenBurnMotor::GetMotorLength() const
 {
     double len = 0;
-    for (const auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         len += grain->GetLength();
     }
@@ -216,7 +205,7 @@ double OpenBurnMotor::GetMotorLength() const
 double OpenBurnMotor::GetMotorMajorDiameter() const
 {
     double dia = 0;
-    for (const auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         //if the new grain's dia is larger than previously recorded dia, its the motor's major dia.
         dia < grain->GetDiameter() ? dia = grain->GetDiameter() : 0.0f;
@@ -226,7 +215,7 @@ double OpenBurnMotor::GetMotorMajorDiameter() const
 double OpenBurnMotor::GetMotorPropellantMass() const
 {
     double mass = 0;
-    for (const auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         mass += grain->GetVolume() * grain->GetPropellantType().GetDensity();
     }
@@ -236,7 +225,7 @@ size_t OpenBurnMotor::GetNumGrains() const
 {
 	return m_Grains.size();
 }
-GrainVector& OpenBurnMotor::GetGrains()
+GrainVector OpenBurnMotor::GetGrains() const
 {
 	return m_Grains;
 }
@@ -251,7 +240,7 @@ const OpenBurnPropellant OpenBurnMotor::GetAvgPropellant() const
 double OpenBurnMotor::GetVolumeLoading() const
 {
 	double propellantVolume = 0;
-	for (const auto grain : m_Grains)
+	for (const auto& grain : m_Grains)
 	{
 		propellantVolume += grain->GetVolume();
 	}
@@ -280,7 +269,7 @@ void OpenBurnMotor::CalcAvgPropellant()
 {
     double w_a = 0, w_n = 0, w_cstar = 0, w_rho = 0, w_gmma = 0;
     //sum up all the propellant properties
-    for (const auto grain : m_Grains)
+    for (const auto& grain : m_Grains)
     {
         //"weight" each property based on the propellant mass in the motor
         double mass = grain->GetVolume() * grain->GetPropellantType().GetDensity();
@@ -319,19 +308,19 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
         propellants.push_back(prop);
     }
     QJsonArray grainArray = object["grains"].toArray(); 
-    for(auto i : grainArray)
+    for(auto grain : grainArray)
     {
-        QJsonObject grainObject = i.toObject();
+        QJsonObject grainObject = grain.toObject();
         if (grainObject["_type"] == "BATES")
         {
-            CylindricalGrain* bates = new CylindricalGrain;
+            auto bates = std::make_shared<CylindricalGrain>();
             QString propellantName;
             bates->ReadJSON(grainObject, propellantName);
-            for (auto i : propellants)
+            for (auto prop : propellants)
             {
-                if (propellantName == i.GetPropellantName())
+                if (propellantName == prop.GetPropellantName())
                 {
-                    bates->SetPropellantType(i);
+                    bates->SetPropellantType(prop);
                 }
             }
             AddGrain(bates);
@@ -349,7 +338,7 @@ void OpenBurnMotor::WriteJSON(QJsonObject &object)
 {
     QJsonArray grainArray;
     PropellantList propellants;
-    for(auto grain : m_Grains)
+    for(const auto& grain : m_Grains)
     {
         QJsonObject object;
         grain->WriteJSON(object);
