@@ -18,7 +18,6 @@ GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBu
     m_GlobalSettings(settings),
     m_isNewGrainWindow(grains.empty())
 {
-    setAttribute(Qt::WA_DeleteOnClose);
     SetupGraphics();
     SetupUI(seedValues); //setup the ui and populate the various options with the "seed" values
     connect(m_btnCancel, &QPushButton::clicked,
@@ -134,6 +133,12 @@ void GrainDialog::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
     UpdateGraphics();
 }
+void GrainDialog::closeEvent(QCloseEvent* event)
+{
+	emit DialogClosed();
+	event->accept();
+}
+
 void GrainDialog::OnCancelButtonClicked()
 {
     close();

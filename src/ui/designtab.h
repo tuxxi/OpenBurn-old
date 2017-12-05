@@ -66,8 +66,8 @@ private:
     //controls
     QToolButton *m_btntMoveGrainUp, *m_btntMoveGrainDown;
 
-	GrainDialog* m_GrainDialog;
-	NozzleDialog* m_NozzleDialog;
+	std::unique_ptr<GrainDialog> m_GrainDialog;
+	std::unique_ptr<NozzleDialog> m_NozzleDialog;
 
     //gfx
     std::unique_ptr<MotorGraphicsItem> m_gfxMotor;

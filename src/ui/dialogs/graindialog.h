@@ -29,10 +29,11 @@ public:
     ~GrainDialog() = default;
 protected:
     void resizeEvent(QResizeEvent* event) override;
-
+	void closeEvent(QCloseEvent* event) override;
 signals:
     void GrainAdded(const std::shared_ptr<OpenBurnGrain>&);
     void GrainEdited(const std::shared_ptr<OpenBurnGrain>&);
+	void DialogClosed();
 private slots:
     void OnCancelButtonClicked();
     void OnApplyButtonClicked();

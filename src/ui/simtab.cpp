@@ -18,11 +18,11 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
     m_lineGraphTime(nullptr),
     m_Motor(motor),
     m_Simulator(sim),
-    m_GlobalSettings(settings),
+	m_GlobalSettings(settings),
     m_SimSettingsDialog(nullptr)
 {
     SetupUI();
-    m_SimSettings = new MotorSimSettings;
+    m_SimSettings = std::make_unique<MotorSimSettings>();
 
     connect(m_Motor, &OpenBurnMotor::DesignReady,
             this, &SimulationTab::OnDesignReady);
@@ -32,7 +32,7 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
             this, &SimulationTab::OnRunSimButtonClicked);
     connect(m_btnSimSettings, &QPushButton::clicked,
             this, &SimulationTab::OnSimSettingsButtonClicked);
-    connect(m_SimSettings, &MotorSimSettings::SettingsChanged,
+    connect(m_SimSettings.get(), &MotorSimSettings::SettingsChanged,
             this, &SimulationTab::OnSimSettingsChanged);
     connect(m_sldBurnTimeScrubBar, &QSlider::valueChanged,
             this, &SimulationTab::OnMotorSliceChanged);
@@ -45,7 +45,7 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
 }
 SimulationTab::~SimulationTab()
 {
-    delete m_SimSettings;
+
 }
 void SimulationTab::SetupUI()
 {
@@ -179,7 +179,7 @@ void SimulationTab::SetGraphNames()
 }
 void SimulationTab::UpdateSimulation()
 {
-    m_Simulator->RunSim(m_SimSettings);
+    m_Simulator->RunSim(m_SimSettings.get());
     UpdateResults();
     UpdatePlotterLine();
     int idx = m_sldBurnTimeScrubBar->value();
@@ -375,7 +375,7 @@ void SimulationTab::OnSimSettingsButtonClicked()
 {
     if (m_SimSettingsDialog == nullptr)
     {
-        m_SimSettingsDialog = new SimSettingsDialog(m_SimSettings);
+        m_SimSettingsDialog = std::make_unique<SimSettingsDialog>(m_SimSettings.get());
     }
     m_SimSettingsDialog->show();
     m_SimSettingsDialog->activateWindow();
@@ -394,8 +394,8 @@ void SimulationTab::OnPlayAnimationButtonClicked()
 {
     if (!m_animation)
     {
-        m_animation = new QPropertyAnimation(m_sldBurnTimeScrubBar,"sliderPosition");
-        connect(m_animation, &QPropertyAnimation::finished,
+        m_animation = std::make_unique<QPropertyAnimation>(m_sldBurnTimeScrubBar,"sliderPosition");
+        connect(m_animation.get(), &QPropertyAnimation::finished,
             this, &SimulationTab::OnAnimationFinished);
     }
     m_animation->setDuration(1000.0 * m_Simulator->GetTotalBurnTime());
@@ -428,8 +428,7 @@ void SimulationTab::OnXPosChanged(int xPos)
 }
 void SimulationTab::OnAnimationFinished()
 {
-    delete m_animation;
-    m_animation = nullptr;
+	m_animation.reset();
 }
 void SimulationTab::OnXPosClicked(double newXPos)
 {

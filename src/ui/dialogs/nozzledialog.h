@@ -19,8 +19,11 @@ class NozzleDialog : public QDialog
 public:
     explicit NozzleDialog(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr, OpenBurnSettings* settings = nullptr);
     ~NozzleDialog() = default;
+protected:
+	void closeEvent(QCloseEvent* event) override;
 signals:
     void NozzleChanged(OpenBurnNozzle*);
+	void DialogClosed();
 private slots:
     void OnApplyButtonClicked();
     void OnOkButtonClicked();

@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QFrame>
+#include <QCloseEvent>
 
 #include "src/ui/dialogs/nozzledialog.h"
 NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettings* settings)
@@ -10,7 +11,6 @@ NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettin
       m_Nozzle(seed),
       m_GlobalSettings(settings)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
     connect(m_btnOK, &QPushButton::clicked,
             this, &NozzleDialog::OnOkButtonClicked);
@@ -22,6 +22,13 @@ NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettin
     connect(m_NozzleDesign, &OpenBurnDesignNozzle::DesignUpdated,
             this, &NozzleDialog::OnDesignUpdated);
 }
+
+void NozzleDialog::closeEvent(QCloseEvent* event)
+{
+	emit DialogClosed();
+	event->accept();
+}
+
 void NozzleDialog::SetupUI()
 {
     QGridLayout* layout = new QGridLayout(this);

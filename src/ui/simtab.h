@@ -53,7 +53,7 @@ private:
     double m_currentXPos;
 
     QSlider* m_sldBurnTimeScrubBar, *m_sldCurrentXPos;
-    QPropertyAnimation *m_animation;
+    std::unique_ptr<QPropertyAnimation> m_animation;
     QLabel* m_lblMaxpressure, *m_lblBurnTime, *m_lblTotalImpulse, *m_lblMotorDesignation, *m_lblCoreMassFlux, *m_lblIsp;
     QLabel* m_lblCurrentPressure, *m_lblCurrentCoreMassFlux, *m_lblCurrentThrust, *m_lblCurrentIsp;
     QLabel* m_lblXPos, *m_lblXPosMassFlux, *m_lblXPosMachNumber;
@@ -65,7 +65,7 @@ private:
 
     OpenBurnMotor* m_Motor;
     MotorSim* m_Simulator;
-    MotorSimSettings* m_SimSettings;
-    OpenBurnSettings* m_GlobalSettings;
-    SimSettingsDialog* m_SimSettingsDialog;
+	OpenBurnSettings* m_GlobalSettings;
+    std::unique_ptr<MotorSimSettings> m_SimSettings;
+	std::unique_ptr<SimSettingsDialog> m_SimSettingsDialog;
 };

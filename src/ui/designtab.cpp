@@ -242,17 +242,14 @@ void DesignTab::SetSeed(OpenBurnGrain* seed)
 		m_grainSeed = std::make_unique<CylindricalGrain>(*bates);
     }
 }
-//this allows us to mark the objects as null when they are destroyed (via attribute WA_DeleteOnClose),
-//allowing a new object to be made the next time we need one
 void DesignTab::OnNozzleDialogClosed()
 {
-    m_NozzleDialog = nullptr;
+    m_NozzleDialog.reset();
 }
 void DesignTab::OnGrainDialogClosed()
 {
-    m_GrainDialog = nullptr;
+    m_GrainDialog.reset();
 }
-
 void DesignTab::OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 {
     m_Motor->AddGrain(std::move(grain));
@@ -275,12 +272,12 @@ void DesignTab::OnNewGrainButtonClicked()
 {
     if (!m_GrainDialog) //only make one!!
     {
-        m_GrainDialog = new GrainDialog(m_Propellants,
+        m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
                 m_grainSeed.get(),
                 m_GlobalSettings);
-        connect(m_GrainDialog, &GrainDialog::GrainAdded
+        connect(m_GrainDialog.get(), &GrainDialog::GrainAdded
 			, this, &DesignTab::OnNewGrain);
-        connect(m_GrainDialog, &GrainDialog::destroyed, 
+        connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
 			this, &DesignTab::OnGrainDialogClosed);
     }
     m_GrainDialog->show();
@@ -289,21 +286,17 @@ void DesignTab::OnNewGrainButtonClicked()
 }
 void DesignTab::OnEditGrainButtonClicked()
 {
-    //we want to be able to click "edit" and edit differently selected grains, so we delete this every time
-    //the edit button is clicked
-	
-	if (m_GrainDialog)
-	{
-		delete m_GrainDialog;
-		m_GrainDialog = nullptr;
-	}
-    m_GrainDialog = new GrainDialog(m_Propellants,
+    //we want to be able to click "edit" and edit differently selected grains, so we reset the
+	//unique_ptr every time the edit button is clicked
+	m_GrainDialog.reset();
+
+    m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
             m_GrainTable->GetSelectedGrains()[0].get(),
             m_GlobalSettings,
             m_GrainTable->GetSelectedGrains());
-	connect(m_GrainDialog, &GrainDialog::GrainEdited
+	connect(m_GrainDialog.get(), &GrainDialog::GrainEdited
 		, this, &DesignTab::OnGrainModified);
-	connect(m_GrainDialog, &GrainDialog::destroyed,
+	connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
 		this, &DesignTab::OnGrainDialogClosed);
 
     m_GrainDialog->show();
@@ -328,9 +321,11 @@ void DesignTab::OnNozzleButtonClicked()
 {
     if (!m_NozzleDialog) //only make one!!
     {
-        m_NozzleDialog = new NozzleDialog(nullptr, m_Motor->GetNozzle(), m_GlobalSettings);
-        connect(m_NozzleDialog, SIGNAL(NozzleChanged(OpenBurnNozzle*)), this, SLOT(OnNozzleUpdated(OpenBurnNozzle*)));
-        connect(m_NozzleDialog, SIGNAL(destroyed()), this, SLOT(OnNozzleDialogClosed()));
+        m_NozzleDialog = std::make_unique<NozzleDialog>(nullptr, m_Motor->GetNozzle(), m_GlobalSettings);
+        connect(m_NozzleDialog.get(), &NozzleDialog::NozzleChanged, 
+			this, &DesignTab::OnNozzleUpdated);
+        connect(m_NozzleDialog.get(), &NozzleDialog::DialogClosed,
+			this, &DesignTab::OnNozzleDialogClosed);
     }
     m_NozzleDialog->show();
     m_NozzleDialog->activateWindow();
