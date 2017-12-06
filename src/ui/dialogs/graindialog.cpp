@@ -1,13 +1,12 @@
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QFrame>
 #include <QLabel>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include <QDebug>
 
 #include "src/ui/dialogs/graindialog.h"
-#include "src/grain.h"
 
 GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
 	const GrainVector& grains, QWidget *parent)

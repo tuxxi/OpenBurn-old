@@ -3,7 +3,7 @@
 ######################################################################
 
 QT+= core gui widgets printsupport
-CONFIG += C++11
+CONFIG += C++14
 TEMPLATE = app
 TARGET = OpenBurn
 INCLUDEPATH += .

@@ -1,15 +1,20 @@
 #IDEs
+
 Win32/
 debug/
 release/
 x64/
 .vscode/
 .vs/
+.idea/
+cmake-build-*/
+
 *.sln
 *.pro.user
 *.qmake.stash
 *.vcxproj.*
 *.vcxproj
+
 
 #Build Products
 Makefile
