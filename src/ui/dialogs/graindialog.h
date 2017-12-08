@@ -32,7 +32,8 @@ protected:
 	void closeEvent(QCloseEvent* event) override;
 signals:
     void GrainAdded(const std::shared_ptr<OpenBurnGrain>&);
-    void GrainEdited(const std::shared_ptr<OpenBurnGrain>&);
+    void GrainsEdited(const GrainVector& newGrains,
+		const GrainVector& originalGrains);
 	void DialogClosed();
 private slots:
     void OnCancelButtonClicked();
@@ -51,7 +52,11 @@ private:
     QPushButton *m_btnApply, *m_btnCancel;
 
     OpenBurnDesignGrain* m_GrainDesign;
+
 	GrainVector m_grainsToEdit;
+	//because the grains are pointers and we explicitly modify their values via the dialog, 
+	//we store a copy of the original grains for the undo action later on
+	GrainVector m_OriginalGrains;
     PropellantList* m_Propellants;
     OpenBurnSettings* m_GlobalSettings;
     bool m_isNewGrainWindow;

@@ -25,6 +25,14 @@ GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBu
             this, &GrainDialog::OnApplyButtonClicked);
     connect(m_GrainDesign, &OpenBurnDesignGrain::GrainDesignChanged,
             this, &GrainDialog::OnDesignUpdated);
+
+	//deep copy of the "grains to edit" vector, so we can store the original unmodified grain for the undo action
+	m_OriginalGrains.reserve(grains.size());
+	for (const auto& grain : grains)
+	{
+		m_OriginalGrains.emplace_back(grain->Clone());
+	}
+
 }
 void GrainDialog::SetupUI(OpenBurnGrain* seed)
 {
@@ -89,7 +97,7 @@ void GrainDialog::OnDesignUpdated()
                 design->GetLength(),
                 design->GetPropellant(),                    
 				design->GetInhibitedFaces());
-				m_grainsToEdit.emplace_back(std::move(grain));
+			m_grainsToEdit.emplace_back(std::move(grain));
         }
         else
         {
@@ -167,9 +175,6 @@ void GrainDialog::OnApplyButtonClicked()
     }
     else
     {
-        for (auto& i : m_grainsToEdit)
-        {
-            emit GrainEdited(i);
-        }
+		emit GrainsEdited(m_grainsToEdit, m_OriginalGrains);
     }
 }

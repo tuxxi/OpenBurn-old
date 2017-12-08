@@ -1,15 +1,17 @@
-#include <QSizePolicy>
-#include <QGridLayout>
 #include <QDebug>
 
+#include "src/commands.h"
 #include "src/ui/designtab.h"
 
-DesignTab::DesignTab(OpenBurnMotor* motor, PropellantList* propellantTypes, OpenBurnSettings* settings, QWidget* parent)
+DesignTab::DesignTab(OpenBurnMotor* motor, 
+	PropellantList* propellantTypes, OpenBurnSettings* settings, 
+	QUndoStack* stack, QWidget* parent)
     : QWidget(parent),
-      m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
-      m_Motor(motor),
-      m_Propellants(propellantTypes),
-      m_GlobalSettings(settings)
+	m_UndoStack(stack),
+    m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
+    m_Motor(motor),
+    m_Propellants(propellantTypes),
+    m_GlobalSettings(settings)
 {   
     SetupUI();
     connect(m_btnNewGrain, &QPushButton::clicked,
@@ -252,13 +254,17 @@ void DesignTab::OnGrainDialogClosed()
 }
 void DesignTab::OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 {
-    m_Motor->AddGrain(std::move(grain));
+	QUndoCommand* addCommand = new AddGrainCommand(grain, m_Motor);
+	m_UndoStack->push(addCommand);
     SetSeed(grain.get());
 }
-void DesignTab::OnGrainModified(const std::shared_ptr<OpenBurnGrain>& grain)
+
+void DesignTab::OnGrainsModified(const GrainVector& newGrains, const GrainVector& originalGrains)
 {
-    emit m_Motor->DesignUpdated();
-    SetSeed(grain.get());
+	QUndoCommand* modifyCommand = new ModifyGrainCommand(newGrains, originalGrains, m_Motor);
+	m_UndoStack->push(modifyCommand);
+	emit m_Motor->DesignUpdated();
+	SetSeed(newGrains[0].get());
 }
 void DesignTab::OnNozzleUpdated(OpenBurnNozzle* nozz)
 {
@@ -294,8 +300,8 @@ void DesignTab::OnEditGrainButtonClicked()
             m_GrainTable->GetSelectedGrains()[0].get(),
             m_GlobalSettings,
             m_GrainTable->GetSelectedGrains());
-	connect(m_GrainDialog.get(), &GrainDialog::GrainEdited
-		, this, &DesignTab::OnGrainModified);
+	connect(m_GrainDialog.get(), &GrainDialog::GrainsEdited,
+		this, &DesignTab::OnGrainsModified);
 	connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
 		this, &DesignTab::OnGrainDialogClosed);
 
@@ -306,13 +312,11 @@ void DesignTab::OnEditGrainButtonClicked()
 }
 void DesignTab::OnDeleteGrainButtonClicked()
 {
-    QList<int> selected = m_GrainTable->GetSelectedGrainIndices();
-    int count = 0;
-    for (auto i : selected)
-    {
-        m_Motor->RemoveGrain(i - count);
-        count++;
-    }
+	const auto selected = m_GrainTable->GetSelectedGrains();
+    QUndoCommand* removeGrainCommand = new RemoveGrainCommand(selected, m_Motor);
+	m_UndoStack->push(removeGrainCommand);
+
+	//TODO: fix this by moving to some type of "selection" signal
     //disable the button again since we no longer have anything selected
 	ToggleDesignButtons(false);
     UpdateDesign();

@@ -54,8 +54,8 @@ private:
 	std::unique_ptr<PropellantList> m_Propellants;
     std::unique_ptr<MotorSim> m_Simulator;
     std::unique_ptr<OpenBurnSettings> m_GlobalSettings;
-    QString m_CurrentDesignFilename;
 
+    QString m_CurrentDesignFilename;
     QString m_SettingsFileName;
     
     QWidget *m_CentralWidget;
@@ -66,6 +66,9 @@ private:
     QAction *m_ActionOpen, *m_ActionSave, *m_ActionSaveAs, *m_ActionQuit, *m_ActionNew, *m_ActionExport;
     //tools
     QAction *m_ActionSettings;
+	//edit
+	QAction *m_ActionUndo, *m_ActionRedo;
+	QUndoStack *m_UndoStack;
 
     QStatusBar *m_StatusBar;
 

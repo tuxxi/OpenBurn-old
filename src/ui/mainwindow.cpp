@@ -1,11 +1,11 @@
 #include <QFileDialog>
 #include <QFile>
-
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+	m_UndoStack = new QUndoStack();
 	m_DesignMotor = std::make_unique<OpenBurnMotor>();
     m_Propellants = std::make_unique<PropellantList>();
     m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
@@ -78,10 +78,15 @@ void MainWindow::SetupUI()
     m_MenuFile->addAction(m_ActionQuit);
 
 
-
     m_MenuEdit = new QMenu(m_MenuBar);
     m_MenuEdit->setTitle(tr("Edit"));
     m_MenuBar->addAction(m_MenuEdit->menuAction());
+	m_ActionUndo = m_UndoStack->createUndoAction(this, tr("&Undo"));
+	m_ActionUndo->setShortcuts(QKeySequence::Undo);
+	m_ActionRedo = m_UndoStack->createRedoAction(this, tr("&Redo"));
+	m_ActionRedo->setShortcuts(QKeySequence::Redo);
+	m_MenuEdit->addAction(m_ActionUndo);
+	m_MenuEdit->addAction(m_ActionRedo);
 
     m_MenuTools = new QMenu(m_MenuBar);
     m_MenuTools->setTitle(tr("Tools"));    
@@ -101,7 +106,7 @@ void MainWindow::SetupUI()
     setSizePolicy(sizePolicy);
     
     m_TabWidget = new QTabWidget(this);
-    m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get());
+    m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get(), m_UndoStack);
     m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
     m_PropellantTab = std::make_unique<PropellantTab>(m_Propellants.get());
     m_TabWidget->addTab(m_DesignTab.get(), tr("Design"));
@@ -118,7 +123,7 @@ void MainWindow::ResetCurrentDesign()
 	m_SimTab.reset();
 	m_DesignMotor = std::make_unique<OpenBurnMotor>();
 	m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
-	m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get());
+	m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get(), m_UndoStack);
 	m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
 
 	m_TabWidget->insertTab(0, m_DesignTab.get(), tr("Design"));

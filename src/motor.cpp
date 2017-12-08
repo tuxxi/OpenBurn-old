@@ -44,24 +44,47 @@ void OpenBurnMotor::AddGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
-void OpenBurnMotor::RemoveGrain(OpenBurnGrain *grain)
+void OpenBurnMotor::AddGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index)
 {
-    for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
-    {
-        if (i->get() == grain)
-        {
-			emit GrainRemoved(std::distance(m_Grains.begin(), i));
-            m_Grains.erase(i);
-        }
-    }
+	m_Grains.emplace(m_Grains.begin() + index, std::move(grain));
+	emit GrainAdded(grain.get());
 	UpdateDesign();
+}
+
+void OpenBurnMotor::UpdateGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index)
+{
+	m_Grains.at(index) = grain;
+	UpdateDesign();
+}
+
+void OpenBurnMotor::RemoveGrain(const std::shared_ptr<OpenBurnGrain>& grain)
+{
+	const int idx = GetGrainIndex(grain);
+	if (idx != -1)
+	{
+		RemoveGrain(idx);
+	}
 }
 void OpenBurnMotor::RemoveGrain(int index)
 {
+	qDebug() << "index is " << index;
 	emit GrainRemoved(index);
     m_Grains.erase(m_Grains.begin() + index);
 	UpdateDesign();
 }
+
+int OpenBurnMotor::GetGrainIndex(const std::shared_ptr<OpenBurnGrain>& grain)
+{
+	for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
+	{
+		if (i->get() == grain.get())
+		{
+			return std::distance(m_Grains.begin(), i);
+		}
+	}
+	return -1;
+}
+
 void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
 {
     std::swap(m_Grains[oldPos], m_Grains[newPos]);

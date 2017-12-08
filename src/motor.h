@@ -35,11 +35,15 @@ public:
     void SetGrains(const GrainVector& grains, bool copy = false);
     void SetNozzle(OpenBurnNozzle* nozz);
 
-    void AddGrain(const std::shared_ptr<OpenBurnGrain>&);
+    void AddGrain(const std::shared_ptr<OpenBurnGrain>& grain);
+	void AddGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index);
+	void UpdateGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index);
     void SwapGrains(int idx1, int idx2);
-    void RemoveGrain(OpenBurnGrain* grain);
+    void RemoveGrain(const std::shared_ptr<OpenBurnGrain>& grain);
     void RemoveGrain(int index);
 
+	//returns the idx of grain, else -1 if the grain was not found.
+	int GetGrainIndex(const std::shared_ptr<OpenBurnGrain>& grain);
     GrainVector GetGrains() const;
     OpenBurnGrain* GetGrainAtX(double x);
     OpenBurnNozzle* GetNozzle() const;

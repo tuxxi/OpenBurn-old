@@ -55,6 +55,8 @@ add_executable(OpenBurn
         src/ui/propellanttab.h
         src/ui/simtab.cpp
         src/ui/simtab.h
+		src/commands.h
+		src/commands.cpp
         src/grain.cpp
         src/grain.h
         src/main.cpp

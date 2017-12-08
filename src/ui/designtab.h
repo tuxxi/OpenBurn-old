@@ -2,7 +2,7 @@
 
 #include <QWidget>
 #include <QLabel>
-
+#include <QUndoStack>
 #include <memory>
 
 #include "src/ui/graphics/motorgraphicsitem.h"
@@ -13,19 +13,26 @@
 #include "src/motorsim.h"
 #include "src/settings.h"
 
+
 class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnMotor* motor, PropellantList* propellant, OpenBurnSettings* settings, QWidget* parent = nullptr);
+    explicit DesignTab(OpenBurnMotor* motor, 
+		PropellantList* propellant, 
+		OpenBurnSettings* settings, 
+		QUndoStack* undoStack, 
+		QWidget* parent = nullptr);
     ~DesignTab();
+
     void UpdateDesign();  
     void UpdateGraphics();
 
     void resizeEvent(QResizeEvent* event) override;
 public slots:
     void OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain); //recieved from the grain dialog
-    void OnGrainModified(const std::shared_ptr<OpenBurnGrain>& grain); //recieved from the grain dialog
+	void OnGrainsModified(const GrainVector& newGrains, 
+		const GrainVector& originalGrain); //recieved from the grain dialog
     void OnNozzleUpdated(OpenBurnNozzle* nozz);
     void OnDesignUpdated();
 private slots:
@@ -45,6 +52,8 @@ private:
     void SetSeed(OpenBurnGrain* grain);
     void SetupUI();
     
+	QUndoStack* m_UndoStack;
+
     //grain design overview - static
     QLabel *m_lblMotorMajorDia, *m_lblMotorLen, *m_lblNumGrains, *m_lblPropellantMass, *m_lblVolumeLoading;
     //nozzle overview
