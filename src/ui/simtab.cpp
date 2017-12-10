@@ -213,7 +213,7 @@ void SimulationTab::UpdateResults()
     m_lblTotalImpulse->setText(QString::number(round(totalImpulse)) +
                                " " + forceUnits + "-" + tr("sec"));
     m_lblIsp->setText(QString::number(deliveredIsp, 'f', 1) + tr(" s"));
-    m_lblMotorDesignation->setText(m_Simulator->GetMotorDesignation());
+    m_lblMotorDesignation->setText(m_Simulator->GetFullMotorDesignation());
 
     //update gfx thingies
     m_sldBurnTimeScrubBar->setRange(0, int(m_Simulator->GetNumPoints() - 1));

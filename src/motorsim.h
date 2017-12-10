@@ -58,6 +58,7 @@ public:
     double GetMaxMassFlux() const;
 
     QString GetMotorDesignation() const;
+    QString GetFullMotorDesignation() const;
     std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsBegin();
     std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsEnd();
     MotorSimDataPoint* GetResult(int index);

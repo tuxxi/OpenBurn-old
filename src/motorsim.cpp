@@ -363,8 +363,18 @@ QString MotorSim::GetMotorDesignation() const
 
     const QString designation(OpenBurnUtil::GetMotorClass(totalImpulseN));
     const QString thrust(QString::number(round(avgThrustN)));
+    return QString(designation + "-" + thrust);
+}
+
+QString MotorSim::GetFullMotorDesignation() const
+{
+    const double totalImpulseN = OpenBurnUnits::ForceUnits::Convert(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        GetTotalImpulse());
+
     const QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
-    return QString(percent + "% " + designation + "-" + thrust);
+    return QString(percent + "% " + GetMotorDesignation());
 }
 
 std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsBegin()

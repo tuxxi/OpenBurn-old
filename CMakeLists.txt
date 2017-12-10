@@ -25,6 +25,8 @@ get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
 add_executable(OpenBurn
         src/thirdparty/qcustomplot/qcustomplot.cpp
         src/thirdparty/qcustomplot/qcustomplot.h
+        src/ui/dialogs/exportdialog.cpp
+        src/ui/dialogs/exportdialog.h
         src/ui/dialogs/globalsettingsdialog.cpp
         src/ui/dialogs/globalsettingsdialog.h
         src/ui/dialogs/graindesigntypes.cpp

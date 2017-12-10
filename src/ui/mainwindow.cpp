@@ -2,6 +2,7 @@
 #include <QFile>
 #include "mainwindow.h"
 #include "src/export.h"
+#include "src/ui/dialogs/exportdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -215,7 +216,7 @@ void MainWindow::OnMenuQuit()
 void MainWindow::OnMenuSettings()
 {
     //we don't have to worry about memory managment because of WA_DeleteOnClose
-    GlobalSettingsDialog* dialog = new GlobalSettingsDialog(m_GlobalSettings.get());
+    auto dialog = new GlobalSettingsDialog(m_GlobalSettings.get());
     dialog->activateWindow();
     dialog->show();
     dialog->raise();
@@ -229,10 +230,12 @@ void MainWindow::OnMenuEngExport()
         return;
     }
     EngExport engExporter(m_Simulator.get());
-    engExporter.SetMotorDetails(0, "Test", "Test");
-    engExporter.WriteToEngFile("test.eng");
+    //we don't have to worry about memory managment because of WA_DeleteOnClose
+    auto dialog = new EngExportDialog(engExporter, m_Simulator.get());
+    dialog->activateWindow();
+    dialog->show();
+    dialog->raise();
 }
-
 void MainWindow::SaveFile(QString fileName)
 {
     if (!fileName.isEmpty())
