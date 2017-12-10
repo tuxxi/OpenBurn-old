@@ -34,12 +34,12 @@ void MotorSim::RunSim(MotorSimSettings* settings)
     while(numBurnedOut < m_InitialDesignMotor->GetNumGrains())
     {
         auto newDataPoint = std::make_unique<MotorSimDataPoint>();
-		auto newDataPointMotor = std::make_unique<OpenBurnMotor>();
+        auto newDataPointMotor = std::make_unique<OpenBurnMotor>();
 
-		//we need to clone the motor's data so that we can modify it for eacn time slice during the simulation
+        //we need to clone the motor's data so that we can modify it for eacn time slice during the simulation
         newDataPointMotor->SetNozzle(std::move(m_InitialDesignMotor->GetNozzle()->Clone())); //clone nozzle ptr
 
-		//clone grain ptrs
+        //clone grain ptrs
         if (iterations == 0) //start with initial conditions
         {
             newDataPointMotor->SetGrains(m_InitialDesignMotor->GetGrains(), true);
@@ -349,13 +349,31 @@ double MotorSim::GetMaxMassFlux() const
     return maxMassFlux;
 }
 
+QString MotorSim::GetMotorDesignation() const
+{
+    const double totalImpulseN = OpenBurnUnits::ForceUnits::Convert(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        GetTotalImpulse());
+
+    const double avgThrustN = OpenBurnUnits::ForceUnits::Convert(
+        OpenBurnUnits::ForceUnits_T::pounds_force,
+        OpenBurnUnits::ForceUnits_T::newtons,
+        GetAvgThrust());
+
+    const QString designation(OpenBurnUtil::GetMotorClass(totalImpulseN));
+    const QString thrust(QString::number(round(avgThrustN)));
+    const QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
+    return QString(percent + "% " + designation + "-" + thrust);
+}
+
 std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsBegin()
 {
-	return m_SimResultData.begin();
+    return m_SimResultData.begin();
 }
 std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator MotorSim::GetResultsEnd()
 {
-	return m_SimResultData.end();
+    return m_SimResultData.end();
 }
 MotorSimDataPoint* MotorSim::GetResult(int index)
 {
@@ -364,9 +382,18 @@ MotorSimDataPoint* MotorSim::GetResult(int index)
     return m_SimResultData[index].get();
 }
 
+size_t MotorSim::GetNumPoints() const
+{
+    return m_SimResultData.size();
+}
+
+OpenBurnMotor* MotorSim::GetDesignMotor() const
+{
+    return m_InitialDesignMotor;
+}
 bool MotorSim::GetResultsEmpty() const
 {
-	return qFuzzyIsNull(m_TotalBurnTime) || m_SimResultData.empty();
+    return qFuzzyIsNull(m_TotalBurnTime) || m_SimResultData.empty();
 }
 double MotorSim::GetAvgThrust() const
 {

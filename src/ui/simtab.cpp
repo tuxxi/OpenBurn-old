@@ -18,7 +18,7 @@ SimulationTab::SimulationTab(OpenBurnMotor* motor, MotorSim* sim, OpenBurnSettin
     m_lineGraphTime(nullptr),
     m_Motor(motor),
     m_Simulator(sim),
-	m_GlobalSettings(settings),
+    m_GlobalSettings(settings),
     m_SimSettingsDialog(nullptr)
 {
     SetupUI();
@@ -194,15 +194,7 @@ void SimulationTab::UpdateResults()
     UpdatePlotter();
 
     //update results labels
-    const double totalImpulseN = OpenBurnUnits::ForceUnits::Convert(
-        OpenBurnUnits::ForceUnits_T::pounds_force,
-        OpenBurnUnits::ForceUnits_T::newtons,
-        m_Simulator->GetTotalImpulse());
 
-    const double avgThrustN = OpenBurnUnits::ForceUnits::Convert(
-        OpenBurnUnits::ForceUnits_T::pounds_force,
-        OpenBurnUnits::ForceUnits_T::newtons,
-        m_Simulator->GetAvgThrust());
     const double totalImpulse = m_GlobalSettings->m_ForceUnits.ConvertFrom(
         OpenBurnUnits::ForceUnits_T::pounds_force,
         m_Simulator->GetTotalImpulse());
@@ -221,15 +213,10 @@ void SimulationTab::UpdateResults()
     m_lblTotalImpulse->setText(QString::number(round(totalImpulse)) +
                                " " + forceUnits + "-" + tr("sec"));
     m_lblIsp->setText(QString::number(deliveredIsp, 'f', 1) + tr(" s"));
-
-    const QString designation(OpenBurnUtil::GetMotorClass(totalImpulseN));
-    const QString thrust(QString::number(round(avgThrustN)));
-    const QString percent(QString::number(OpenBurnUtil::GetMotorClassPercent(totalImpulseN), 'g', 2));
-    m_lblMotorDesignation->setText(percent + "% " + designation + "-" + thrust);
+    m_lblMotorDesignation->setText(m_Simulator->GetMotorDesignation());
 
     //update gfx thingies
-    const int numPoints = m_Simulator->GetTotalBurnTime() / m_SimSettings->timeStep;
-    m_sldBurnTimeScrubBar->setRange(0, numPoints-1);
+    m_sldBurnTimeScrubBar->setRange(0, int(m_Simulator->GetNumPoints() - 1));
     UpdateGraphics();
 }
 void SimulationTab::UpdatePlotterLine()
@@ -279,7 +266,7 @@ void SimulationTab::UpdatePlotter()
         return;
     }
     //prepare graphs
-    const int numPoints = m_Simulator->GetTotalBurnTime() / m_SimSettings->timeStep;
+    const int numPoints = int(m_Simulator->GetNumPoints());
     const double maxPressure =m_GlobalSettings->m_PressureUnits.ConvertFrom(
         OpenBurnUnits::PressureUnits_T::psi,
         m_Simulator->GetMaxPressure());
@@ -318,26 +305,26 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     {
         motor = GetCurrentSliceMotor();
     }
-	if (m_gfxMotor == nullptr)
-	{
-		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor, true);
-		connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
-			this, &SimulationTab::OnXPosClicked);
-		m_MotorDisplayScene->addItem(m_gfxMotor.get());
-	}
-	if (m_Motor->HasGrains())
-	{
-		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
-		if (m_Motor->HasNozzle()) m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
-	}
+    if (m_gfxMotor == nullptr)
+    {
+        m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor, true);
+        connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
+            this, &SimulationTab::OnXPosClicked);
+        m_MotorDisplayScene->addItem(m_gfxMotor.get());
+    }
+    if (m_Motor->HasGrains())
+    {
+        m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
+        if (m_Motor->HasNozzle()) m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
+    }
 
-	m_gfxMotor->BurnGrains(motor->GetGrains());
+    m_gfxMotor->BurnGrains(motor->GetGrains());
 
-	//set the motor display scene to the middle of the view plus a bit of padding on the sides
-	const QRectF rect = m_gfxMotor->boundingRect();
-	m_MotorDisplayScene->setSceneRect(rect);
-	const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
-	m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+    //set the motor display scene to the middle of the view plus a bit of padding on the sides
+    const QRectF rect = m_gfxMotor->boundingRect();
+    m_MotorDisplayScene->setSceneRect(rect);
+    const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
+    m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
     //update again just in case
     repaint();
@@ -428,7 +415,7 @@ void SimulationTab::OnXPosChanged(int xPos)
 }
 void SimulationTab::OnAnimationFinished()
 {
-	m_animation.reset();
+    m_animation.reset();
 }
 void SimulationTab::OnXPosClicked(double newXPos)
 {

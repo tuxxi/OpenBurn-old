@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include "mainwindow.h"
+#include "src/export.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -64,10 +65,11 @@ void MainWindow::SetupUI()
     connect(m_ActionSaveAs, &QAction::triggered, this, &MainWindow::OnMenuSaveAs);
     m_MenuFile->addAction(m_ActionSaveAs);
 
-    m_ActionExport = new QAction(this);
-    m_ActionExport->setText(tr("Export"));    
-    //connect(actionExport, &QAction::triggered, this, &MainWindow::menuExport);
-    m_MenuFile->addAction(m_ActionExport);
+    m_MenuExport = m_MenuFile->addMenu(tr("Export"));
+    m_ActionEngExport = new QAction(this);
+    m_ActionEngExport->setText(tr("To .eng (RockSim, OpenRocket)"));
+    m_MenuExport->addAction(m_ActionEngExport);
+    connect(m_ActionEngExport, &QAction::triggered, this, &MainWindow::OnMenuEngExport);
 
     m_MenuFile->addSeparator();
 
@@ -218,6 +220,19 @@ void MainWindow::OnMenuSettings()
     dialog->show();
     dialog->raise();
 }
+
+void MainWindow::OnMenuEngExport()
+{
+    if (m_Simulator->GetResultsEmpty())
+    {
+        QMessageBox::critical(this, tr("Error"), tr("No simulation results!"));
+        return;
+    }
+    EngExport engExporter(m_Simulator.get());
+    engExporter.SetMotorDetails(0, "Test", "Test");
+    engExporter.WriteToEngFile("test.eng");
+}
+
 void MainWindow::SaveFile(QString fileName)
 {
     if (!fileName.isEmpty())
@@ -231,7 +246,6 @@ void MainWindow::SaveFile(QString fileName)
         if (!file.open(QIODevice::WriteOnly))
         {
             QMessageBox::critical(this, tr("Error"), tr("Could not save file"));
-            return;
         }
         else
         {
@@ -243,7 +257,6 @@ void MainWindow::SaveFile(QString fileName)
             m_StatusBar->showMessage(tr("File saved."), 3000);
         }
     }
-
 }
 bool MainWindow::LoadSettings(const QString& filename)
 {

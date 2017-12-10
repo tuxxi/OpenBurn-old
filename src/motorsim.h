@@ -54,13 +54,17 @@ public:
     double GetTotalBurnTime() const;
     double GetAvgThrust() const;
     double GetTotalImpulse() const;
-
     double GetMaxPressure() const;
     double GetMaxMassFlux() const;
+
+    QString GetMotorDesignation() const;
     std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsBegin();
-	std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsEnd();
-	MotorSimDataPoint* GetResult(int index);
-	bool GetResultsEmpty() const;
+    std::vector<std::unique_ptr<MotorSimDataPoint>>::iterator GetResultsEnd();
+    MotorSimDataPoint* GetResult(int index);
+    size_t GetNumPoints() const;
+    bool GetResultsEmpty() const;
+
+    OpenBurnMotor* GetDesignMotor() const;
     void SetDesignMotor(OpenBurnMotor* motor);
 signals:
     void SimulationStarted();

@@ -1,6 +1,6 @@
 {
     "settings": {
-        "redrawOnChanges": false
+        "redrawOnChanges": true
     },
     "units": {
         "angleunits": 0,

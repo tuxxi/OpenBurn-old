@@ -1,13 +1,8 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QMenu>
-#include <QMenuBar>
-#include <QStatusBar>
 #include <QTabWidget>
 #include <QWidget>
-#include <QStatusBar>
-
 #include <memory>
 
 #include "src/motor.h"
@@ -37,7 +32,8 @@ private slots:
     void OnMenuSaveAs();
     void OnMenuNew();
     void OnMenuSettings();
-
+    
+    void OnMenuEngExport();
     void OnSimulationStarted();
     void OnSimulationFinished(bool success);
     void OnPropellantsUpdated();
@@ -63,7 +59,8 @@ private:
     QMenuBar *m_MenuBar;
     QMenu *m_MenuFile, *m_MenuEdit, *m_MenuTools, *m_MenuHelp;
     //file
-    QAction *m_ActionOpen, *m_ActionSave, *m_ActionSaveAs, *m_ActionQuit, *m_ActionNew, *m_ActionExport;
+    QMenu *m_MenuExport;
+    QAction *m_ActionOpen, *m_ActionSave, *m_ActionSaveAs, *m_ActionQuit, *m_ActionNew, *m_ActionEngExport;
     //tools
     QAction *m_ActionSettings;
 	//edit

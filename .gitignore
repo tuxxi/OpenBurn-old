@@ -1,5 +1,4 @@
 #IDEs
-
 Win32/
 debug/
 release/
@@ -25,3 +24,4 @@ ui_*.h
 
 #OpenBurn Files
 *.obm
+*.eng
