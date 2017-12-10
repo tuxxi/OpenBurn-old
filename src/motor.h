@@ -14,7 +14,7 @@ enum KN_STATIC_CALC_TYPE
     KN_CALC_FINAL
 };
 
-typedef std::vector<std::shared_ptr<OpenBurnGrain>> GrainVector;
+typedef std::vector<GrainPtr> GrainVector;
 
 //we inherit from QObject in order to use signals and slots
 class OpenBurnMotor : public QObject
@@ -33,17 +33,18 @@ public:
     double GetBurningSurfaceArea();
     //if (copy), clones the grain objects and sets the grains as these new objects
     void SetGrains(const GrainVector& grains, bool copy = false);
-    void SetNozzle(OpenBurnNozzle* nozz);
+	void SetNozzle(NozzlePtr&& nozzle);
 
-    void AddGrain(const std::shared_ptr<OpenBurnGrain>& grain);
-	void AddGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index);
-	void UpdateGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index);
+    void AddGrain(const GrainPtr& grain);
+	void AddGrain(const GrainPtr& grain, int index);
+	void UpdateGrain(const GrainPtr& grain, int index);
     void SwapGrains(int idx1, int idx2);
-    void RemoveGrain(const std::shared_ptr<OpenBurnGrain>& grain);
+    void RemoveGrain(const GrainPtr& grain);
     void RemoveGrain(int index);
+	void RemoveNozzle();
 
 	//returns the idx of grain, else -1 if the grain was not found.
-	int GetGrainIndex(const std::shared_ptr<OpenBurnGrain>& grain);
+	int GetGrainIndex(const GrainPtr& grain);
     GrainVector GetGrains() const;
     OpenBurnGrain* GetGrainAtX(double x);
     OpenBurnNozzle* GetNozzle() const;
@@ -68,10 +69,12 @@ signals:
 	void DesignNotReady();
     void DesignUpdated();
 	void GrainAdded(OpenBurnGrain*);
+	void NozzleUpdated(OpenBurnNozzle*);
 	void GrainRemoved(int);
+	void NozzleRemoved();
 private:
 	void UpdateDesign();
-    OpenBurnNozzle* m_Nozzle;
+	NozzlePtr m_Nozzle;
     GrainVector m_Grains;
 
     //WARNING - APPROXIMATION TIME --- average of all grains in motor because idk what im doing

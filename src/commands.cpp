@@ -1,6 +1,6 @@
 #include "commands.h"
 
-AddGrainCommand::AddGrainCommand(const std::shared_ptr<OpenBurnGrain>& grain, OpenBurnMotor* motor, 
+AddGrainCommand::AddGrainCommand(const GrainPtr& grain, OpenBurnMotor* motor, 
 	QUndoCommand* parent)
 	: QUndoCommand(parent), 
 	m_Motor(motor),
@@ -44,19 +44,6 @@ void RemoveGrainCommand::redo()
 		m_Motor->RemoveGrain(i.second);
 	}
 }
-
-/*
-ModifyGrainCommand::ModifyGrainCommand(const std::shared_ptr<OpenBurnGrain>& grain,
-	const std::shared_ptr<OpenBurnGrain>& oldGrain,
-	OpenBurnMotor* motor, QUndoCommand* parent)
-	: QUndoCommand(parent),
-	m_Motor(motor),
-	m_NewGrain(grain),
-	m_OldGrain(oldGrain),
-	m_GrainIdx(motor->GetGrainIndex(grain))
-{
-}
-*/
 ModifyGrainCommand::ModifyGrainCommand(const GrainVector& newGrains,
 	const GrainVector& oldGrains,
 	OpenBurnMotor* motor,
@@ -90,4 +77,54 @@ void ModifyGrainCommand::redo()
 	{
 		m_Motor->UpdateGrain(i.second.first, i.first);
 	}
+}
+
+ModifyNozzleCommand::ModifyNozzleCommand(NozzlePtr&& newNozzle, 
+	NozzlePtr&& oldNozzle, 
+	OpenBurnMotor* motor,
+	QUndoCommand* parent)
+	: QUndoCommand(parent),
+	m_NewNozzle(std::move(newNozzle)),
+	m_OldNozzle(std::move(oldNozzle)),
+	m_Motor(motor)
+{
+}
+
+void ModifyNozzleCommand::undo()
+{
+	auto tempObject = m_OldNozzle->Clone(); //create a temp object thats a clone of the nozzle
+	m_Motor->SetNozzle(std::move(m_OldNozzle)); //move the nozzle into the motor, releasing it from this scope
+	m_OldNozzle.release(); //we also need to release *this from owning the nozzle ptr or it will be deleted when scope exits
+	m_OldNozzle = std::move(tempObject); //finally, move the temp object back into the nozzle so we can undo/redo later
+}
+
+void ModifyNozzleCommand::redo()
+{
+	//see undo()
+	auto tempObject = m_NewNozzle->Clone();
+	m_Motor->SetNozzle(std::move(m_NewNozzle));
+	m_NewNozzle.release();
+	m_NewNozzle = std::move(tempObject);
+}
+
+NewNozzleCommand::NewNozzleCommand(NozzlePtr&& newNozzle, 
+	OpenBurnMotor* motor, 
+	QUndoCommand* parent)
+	: QUndoCommand(parent),
+	m_NewNozzle(std::move(newNozzle)),
+	m_Motor(motor)
+{
+}
+void NewNozzleCommand::undo()
+{
+	m_Motor->RemoveNozzle();
+}
+
+void NewNozzleCommand::redo()
+{
+	//see ModifyNozzleCommand::undo()
+	auto tempObject = m_NewNozzle->Clone();
+	m_Motor->SetNozzle(std::move(m_NewNozzle));
+	m_NewNozzle.release();
+	m_NewNozzle = std::move(tempObject);
 }

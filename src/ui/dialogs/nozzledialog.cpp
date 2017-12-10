@@ -6,11 +6,12 @@
 #include <QCloseEvent>
 
 #include "src/ui/dialogs/nozzledialog.h"
-NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettings* settings)
+NozzleDialog::NozzleDialog(const OpenBurnNozzle* seed, OpenBurnSettings* settings, QWidget* parent)
     : QDialog(parent),
-      m_Nozzle(seed),
       m_GlobalSettings(settings)
 {
+	m_Nozzle = std::move(NozzlePtr(const_cast<OpenBurnNozzle*>(seed)));
+	m_OldNozzle = m_Nozzle ? m_Nozzle->Clone() : nullptr; //if we don't have a nozzle to modify, there's nothing to save the state of!
     SetupUI();
     connect(m_btnOK, &QPushButton::clicked,
             this, &NozzleDialog::OnOkButtonClicked);
@@ -21,6 +22,13 @@ NozzleDialog::NozzleDialog(QWidget* parent, OpenBurnNozzle* seed, OpenBurnSettin
     
     connect(m_NozzleDesign, &OpenBurnDesignNozzle::DesignUpdated,
             this, &NozzleDialog::OnDesignUpdated);
+}
+
+NozzleDialog::~NozzleDialog()
+{
+	//release the dialog from managing these ptrs since they will be managed by the motor from now on.
+	m_Nozzle.release();
+	m_OldNozzle.release();
 }
 
 void NozzleDialog::closeEvent(QCloseEvent* event)
@@ -37,7 +45,7 @@ void NozzleDialog::SetupUI()
     m_gbFrame = new QGroupBox(tr("Nozzle Design"), this);
     m_gbFrame->setLayout(layout);
 
-    ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);
+    auto nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle.get());
     m_NozzleDesign = new ConicalNozzleDesign(this, nozz, m_GlobalSettings);
     m_btnOK = new QPushButton(tr("OK"), this);
     m_btnClose = new QPushButton(tr("Cancel"), this);
@@ -61,14 +69,14 @@ void NozzleDialog::OnDesignUpdated()
     {
         if (!m_Nozzle)
         {
-            m_Nozzle = new ConicalNozzle(
+            m_Nozzle = std::make_unique<ConicalNozzle>(
                 design->GetThroatDiameter(), 
                 design->GetExitDiameter(), 
-                design->GetDivergentHalfAngle());    
+                design->GetDivergentHalfAngle());
         }
         else
         {
-            ConicalNozzle* nozz = static_cast<ConicalNozzle*>(m_Nozzle);
+            auto nozz = static_cast<ConicalNozzle*>(m_Nozzle.get());
             nozz->SetNozzleThroat(design->GetThroatDiameter());
             nozz->SetNozzleExit(design->GetExitDiameter());
             nozz->SetHalfAngle(design->GetDivergentHalfAngle());
@@ -105,6 +113,14 @@ void NozzleDialog::Accept()
         QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
-    OnDesignUpdated();    
-    emit NozzleChanged(m_Nozzle);
+    OnDesignUpdated();
+	//if the old nozzle is null, we never had a seed to begin with, so it must be a newly created nozzle
+	if (m_OldNozzle == nullptr)
+	{
+		emit NewNozzle(m_Nozzle);
+	}
+	else
+	{
+		emit NozzleModified(m_Nozzle, m_OldNozzle);
+	}
 }

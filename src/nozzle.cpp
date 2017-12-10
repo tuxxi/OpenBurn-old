@@ -11,11 +11,11 @@ double OpenBurnNozzle::GetNozzleExit() const { return m_NozzleExit; }
 double OpenBurnNozzle::GetNozzleThroat() const { return m_NozzleThroat; }
 double OpenBurnNozzle::GetNozzleThroatArea() const
 {
-    return 0.25f * M_PI * m_NozzleThroat * m_NozzleThroat;
+    return 0.25 * M_PI * m_NozzleThroat * m_NozzleThroat;
 }
 double OpenBurnNozzle::GetNozzleExitArea() const
 {
-    return 0.25f * M_PI * m_NozzleExit * m_NozzleExit;
+    return 0.25 * M_PI * m_NozzleExit * m_NozzleExit;
 }
 double OpenBurnNozzle::GetNozzleExpansionRatio() const
 {
@@ -26,7 +26,7 @@ void OpenBurnNozzle::SetNozzleExit(double exit) { m_NozzleExit = exit; }
 
 //Conical Nozzle
 ConicalNozzle::ConicalNozzle(double throat, double exit, double halfAngle)
-    : OpenBurnNozzle(throat, exit), m_HalfAngle(halfAngle)
+    : OpenBurnNozzle(throat, exit), m_HalfAngle(halfAngle), m_ThroatLen(0.0)
 {
 
 }
@@ -52,5 +52,10 @@ void ConicalNozzle::WriteJSON(QJsonObject& object)
 }
 double ConicalNozzle::GetNozzleDivergenceLossFactor() const
 {
-    return (1.f + qCos(qDegreesToRadians(m_HalfAngle)) ) / 2.f;
+    return (1.0 + qCos(qDegreesToRadians(m_HalfAngle)) ) / 2.0;
 }
+NozzlePtr ConicalNozzle::Clone()
+{
+	return std::make_unique<ConicalNozzle>(*this);
+}
+

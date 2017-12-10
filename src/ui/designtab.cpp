@@ -179,7 +179,7 @@ void DesignTab::UpdateDesign()
             m_Motor->GetMotorPropellantMass() ), 'f', 2) +
         " " +
         massUnitSymbol);
-    m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.f, 'f', 2) + '%');
+    m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.0, 'f', 2) + '%');
     if (m_Motor->HasNozzle())
     {
 		m_lblNozzleThroatDia->setText(QString::number(
@@ -203,6 +203,14 @@ void DesignTab::UpdateDesign()
         m_lblKn->setText(initialKn + "-" + maxKn);
         m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'f', 2));
     }
+	else
+	{
+		m_lblNozzleThroatDia->setText("");
+		m_lblNozzleExitDia->setText("");
+		m_lblNozzleExpansionRatio->setText("");
+		m_lblKn->setText("");
+		m_lblPortThroatRatio->setText("");
+	}
     
     UpdateGraphics(); 
 }
@@ -214,12 +222,16 @@ void DesignTab::UpdateGraphics()
         m_MotorDisplayScene->addItem(m_gfxMotor.get());
     }
 
+	//these functions are technically unnesscary as the updating is done behind the scenes with OpenBurnMotor's signals
+	//which are recieved by MotorGraphicsObject's slots, however, it's useful to be able to force an update.
 	if (m_Motor->HasGrains())
 	{
 		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
-		if (m_Motor->HasNozzle()) m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
 	}
-
+	if (m_Motor->HasNozzle())
+	{
+		m_gfxMotor->SetNozzle(m_Motor->GetNozzle());
+	}
     //set the motor display scene to the middle of the view plus a bit of padding on the sides
 	const QRectF rect = m_gfxMotor->boundingRect();
     m_MotorDisplayScene->setSceneRect(rect);
@@ -252,7 +264,7 @@ void DesignTab::OnGrainDialogClosed()
 {
     m_GrainDialog.reset();
 }
-void DesignTab::OnNewGrain(const std::shared_ptr<OpenBurnGrain>& grain)
+void DesignTab::OnNewGrain(const GrainPtr& grain)
 {
 	QUndoCommand* addCommand = new AddGrainCommand(grain, m_Motor);
 	m_UndoStack->push(addCommand);
@@ -266,9 +278,17 @@ void DesignTab::OnGrainsModified(const GrainVector& newGrains, const GrainVector
 	emit m_Motor->DesignUpdated();
 	SetSeed(newGrains[0].get());
 }
-void DesignTab::OnNozzleUpdated(OpenBurnNozzle* nozz)
+
+void DesignTab::OnNewNozzle(NozzlePtr& newNozzle)
 {
-    m_Motor->SetNozzle(nozz);  
+	QUndoCommand* newNozzleCommand = new NewNozzleCommand(std::move(newNozzle), m_Motor);
+	m_UndoStack->push(newNozzleCommand);
+}
+
+void DesignTab::OnNozzleUpdated(NozzlePtr& newNozzle, NozzlePtr& oldNozzle)
+{
+	QUndoCommand* nozzleModifyCommand = new ModifyNozzleCommand(std::move(newNozzle), std::move(oldNozzle), m_Motor);
+	m_UndoStack->push(nozzleModifyCommand);
 }
 void DesignTab::OnDesignUpdated()
 {
@@ -323,13 +343,15 @@ void DesignTab::OnDeleteGrainButtonClicked()
 }
 void DesignTab::OnNozzleButtonClicked()
 {
-    if (!m_NozzleDialog) //only make one!!
+    if (!m_NozzleDialog) //only make one at a time
     {
-        m_NozzleDialog = std::make_unique<NozzleDialog>(nullptr, m_Motor->GetNozzle(), m_GlobalSettings);
-        connect(m_NozzleDialog.get(), &NozzleDialog::NozzleChanged, 
+        m_NozzleDialog = std::make_unique<NozzleDialog>(m_Motor->GetNozzle(), m_GlobalSettings);
+        connect(m_NozzleDialog.get(), &NozzleDialog::NozzleModified, 
 			this, &DesignTab::OnNozzleUpdated);
         connect(m_NozzleDialog.get(), &NozzleDialog::DialogClosed,
 			this, &DesignTab::OnNozzleDialogClosed);
+		connect(m_NozzleDialog.get(), &NozzleDialog::NewNozzle,
+			this, &DesignTab::OnNewNozzle);
     }
     m_NozzleDialog->show();
     m_NozzleDialog->activateWindow();

@@ -1,8 +1,8 @@
 #include "src/ui/graphics/nozzlegraphicsitem.h"
 
-NozzleGraphicsItem::NozzleGraphicsItem(OpenBurnNozzle* nozzle, int scale_factor,
-                                       double nozzle_height, bool crossSection, QGraphicsItem *parent)
-    : QGraphicsObject(parent),
+NozzleGraphicsItem::NozzleGraphicsItem(const OpenBurnNozzle* nozzle, int scale_factor, double nozzle_height,
+	bool crossSection, QGraphicsItem* parent)
+	: QGraphicsObject(parent),
       m_Color(Qt::lightGray),
       m_Nozzle(nozzle),
       m_NozzleHeight(nozzle_height),
@@ -37,7 +37,7 @@ void NozzleGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         double convergentLen = throatHeightUpper* qSin(qDegreesToRadians(convergentAngle));            
         
         //draw exit cone
-        ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle);
+	    const auto nozz = dynamic_cast<const ConicalNozzle*>(m_Nozzle);
         if (nozz)
         {        
             double divergentAngle = nozz->GetHalfAngle(); //nozz->GetHalfAngle();
@@ -70,16 +70,16 @@ void NozzleGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     }
 
 }
+
 QRectF NozzleGraphicsItem::boundingRect() const
 {
     //Because the viewport gets at the bounding rect of the nozzle before the nozzle has finished painting,
     //m_nozzleLen is not done being set in the paint() method.
     //We have to either force the viewport to repaint before boundingRect() is called,
     //or do this ugly pile of inefficent garbage
-
     //TODO: please fix me :( im a sad and lonely dynamic cast and i have no place being here
     double nozzleLen = 0;
-    if (ConicalNozzle* nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle))
+    if (auto nozz = dynamic_cast<const ConicalNozzle*>(m_Nozzle))
     {
         double exitRadius = 0.5f * (m_Nozzle->GetNozzleExit() * m_scaleFactor);
         double throatRadius = 0.5f * (m_Nozzle->GetNozzleThroat() * m_scaleFactor);
@@ -96,9 +96,10 @@ QRectF NozzleGraphicsItem::boundingRect() const
     }
    return QRectF(0, 0, nozzleLen, m_NozzleHeight);
 }
-void NozzleGraphicsItem::UpdateNozzle(OpenBurnNozzle* nozz)
+void NozzleGraphicsItem::UpdateNozzle(const OpenBurnNozzle* nozz)
 {
     m_Nozzle = nozz;
+	update();
 }
 void NozzleGraphicsItem::UpdateHeight(double height)
 {

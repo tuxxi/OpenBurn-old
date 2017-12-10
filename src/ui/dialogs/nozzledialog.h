@@ -17,12 +17,15 @@ class NozzleDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit NozzleDialog(QWidget* parent = nullptr, OpenBurnNozzle* seed = nullptr, OpenBurnSettings* settings = nullptr);
-    ~NozzleDialog() = default;
+    explicit NozzleDialog(const OpenBurnNozzle* seed = nullptr, 
+		OpenBurnSettings* settings = nullptr,
+		QWidget* parent = nullptr);
+	~NozzleDialog();
 protected:
 	void closeEvent(QCloseEvent* event) override;
 signals:
-    void NozzleChanged(OpenBurnNozzle*);
+	void NewNozzle(NozzlePtr& nozzle);
+    void NozzleModified(NozzlePtr& nozzle, NozzlePtr& oldNozzle);
 	void DialogClosed();
 private slots:
     void OnApplyButtonClicked();
@@ -39,6 +42,7 @@ private:
     QPushButton *m_btnApply, *m_btnOK, *m_btnClose;
 
     OpenBurnDesignNozzle* m_NozzleDesign;
-    OpenBurnNozzle* m_Nozzle;
+    NozzlePtr m_Nozzle;
+	NozzlePtr m_OldNozzle;
     OpenBurnSettings* m_GlobalSettings;
 };

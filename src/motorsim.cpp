@@ -35,8 +35,11 @@ void MotorSim::RunSim(MotorSimSettings* settings)
     {
         auto newDataPoint = std::make_unique<MotorSimDataPoint>();
 		auto newDataPointMotor = std::make_unique<OpenBurnMotor>();
-        newDataPointMotor->SetNozzle(m_InitialDesignMotor->GetNozzle());
 
+		//we need to clone the motor's data so that we can modify it for eacn time slice during the simulation
+        newDataPointMotor->SetNozzle(std::move(m_InitialDesignMotor->GetNozzle()->Clone())); //clone nozzle ptr
+
+		//clone grain ptrs
         if (iterations == 0) //start with initial conditions
         {
             newDataPointMotor->SetGrains(m_InitialDesignMotor->GetGrains(), true);
@@ -220,7 +223,7 @@ double MotorSim::CalcThrust(OpenBurnMotor* motor, MotorSimSettings* settings, do
     //Nf is skin friction loss
     //Cfv is the ideal thrust coefficent. Note that the reference text includes a correction
     //for ambient pressure, this is already done by the ideal thrust coefficent calculation.
-    OpenBurnNozzle* nozzle =  motor->GetNozzle();
+    const auto nozzle =  motor->GetNozzle();
     double idealCoef = CalcIdealThrustCoefficient(motor, settings, chamberPressure);
     double divergenceLoss = nozzle->GetNozzleDivergenceLossFactor();
     double skinFrictionLoss = (1.0 - settings->skinFrictionEfficency);

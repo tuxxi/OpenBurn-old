@@ -33,7 +33,7 @@ public:
     void UpdateGrains(const GrainVector& grains);
 	void RemoveAllGrains();
 
-    void SetNozzle(OpenBurnNozzle* nozzle);
+    void SetNozzle(const OpenBurnNozzle* nozzle);
 	void HideNozzle();
     void SetScaleFactor(int scale);
     int GetScaleFactor() { return m_ScaleFactor; }
@@ -44,6 +44,7 @@ public slots:
 	void AddGrain(OpenBurnGrain* grain);
 	void RemoveGrain(int idx);
 	void OnMotorUpdated();
+	void OnNozzleUpdated(OpenBurnNozzle* nozzle);
 signals:
     void MotorXPosSliceUpdated(double slice);
 protected:

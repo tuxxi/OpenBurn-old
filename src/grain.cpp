@@ -92,7 +92,7 @@ bool CylindricalGrain::IsBurnedOut()
 {
     return m_CoreDia <= m_GrainDia;
 }
-std::shared_ptr<OpenBurnGrain> CylindricalGrain::Clone()
+GrainPtr CylindricalGrain::Clone()
 {
 	return std::make_shared<CylindricalGrain>(*this);
 }

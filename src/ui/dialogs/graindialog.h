@@ -31,7 +31,7 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 	void closeEvent(QCloseEvent* event) override;
 signals:
-    void GrainAdded(const std::shared_ptr<OpenBurnGrain>&);
+    void GrainAdded(const GrainPtr&);
     void GrainsEdited(const GrainVector& newGrains,
 		const GrainVector& originalGrains);
 	void DialogClosed();

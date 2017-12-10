@@ -8,8 +8,7 @@ OpenBurnMotor::OpenBurnMotor()
 }
 OpenBurnMotor::OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains)
     : m_Nozzle(nozz),
-      m_Grains(grains),
-      m_AvgPropellant(nullptr)
+      m_Grains(grains)
 {
 
 }
@@ -38,26 +37,30 @@ void OpenBurnMotor::SetGrains(const GrainVector& grains, bool copy)
 		emit DesignReady();
 	}
 }
-void OpenBurnMotor::AddGrain(const std::shared_ptr<OpenBurnGrain>& grain)
+void OpenBurnMotor::SetNozzle(NozzlePtr&& nozzle)
+{
+	m_Nozzle.swap(nozzle);
+	emit NozzleUpdated(m_Nozzle.get());
+	UpdateDesign();
+}
+void OpenBurnMotor::AddGrain(const GrainPtr& grain)
 {
     m_Grains.emplace_back(std::move(grain));
 	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
-void OpenBurnMotor::AddGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index)
+void OpenBurnMotor::AddGrain(const GrainPtr& grain, int index)
 {
 	m_Grains.emplace(m_Grains.begin() + index, std::move(grain));
 	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
-
-void OpenBurnMotor::UpdateGrain(const std::shared_ptr<OpenBurnGrain>& grain, int index)
+void OpenBurnMotor::UpdateGrain(const GrainPtr& grain, int index)
 {
-	m_Grains.at(index) = grain;
+	m_Grains.at(index) = std::move(grain);
 	UpdateDesign();
 }
-
-void OpenBurnMotor::RemoveGrain(const std::shared_ptr<OpenBurnGrain>& grain)
+void OpenBurnMotor::RemoveGrain(const GrainPtr& grain)
 {
 	const int idx = GetGrainIndex(grain);
 	if (idx != -1)
@@ -67,13 +70,18 @@ void OpenBurnMotor::RemoveGrain(const std::shared_ptr<OpenBurnGrain>& grain)
 }
 void OpenBurnMotor::RemoveGrain(int index)
 {
-	qDebug() << "index is " << index;
 	emit GrainRemoved(index);
     m_Grains.erase(m_Grains.begin() + index);
 	UpdateDesign();
 }
 
-int OpenBurnMotor::GetGrainIndex(const std::shared_ptr<OpenBurnGrain>& grain)
+void OpenBurnMotor::RemoveNozzle()
+{
+	m_Nozzle.reset();
+	emit NozzleUpdated(nullptr);
+	UpdateDesign();
+}
+int OpenBurnMotor::GetGrainIndex(const GrainPtr& grain)
 {
 	for (auto i = m_Grains.begin(); i != m_Grains.end(); ++i)
 	{
@@ -84,16 +92,10 @@ int OpenBurnMotor::GetGrainIndex(const std::shared_ptr<OpenBurnGrain>& grain)
 	}
 	return -1;
 }
-
 void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
 {
     std::swap(m_Grains[oldPos], m_Grains[newPos]);
     emit DesignUpdated();
-}
-void OpenBurnMotor::SetNozzle(OpenBurnNozzle* nozz)
-{
-    m_Nozzle = nozz;
-	UpdateDesign();
 }
 OpenBurnGrain* OpenBurnMotor::GetGrainAtX(double x)
 {
@@ -252,9 +254,9 @@ GrainVector OpenBurnMotor::GetGrains() const
 {
 	return m_Grains;
 }
-OpenBurnNozzle* OpenBurnMotor::GetNozzle() const 
+OpenBurnNozzle* OpenBurnMotor::GetNozzle() const
 {
-	return m_Nozzle;
+	return m_Nozzle.get();
 }
 const OpenBurnPropellant OpenBurnMotor::GetAvgPropellant() const
 {
@@ -352,9 +354,9 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
     QJsonObject nozzleObject = object["nozzle"].toObject();
     if(nozzleObject["_type"] == "CONICAL")
     {
-        ConicalNozzle* nozz = new ConicalNozzle(0, 0);
+		auto nozz = std::make_unique<ConicalNozzle>(0, 0);
         nozz->ReadJSON(nozzleObject);
-        SetNozzle(nozz);
+        SetNozzle(std::move(nozz));
     }    
 }
 void OpenBurnMotor::WriteJSON(QJsonObject &object)

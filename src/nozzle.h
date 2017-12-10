@@ -1,5 +1,9 @@
 #pragma once
 #include <QJsonObject>
+#include <memory>
+
+class OpenBurnNozzle;
+typedef std::unique_ptr<OpenBurnNozzle> NozzlePtr;
 
 class OpenBurnNozzle
 {
@@ -19,6 +23,7 @@ public:
     virtual void ReadJSON(const QJsonObject& object) = 0;
     virtual void WriteJSON(QJsonObject &object) = 0;
 
+	virtual NozzlePtr Clone() = 0;
 protected:
     double m_NozzleThroat; //nozzle throat diameter
     double m_NozzleExit; //nozzle exit diameter
@@ -28,7 +33,7 @@ class ConicalNozzle : public OpenBurnNozzle
 {
 public:
     ConicalNozzle(double throat, double exit, double halfAngle = 15.0f);
-    virtual ~ConicalNozzle() = default;
+	virtual ~ConicalNozzle() = default;
 
     void SetHalfAngle(double);
     void SetNozzleThroatLen(double);
@@ -39,6 +44,7 @@ public:
     virtual void ReadJSON(const QJsonObject& object) override;
     virtual void WriteJSON(QJsonObject &object) override;
 
+	virtual NozzlePtr Clone() override;
     //http://rasaero.com/dloads/Departures%20from%20Ideal%20Performance.pdf
 private:
     double m_HalfAngle;

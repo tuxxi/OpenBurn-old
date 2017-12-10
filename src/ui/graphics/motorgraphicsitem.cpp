@@ -17,6 +17,8 @@ MotorGraphicsItem::MotorGraphicsItem(int scale_factor, OpenBurnMotor* motor, boo
 		this, &MotorGraphicsItem::RemoveGrain);
 	connect(m_Motor, &OpenBurnMotor::DesignUpdated,
 		this, &MotorGraphicsItem::OnMotorUpdated);
+	connect(m_Motor, &OpenBurnMotor::NozzleUpdated,
+		this, &MotorGraphicsItem::OnNozzleUpdated);
 	if (m_Motor->HasGrains())
 	{
 		SetGrains(m_Motor->GetGrains());
@@ -125,7 +127,7 @@ void MotorGraphicsItem::SetScaleFactor(int scale)
 {
     m_ScaleFactor = scale;
 }
-void MotorGraphicsItem::SetNozzle(OpenBurnNozzle* nozzle)
+void MotorGraphicsItem::SetNozzle(const OpenBurnNozzle* nozzle)
 {
     if (!m_gfxNozzle)
     {
@@ -179,4 +181,16 @@ void MotorGraphicsItem::OnMotorUpdated()
 		SetNozzle(m_Motor->GetNozzle());
 	}
 	UpdateGrains(m_Motor->GetGrains());
+}
+
+void MotorGraphicsItem::OnNozzleUpdated(OpenBurnNozzle* nozzle)
+{
+	if (nozzle == nullptr)
+	{
+		HideNozzle();
+	}
+	else
+	{
+		SetNozzle(nozzle);
+	}
 }
