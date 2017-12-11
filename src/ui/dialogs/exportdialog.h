@@ -8,7 +8,11 @@
 class EngExportDialog : public QDialog
 {
 public:
-    explicit EngExportDialog(const EngExport& exporter, MotorSim* simulator, QWidget* parent = nullptr);
+    explicit EngExportDialog(
+        const EngExport& exporter,
+        MotorSim* simulator,
+        OpenBurnSettings* settings,
+        QWidget* parent = nullptr);
 private slots:
     void OnOKButtonClicked();
     void OnCancelButtonClicked();

@@ -4,10 +4,13 @@
 #include "exportdialog.h"
 #include <QFileDialog>
 
-EngExportDialog::EngExportDialog(const EngExport& exporter, MotorSim* sim, QWidget* parent)
+EngExportDialog::EngExportDialog(const EngExport &exporter,
+                                 MotorSim *simulator,
+                                 OpenBurnSettings *settings,
+                                 QWidget *parent)
     : QDialog(parent),
     m_Exporter(exporter),
-    m_Simulator(sim)
+    m_Simulator(simulator)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
@@ -21,6 +24,10 @@ EngExportDialog::EngExportDialog(const EngExport& exporter, MotorSim* sim, QWidg
         m_sbMotorDia->setValue(m_Simulator->GetDesignMotor()->GetMotorMajorDiameter());
         m_lneMotorName->setText(m_Simulator->GetMotorDesignation());
     }
+    m_UnitsCaseMass->SetUnits(settings->m_MassUnits);
+    m_UnitsMotorDia->SetUnits(settings->m_LengthUnits);
+    m_UnitsMotorLen->SetUnits(settings->m_LengthUnits);
+
 }
 void EngExportDialog::SetupUI()
 {

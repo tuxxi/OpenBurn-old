@@ -25,7 +25,7 @@ public:
 	void undo() override;
 	void redo() override;
 private:
-	//the grains we removed, and their indicies
+	//the grains we removed, and their indices
 	std::map<int, GrainPtr> m_GrainsRemoved;
 	OpenBurnMotor* m_Motor;
 	int m_GrainIdx;

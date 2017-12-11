@@ -4,7 +4,7 @@
 #include "simsettingsdialog.h"
 
 #include "src/units.h"
-SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, QWidget* parent)
+SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, OpenBurnSettings* globalSettings, QWidget* parent)
     : QDialog(parent),
       m_Settings(settings)
 {
@@ -13,6 +13,7 @@ SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, QWidget* parent
             this, &SimSettingsDialog::OnApplyButtonClicked);
     connect(m_btnCancel, &QPushButton::clicked,
             this, &SimSettingsDialog::OnCancelButtonClicked);
+    SetGlobalSettings(globalSettings);
 }
 void SimSettingsDialog::SetupUI()
 {
@@ -86,4 +87,10 @@ void SimSettingsDialog::OnApplyButtonClicked()
 void SimSettingsDialog::OnCancelButtonClicked()
 {
     close();
+}
+void SimSettingsDialog::SetGlobalSettings(OpenBurnSettings *globalSettings)
+{
+    m_unitsAmbientPressure->SetUnits(globalSettings->m_PressureUnits);
+    m_unitsAmbientTemp->SetUnits(globalSettings->m_TemperatureUnits);
+
 }

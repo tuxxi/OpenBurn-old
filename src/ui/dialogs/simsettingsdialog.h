@@ -12,8 +12,13 @@ class SimSettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit SimSettingsDialog(MotorSimSettings* settings, QWidget* parent = nullptr);
+    explicit SimSettingsDialog(
+        MotorSimSettings* settings,
+        OpenBurnSettings* globalSettings,
+        QWidget* parent = nullptr);
     ~SimSettingsDialog() = default;
+    void SetGlobalSettings(OpenBurnSettings* settings);
+
 private slots:
     void OnApplyButtonClicked();
     void OnCancelButtonClicked();

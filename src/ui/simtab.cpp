@@ -266,7 +266,7 @@ void SimulationTab::UpdatePlotter()
         return;
     }
     //prepare graphs
-    const int numPoints = int(m_Simulator->GetNumPoints());
+    auto numPoints = int(m_Simulator->GetNumPoints());
     const double maxPressure =m_GlobalSettings->m_PressureUnits.ConvertFrom(
         OpenBurnUnits::PressureUnits_T::psi,
         m_Simulator->GetMaxPressure());
@@ -352,7 +352,7 @@ void SimulationTab::OnDesignReady()
         UpdateSimulation();
     }
     m_btnRunSim->setEnabled(true);
-    m_sldCurrentXPos->setRange(0, m_Motor->GetMotorLength() * motorLenMultiplier);
+    m_sldCurrentXPos->setRange(0, static_cast<int>(m_Motor->GetMotorLength() * motorLenMultiplier));
 }
 void SimulationTab::OnDesignUpdated()
 {
@@ -362,12 +362,13 @@ void SimulationTab::OnSimSettingsButtonClicked()
 {
     if (m_SimSettingsDialog == nullptr)
     {
-        m_SimSettingsDialog = std::make_unique<SimSettingsDialog>(m_SimSettings.get());
+        m_SimSettingsDialog = std::make_unique<SimSettingsDialog>(m_SimSettings.get(), m_GlobalSettings);
     }
+    m_SimSettingsDialog->SetGlobalSettings(m_GlobalSettings);
     m_SimSettingsDialog->show();
     m_SimSettingsDialog->activateWindow();
     m_SimSettingsDialog->raise();
-    m_sldCurrentXPos->setRange(0, m_Motor->GetMotorLength() * motorLenMultiplier);
+    m_sldCurrentXPos->setRange(0, static_cast<int>(m_Motor->GetMotorLength() * motorLenMultiplier));
 }
 void SimulationTab::OnRunSimButtonClicked()
 {
@@ -385,7 +386,7 @@ void SimulationTab::OnPlayAnimationButtonClicked()
         connect(m_animation.get(), &QPropertyAnimation::finished,
             this, &SimulationTab::OnAnimationFinished);
     }
-    m_animation->setDuration(1000.0 * m_Simulator->GetTotalBurnTime());
+    m_animation->setDuration(static_cast<int>(1000 * m_Simulator->GetTotalBurnTime()));
     m_animation->setStartValue(m_sldBurnTimeScrubBar->minimum());
     m_animation->setEndValue(m_sldBurnTimeScrubBar->maximum());
     m_animation->setEasingCurve(QEasingCurve::Linear);
@@ -420,7 +421,7 @@ void SimulationTab::OnAnimationFinished()
 void SimulationTab::OnXPosClicked(double newXPos)
 {
     m_currentXPos = newXPos;
-    m_sldCurrentXPos->setValue(newXPos * motorLenMultiplier);
+    m_sldCurrentXPos->setValue(static_cast<int>(newXPos * motorLenMultiplier));
 }
 
 void SimulationTab::resizeEvent(QResizeEvent* event)

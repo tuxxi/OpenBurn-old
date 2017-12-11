@@ -231,7 +231,7 @@ void MainWindow::OnMenuEngExport()
     }
     EngExport engExporter(m_Simulator.get());
     //we don't have to worry about memory managment because of WA_DeleteOnClose
-    auto dialog = new EngExportDialog(engExporter, m_Simulator.get());
+    auto dialog = new EngExportDialog(engExporter, m_Simulator.get(), m_GlobalSettings.get());
     dialog->activateWindow();
     dialog->show();
     dialog->raise();

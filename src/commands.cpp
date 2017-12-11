@@ -2,9 +2,9 @@
 
 AddGrainCommand::AddGrainCommand(const GrainPtr& grain, OpenBurnMotor* motor, 
 	QUndoCommand* parent)
-	: QUndoCommand(parent), 
-	m_Motor(motor),
-	m_GrainAdded(grain)
+	: QUndoCommand(parent),
+    m_GrainAdded(grain),
+    m_Motor(motor)
 {
 }
 void AddGrainCommand::undo()
@@ -92,7 +92,7 @@ ModifyNozzleCommand::ModifyNozzleCommand(NozzlePtr&& newNozzle,
 
 void ModifyNozzleCommand::undo()
 {
-	auto tempObject = m_OldNozzle->Clone(); //create a temp object thats a clone of the nozzle
+	auto tempObject = m_OldNozzle->Clone(); //create a temp object that's a clone of the nozzle
 	m_Motor->SetNozzle(std::move(m_OldNozzle)); //move the nozzle into the motor, releasing it from this scope
 	m_OldNozzle.release(); //we also need to release *this from owning the nozzle ptr or it will be deleted when scope exits
 	m_OldNozzle = std::move(tempObject); //finally, move the temp object back into the nozzle so we can undo/redo later
