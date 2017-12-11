@@ -789,7 +789,7 @@ namespace OpenBurnUnits
                 case DensityUnits_T::kg_per_m_cu:
                     return SI_PER_ENGLISH * value;
                 case DensityUnits_T::g_per_cc:
-                    return (SI_PER_ENGLISH / 1000) * value / 1000;
+                    return (SI_PER_ENGLISH / 1000) * value;
                 case DensityUnits_T::slugs_per_foot_cu:
                     return LBSIN3_PER_SLUGFT3 * value;
                 }
@@ -821,7 +821,7 @@ namespace OpenBurnUnits
                 case DensityUnits_T::g_per_cc:
                     return value;
                 case DensityUnits_T::slugs_per_foot_cu:
-                    return (ENGLISH_PER_SI / 1000) * LBSIN3_PER_SLUGFT3 * value;
+                    return (ENGLISH_PER_SI * 1000) * LBSIN3_PER_SLUGFT3 * value;
                 }
             }
             case DensityUnits_T::slugs_per_foot_cu:
@@ -834,7 +834,7 @@ namespace OpenBurnUnits
                 case DensityUnits_T::kg_per_m_cu:
                     return SLUGFT3_PER_LBSIN3 * SI_PER_ENGLISH * value;
                 case DensityUnits_T::g_per_cc:
-                    return SLUGFT3_PER_LBSIN3 * (SI_PER_ENGLISH / 1000) * value;
+                    return SLUGFT3_PER_LBSIN3 * (SI_PER_ENGLISH * 1000) * value;
                 case DensityUnits_T::slugs_per_foot_cu:
                     return value;
                 }

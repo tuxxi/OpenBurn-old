@@ -11,7 +11,7 @@ namespace OpenBurnUtil
             if (nsec > 5.0f ) designation = 'C';
             else if (nsec > 2.5f) designation = 'B';
             else if (nsec > 1.25f) designation = 'A';
-            else designation = 0;           
+            else designation = 0;
         }
         else
         {

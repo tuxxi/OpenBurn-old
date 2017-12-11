@@ -61,7 +61,7 @@ void PropellantTab::SetupUI()
     topRowEdit->addStretch();
 
     //propellant properties
-    QGroupBox* gb_properties = new QGroupBox(tr("Internal Balistic Parameters"));
+    QGroupBox* gb_properties = new QGroupBox(tr("Internal Ballistic Parameters"));
 
     QGroupBox* gb_basic = new QGroupBox(tr("Basic"));
     QFormLayout* basicParamsLayout = new QFormLayout;
@@ -215,7 +215,7 @@ void PropellantTab::OnDeleteButtonClicked()
         QMessageBox::question( this, "OpenBurn", tr("Are you sure you want to delete propellant: ")
          + (*m_Propellants)[oldIndex].GetPropellantName(),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
-    
+
     if (resBtn == QMessageBox::Yes)
     {
         m_Propellants->erase(m_Propellants->begin() + oldIndex);
@@ -227,7 +227,7 @@ void PropellantTab::OnDeleteButtonClicked()
             m_btnDeleteProp->setEnabled(false);
         }
         SaveDatabase();    
-        }
+    }
     else
     {
         return;
