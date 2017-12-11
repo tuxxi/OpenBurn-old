@@ -11,13 +11,14 @@
 
 const static QString DEFAULT_NAME = QString("New Propellant");
 
-PropellantTab::PropellantTab(PropellantList* propellants, QWidget* parent)
+PropellantTab::PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent)
     : QWidget(parent),
-      m_Propellants(propellants)
+      m_Propellants(propellants),
+      m_GlobalSettings(settings)
 {
     SetupUI();
     LoadDatabase("user/propellants.json");
-    if (m_Propellants->size() == 0)
+    if (m_Propellants->empty())
     {
         m_gbEdit->setEnabled(false);        
     }
@@ -40,8 +41,6 @@ PropellantTab::PropellantTab(PropellantList* propellants, QWidget* parent)
 
 void PropellantTab::SetupUI()
 {
-    static const double numIngredients = 10;
-    
     //top row
     QHBoxLayout* topHLayout = new QHBoxLayout;    
     m_cbPropSelection = new QComboBox;
@@ -65,10 +64,23 @@ void PropellantTab::SetupUI()
 
     QGroupBox* gb_basic = new QGroupBox(tr("Basic"));
     QFormLayout* basicParamsLayout = new QFormLayout;
-    basicParamsLayout->addRow("Burn Rate Coef (a)", m_lnePropBRCoef = new QLineEdit);
+    QHBoxLayout* a = new QHBoxLayout;
+    a->addWidget(m_lnePropBRCoef = new QLineEdit);
+    a->addWidget(m_unitsBRCoef = new VelocityUnitsComboBox(this, m_lnePropBRCoef));
+    basicParamsLayout->addRow("Burn Rate Coef (a)", a);
+
     basicParamsLayout->addRow("Burn Rate Exp (n)", m_lnePropBRExp = new QLineEdit);
-    basicParamsLayout->addRow("Density (rho)", m_lnePropDensity = new QLineEdit);
-    basicParamsLayout->addRow("Characteristic Velocity (C*)", m_lnePropCStar = new QLineEdit);
+
+    QHBoxLayout* rho = new QHBoxLayout;
+    rho->addWidget(m_lnePropDensity = new QLineEdit);
+    rho->addWidget(m_unitsDensity = new DensityUnitsComboBox(this, m_lnePropDensity));
+    basicParamsLayout->addRow("Density (rho)", rho);
+
+    QHBoxLayout* cstar = new QHBoxLayout;
+    cstar->addWidget(m_lnePropCStar = new QLineEdit);
+    cstar->addWidget(m_unitsCStar = new VelocityUnitsComboBox(this, m_lnePropCStar));
+    m_unitsCStar->SetUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second);
+    basicParamsLayout->addRow("Characteristic Velocity (C*)", cstar);
     basicParamsLayout->addRow("Specific Heat Ratio (gamma, Cp/Cv)", m_lnePropGasSpecificHeatRatio = new QLineEdit); 
     gb_basic->setLayout(basicParamsLayout);
 

@@ -2,6 +2,7 @@
 
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QLineEdit>
 #include "src/units.h"
 
 //template classes cannot use Q_OBJECT for signals and slots so we have to use this workaround base class that
@@ -22,12 +23,14 @@ template<typename T, class K>
 class UnitsComboBox : public virtual UnitsComboBoxBase
 {
 public:
-    UnitsComboBox(QWidget* parent = nullptr, QDoubleSpinBox* buddy = nullptr);
+    UnitsComboBox(QWidget* parent = nullptr, QWidget* buddy = nullptr);
     virtual ~UnitsComboBox() = default;
         
-    //the units combo box is the "buddy" of this double spin box
-    void SetBuddyDoubleSpinBox(QDoubleSpinBox* box);
-    QDoubleSpinBox* GetBuddyDoubleSpinBox();
+    //the units combo box is the "buddy" of this widget
+    //whenever the units change, the combo box will update the value in this widget
+    //currently supports QDoubleSpinBox and QLineEdit
+    void SetBuddyWidget(QWidget* wid);
+    QWidget* GetBuddyWidget();
 
     void SetUnits(OpenBurnUnits::OpenBurnUnit<T, K> units);
     OpenBurnUnits::OpenBurnUnit<T, K> GetCurrentUnits();
@@ -37,7 +40,7 @@ protected:
     virtual void OnUnitsUpdated(int newIdx) override;
     OpenBurnUnits::OpenBurnUnit<T, K> m_prevUnits;
     OpenBurnUnits::OpenBurnUnit<T, K> m_currentUnits;
-    QDoubleSpinBox* m_buddyBox;
+    QWidget* m_buddyWidget;
 };
 typedef UnitsComboBox<OpenBurnUnits::LengthUnits_T, OpenBurnUnits::LengthUnits> LengthUnitsComboBox;
 typedef UnitsComboBox<OpenBurnUnits::AngleUnits_T, OpenBurnUnits::AngleUnits> AngleUnitsComboBox;
@@ -51,28 +54,28 @@ typedef UnitsComboBox<OpenBurnUnits::DensityUnits_T, OpenBurnUnits::DensityUnits
 
 //These template definitions have to be in the header file so the linker knows what to look for
 template<typename T, class K>
-UnitsComboBox<T, K>::UnitsComboBox(QWidget* parent, QDoubleSpinBox* buddy)
+UnitsComboBox<T, K>::UnitsComboBox(QWidget* parent, QWidget* buddy)
     : UnitsComboBoxBase(parent),
-      m_buddyBox(buddy)
+      m_buddyWidget(buddy)
 {
     m_prevUnits = OpenBurnUnits::OpenBurnUnit<T, K>(currentIndex());
     m_currentUnits = m_prevUnits;
     addItems(K::GetUnits());
-    if (m_buddyBox)
+    if (QDoubleSpinBox* box = qobject_cast<QDoubleSpinBox*>(buddy))
     {
-        m_buddyBox->setMinimum(0.0);
-        m_buddyBox->setMaximum(double(1e6) - 1);
-        m_buddyBox->setDecimals(3);
-        m_buddyBox->setSingleStep(0.25f);
+        box->setMinimum(0.0);
+        box->setMaximum(double(1e6) - 1);
+        box->setDecimals(3);
+        box->setSingleStep(0.25f);
     }
 }
 template<typename T, class K>
-void UnitsComboBox<T, K>::SetBuddyDoubleSpinBox(QDoubleSpinBox* box)
+void UnitsComboBox<T, K>::SetBuddyWidget(QWidget *wid)
 {
-    if (box != nullptr) m_buddyBox = box;
+    if (wid != nullptr) m_buddyWidget = wid;
 }
 template<typename T, class K>
-QDoubleSpinBox* UnitsComboBox<T, K>::GetBuddyDoubleSpinBox() { return m_buddyBox; }
+QWidget* UnitsComboBox<T, K>::GetBuddyWidget(){ return m_buddyWidget; }
 
 template<typename T, class K>
 void UnitsComboBox<T, K>::SetUnits(OpenBurnUnits::OpenBurnUnit<T, K> units)
@@ -94,11 +97,18 @@ void UnitsComboBox<T, K>::OnUnitsUpdated(int newIdx)
 {
     m_prevUnits = m_currentUnits;
     m_currentUnits = OpenBurnUnits::OpenBurnUnit<T, K>(newIdx);
-    if (m_buddyBox)
+    if (QDoubleSpinBox* box = qobject_cast<QDoubleSpinBox*>(m_buddyWidget))
     {
-        m_buddyBox->setValue(
+        box->setValue(
             m_prevUnits.ConvertTo(
                 m_currentUnits.unit,
-                m_buddyBox->value()));
+                box->value()));
+    }
+    if (QLineEdit* lineedit = qobject_cast<QLineEdit*>(m_buddyWidget))
+    {
+        lineedit->setText(QString::number(
+            m_prevUnits.ConvertTo(
+            m_currentUnits.unit,
+            lineedit->text().toDouble())));
     }
 }

@@ -32,8 +32,8 @@ EngExportDialog::EngExportDialog(const EngExport &exporter,
 void EngExportDialog::SetupUI()
 {
     setWindowTitle(tr("Export to .eng"));
-    QGridLayout *controlsLayout = new QGridLayout;
-    QGroupBox *box = new QGroupBox(tr(".eng File Settings"));
+    auto* controlsLayout = new QGridLayout;
+    auto* box = new QGroupBox(tr(".eng File Settings"));
 
     controlsLayout->addWidget(new QLabel(tr("Motor Code:")), 0, 0);
     controlsLayout->addWidget(m_lneMotorName = new QLineEdit, 0, 1);
@@ -50,11 +50,11 @@ void EngExportDialog::SetupUI()
     controlsLayout->addWidget(m_UnitsMotorLen = new LengthUnitsComboBox(this, m_sbMotorLen), 4, 2);
     box->setLayout(controlsLayout);
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    auto* buttonsLayout = new QHBoxLayout;
     buttonsLayout->addWidget(m_btnOk = new QPushButton(tr("Ok")));
     buttonsLayout->addWidget(m_btnCancel = new QPushButton(tr("Cancel")));
 
-    QVBoxLayout *masterLayout = new QVBoxLayout;
+    auto* masterLayout = new QVBoxLayout;
     masterLayout->addWidget(box);
     masterLayout->addLayout(buttonsLayout);
     setLayout(masterLayout);
@@ -65,12 +65,12 @@ void EngExportDialog::SetParams()
     const double caseMass = m_UnitsCaseMass->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::MassUnits_T::kilograms, 
         m_sbCaseMass->value());
-    const int motorLen = m_UnitsMotorLen->GetCurrentUnits().ConvertTo(
-        OpenBurnUnits::LengthUnits_T::millimeters,
-        m_sbMotorLen->value());
-    const int motorDia = m_UnitsMotorDia->GetCurrentUnits().ConvertTo(
-        OpenBurnUnits::LengthUnits_T::millimeters,
-        m_sbMotorDia->value());
+    const int motorLen = static_cast<const int>(m_UnitsMotorLen->GetCurrentUnits().ConvertTo(
+            OpenBurnUnits::LengthUnits_T::millimeters,
+            m_sbMotorLen->value()));
+    const int motorDia = static_cast<const int>(m_UnitsMotorDia->GetCurrentUnits().ConvertTo(
+            OpenBurnUnits::LengthUnits_T::millimeters,
+            m_sbMotorDia->value()));
 
     const auto mfgName = m_lneMotorMfg->text();
     const auto motorName = m_lneMotorName->text();

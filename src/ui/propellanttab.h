@@ -12,13 +12,15 @@
 #include <vector>
 #include <utility>
 
+#include <src/settings.h>
+#include <src/ui/widgets/unitscombobox.h>
 #include "src/propellant.h"
 
 class PropellantTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropellantTab(PropellantList* propellants, QWidget* parent = nullptr);
+    explicit PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~PropellantTab() = default;
 signals:
     void PropellantsUpdated();
@@ -37,10 +39,11 @@ private:
     //Propellant Database
     bool LoadDatabase(const QString& filename);
     bool SaveDatabase();
-    PropellantList* m_Propellants;
-    QString m_DatabaseFileName;
 
-    QGroupBox* m_gbEdit;
+    PropellantList* m_Propellants;
+    OpenBurnSettings* m_GlobalSettings;
+
+    QString m_DatabaseFileName;
 
     QComboBox* m_cbPropSelection;
     QPushButton* m_btnSaveProp, *m_btnDeleteProp, *m_btnNewProp, *m_btnCalculate;
@@ -48,7 +51,11 @@ private:
 
     //Propellant Gas Properties
     //basic
+    QGroupBox* m_gbEdit;
     QLineEdit* m_lnePropBRCoef, *m_lnePropBRExp, *m_lnePropDensity, *m_lnePropCStar;
+    DensityUnitsComboBox* m_unitsDensity;
+    VelocityUnitsComboBox* m_unitsBRCoef;
+    VelocityUnitsComboBox* m_unitsCStar;
 
     //advanced
     QLineEdit* m_lnePropSpecificHeat, *m_lnePropGasSpecificHeatRatio, *m_lnePropGasCp, *m_lnePropGasCv, *m_lnePropAdiabaticFlameTemp,

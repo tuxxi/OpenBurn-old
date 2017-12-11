@@ -74,7 +74,7 @@ void SimSettingsDialog::ApplySettings()
     {
         m_Settings->ambientPressure = m_sbAmbientPressure->value();
         m_Settings->ambientTemp = m_sbAmbientTemp->value();
-        m_Settings->twoPhaseFlowEfficency = m_sbTwoPhaseFlow->value() * 0.01f; //precent
+        m_Settings->twoPhaseFlowEfficency = m_sbTwoPhaseFlow->value() * 0.01f; //percent
         m_Settings->skinFrictionEfficency = m_sbSkinFriction->value() * 0.01f; //percent
         m_Settings->timeStep = m_sbTimeStep->value();
         emit m_Settings->SettingsChanged();

@@ -111,7 +111,7 @@ void MainWindow::SetupUI()
     m_TabWidget = new QTabWidget(this);
     m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get(), m_UndoStack);
     m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
-    m_PropellantTab = std::make_unique<PropellantTab>(m_Propellants.get());
+    m_PropellantTab = std::make_unique<PropellantTab>(m_Propellants.get(), m_GlobalSettings.get());
     m_TabWidget->addTab(m_DesignTab.get(), tr("Design"));
     m_TabWidget->addTab(m_SimTab.get(), tr("Simulation"));
     m_TabWidget->addTab(m_PropellantTab.get(), tr("Propellants"));
@@ -215,7 +215,7 @@ void MainWindow::OnMenuQuit()
 }
 void MainWindow::OnMenuSettings()
 {
-    //we don't have to worry about memory managment because of WA_DeleteOnClose
+    //we don't have to worry about memory management because of WA_DeleteOnClose
     auto dialog = new GlobalSettingsDialog(m_GlobalSettings.get());
     dialog->activateWindow();
     dialog->show();
@@ -230,7 +230,7 @@ void MainWindow::OnMenuEngExport()
         return;
     }
     EngExport engExporter(m_Simulator.get());
-    //we don't have to worry about memory managment because of WA_DeleteOnClose
+    //we don't have to worry about memory management because of WA_DeleteOnClose
     auto dialog = new EngExportDialog(engExporter, m_Simulator.get(), m_GlobalSettings.get());
     dialog->activateWindow();
     dialog->show();
