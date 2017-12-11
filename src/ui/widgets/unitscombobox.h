@@ -51,6 +51,7 @@ typedef UnitsComboBox<OpenBurnUnits::MassUnits_T, OpenBurnUnits::MassUnits> Mass
 typedef UnitsComboBox<OpenBurnUnits::VelocityUnits_T, OpenBurnUnits::VelocityUnits> VelocityUnitsComboBox;
 typedef UnitsComboBox<OpenBurnUnits::MassFluxUnits_T, OpenBurnUnits::MassFluxUnits> MassFluxUnitsComboBox;
 typedef UnitsComboBox<OpenBurnUnits::DensityUnits_T, OpenBurnUnits::DensityUnits> DensityUnitsComboBox;
+typedef UnitsComboBox<OpenBurnUnits::BurnRateUnits_T , OpenBurnUnits::BurnRateUnits> BurnRateUnitsComboBox;
 
 //These template definitions have to be in the header file so the linker knows what to look for
 template<typename T, class K>

@@ -654,8 +654,6 @@ namespace OpenBurnUnits
 //=============================================================================
     enum class VelocityUnits_T
     {
-        inches_per_second,
-        millimeters_per_second,
         feet_per_second,
         meters_per_second,
     };
@@ -668,44 +666,10 @@ namespace OpenBurnUnits
             switch(oldUnits)
             {
                 default:
-                case VelocityUnits_T::inches_per_second:
-                {
-                    switch (newUnits)
-                    {
-                    default:
-                    case VelocityUnits_T::inches_per_second:
-                        return value;
-                    case VelocityUnits_T::millimeters_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::millimeters, value);
-                    case VelocityUnits_T::feet_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::feet, value);
-                    case VelocityUnits_T::meters_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::meters, value);
-                    }
-                }
-                case VelocityUnits_T::millimeters_per_second:
-                {
-                    switch (newUnits)
-                    {
-                    case VelocityUnits_T::inches_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::millimeters, LengthUnits_T::inches, value);
-                    default:
-                    case VelocityUnits_T::millimeters_per_second:
-                        return value;
-                    case VelocityUnits_T::feet_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::millimeters, LengthUnits_T::feet, value);
-                    case VelocityUnits_T::meters_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::meters, value);
-                    }
-                }
                 case VelocityUnits_T::feet_per_second:
                 {
                     switch (newUnits)
                     {
-                    case VelocityUnits_T::inches_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::feet, LengthUnits_T::inches, value);
-                    case VelocityUnits_T::millimeters_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::feet, LengthUnits_T::millimeters, value);
                     default:
                     case VelocityUnits_T::feet_per_second:
                         return value;
@@ -717,10 +681,6 @@ namespace OpenBurnUnits
                 {
                     switch (newUnits)
                     {
-                    case VelocityUnits_T::inches_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::inches, value);
-                    case VelocityUnits_T::millimeters_per_second:
-                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::millimeters, value);
                     case VelocityUnits_T::feet_per_second:
                         return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::feet, value);
                     default:
@@ -730,32 +690,27 @@ namespace OpenBurnUnits
                 }
             }
         }
-
         static const QStringList GetAllUnitSymbols()
         {
             return QStringList() <<
-                QString("in/sec") <<
-                QString("mm/sec") <<
                 QString("feet/sec") <<
                 QString("m/sec");
         }
         static const QStringList GetAllUnitNames()
         {
             return QStringList() <<
-                QObject::tr("Inches / Second") <<
-                QObject::tr("Millimeters / Second") <<
                 QObject::tr("Feet / Second") <<
                 QObject::tr("Meters / Second");
         }
     };
+//=============================================================================
+//*************MASS FLUX UNITS********************
+//=============================================================================
     enum class MassFluxUnits_T
     {
         lbs_sec_sq_in,
         kg_sec_sq_meter
     };
-//=============================================================================
-//*************MASS FLUX UNITS********************
-//=============================================================================
     class MassFluxUnits : public OpenBurnUnit<MassFluxUnits_T, MassFluxUnits>
     {
     public:
@@ -907,5 +862,59 @@ namespace OpenBurnUnits
         static constexpr double ENGLISH_PER_SI = 1.0 / SI_PER_ENGLISH;
         static constexpr double LBSIN3_PER_SLUGFT3 = 53.7079;
         static constexpr double SLUGFT3_PER_LBSIN3 = 1.0 / LBSIN3_PER_SLUGFT3;
+    };
+//=============================================================================
+//*************VELOCITY UNITS********************
+//=============================================================================
+    enum class BurnRateUnits_T
+    {
+        inches_per_second,
+        millimeters_per_second
+    };
+    class BurnRateUnits : public OpenBurnUnit<BurnRateUnits_T, BurnRateUnits>
+    {
+    public:
+        using OpenBurnUnit::OpenBurnUnit;
+        static double Convert(BurnRateUnits_T oldUnits, BurnRateUnits_T newUnits, double value)
+        {
+            switch (oldUnits)
+            {
+            default:
+            case BurnRateUnits_T::inches_per_second:
+            {
+                switch (newUnits)
+                {
+                default:
+                case BurnRateUnits_T::inches_per_second:
+                    return value;
+                case BurnRateUnits_T::millimeters_per_second:
+                    return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::millimeters, value);
+                }
+            }
+            case BurnRateUnits_T::millimeters_per_second:
+            {
+                switch (newUnits)
+                {
+                case BurnRateUnits_T::inches_per_second:
+                    return LengthUnits::Convert(LengthUnits_T::millimeters, LengthUnits_T::inches, value);
+                default:
+                case BurnRateUnits_T::millimeters_per_second:
+                    return value;
+                }
+            }
+            }
+        }
+        static const QStringList GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                 QString("in/sec") <<
+                 QString("mm/sec");
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return QStringList() <<
+                 QObject::tr("Inches / Second") <<
+                 QObject::tr("Millimeters / Second");
+        }
     };
 }

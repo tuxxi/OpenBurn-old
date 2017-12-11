@@ -48,4 +48,5 @@ private:
     VelocityUnitsComboBox* m_unitsVelocity;
     MassFluxUnitsComboBox* m_unitsMassFlux;
     DensityUnitsComboBox* m_unitsDensity;
+    BurnRateUnitsComboBox* m_unitsBurnRate;
 };

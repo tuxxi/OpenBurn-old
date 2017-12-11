@@ -328,6 +328,7 @@ void MainWindow::OnSettingsChanged()
 
     emit m_DesignMotor->DesignUpdated();
     m_SimTab->UpdateResults();
+    m_PropellantTab->UpdateSettings();
 }
 void MainWindow::OnTabChanged(int index)
 {

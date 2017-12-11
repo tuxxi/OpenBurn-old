@@ -12,6 +12,7 @@ OpenBurnSettings::OpenBurnSettings()
     m_VelocityUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second),
     m_MassFluxUnits(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in),
     m_DensityUnits(OpenBurnUnits::DensityUnits_T::lbs_per_in_cu),
+    m_BurnRateUnits(OpenBurnUnits::BurnRateUnits_T::inches_per_second),
     m_redrawOnChanges(true)
 {
     
@@ -46,6 +47,7 @@ void OpenBurnSettings::ReadJSON(const QJsonObject& object)
     m_VelocityUnits = OpenBurnUnits::VelocityUnits(unitsObject["velocity"].toInt());
     m_MassFluxUnits = OpenBurnUnits::MassFluxUnits(unitsObject["massflux"].toInt());
     m_DensityUnits = OpenBurnUnits::DensityUnits(unitsObject["density"].toInt());
+    m_BurnRateUnits = OpenBurnUnits::BurnRateUnits(unitsObject["burnrate"].toInt());
 
     m_redrawOnChanges = settingsObject["redraw"].toBool();
 }   
@@ -61,6 +63,7 @@ void OpenBurnSettings::WriteJSON(QJsonObject &object)
     units["velocity"] = int(m_VelocityUnits.unit);
     units["massflux"] = int(m_MassFluxUnits.unit);
     units["density"] = int(m_DensityUnits.unit);
+    units["burnrate"] = int(m_BurnRateUnits.unit);
 
     settings["redraw"] = m_redrawOnChanges;
     object["units"] = units;

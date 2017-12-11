@@ -22,9 +22,10 @@ class PropellantTab : public QWidget
 public:
     explicit PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~PropellantTab() = default;
+    void UpdateSettings();
+
 signals:
     void PropellantsUpdated();
-
 private slots:
     void OnSaveButtonClicked();
     void OnDeleteButtonClicked();
@@ -54,7 +55,7 @@ private:
     QGroupBox* m_gbEdit;
     QLineEdit* m_lnePropBRCoef, *m_lnePropBRExp, *m_lnePropDensity, *m_lnePropCStar;
     DensityUnitsComboBox* m_unitsDensity;
-    VelocityUnitsComboBox* m_unitsBRCoef;
+    BurnRateUnitsComboBox* m_unitsBRCoef;
     VelocityUnitsComboBox* m_unitsCStar;
 
     //advanced

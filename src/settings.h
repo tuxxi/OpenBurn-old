@@ -24,6 +24,7 @@ public:
     OpenBurnUnits::VelocityUnits m_VelocityUnits;
     OpenBurnUnits::MassFluxUnits m_MassFluxUnits;
     OpenBurnUnits::DensityUnits m_DensityUnits;
+    OpenBurnUnits::BurnRateUnits m_BurnRateUnits;
 
     bool m_redrawOnChanges;
 signals:
