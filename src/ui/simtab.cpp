@@ -6,7 +6,6 @@
 #include "simtab.h"
 #include "src/units.h"
 
-static const QString massFluxUnits = QObject::tr("lbs/sec/inch²"); //todo: make more mass flux units?
 static const double pressureMultiplier = 1.10;
 static const double motorLenMultiplier = 100;
 
@@ -174,6 +173,8 @@ void SimulationTab::SetupPlotter()
 void SimulationTab::SetGraphNames()
 {
     const QString pressureUnits = m_GlobalSettings->m_PressureUnits.GetUnitSymbol();
+    const QString massFluxUnits = m_GlobalSettings->m_MassFluxUnits.GetUnitSymbol();
+
     m_Plotter->graph(0)->setName(tr("Chamber Pressure") + "(" + pressureUnits + ")");
     m_Plotter->graph(1)->setName(tr("Core Mass Flux") + "(" + massFluxUnits + ")");
 }
@@ -202,10 +203,13 @@ void SimulationTab::UpdateResults()
     const double maxPressure = m_GlobalSettings->m_PressureUnits.ConvertFrom(
         OpenBurnUnits::PressureUnits_T::psi,
         m_Simulator->GetMaxPressure());
-    const double maxMassFlux = m_Simulator->GetMaxMassFlux();
+    const double maxMassFlux = m_GlobalSettings->m_MassFluxUnits.ConvertFrom(
+        OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in,
+        m_Simulator->GetMaxMassFlux());
 
     const QString pressureUnits = m_GlobalSettings->m_PressureUnits.GetUnitSymbol();
     const QString forceUnits = m_GlobalSettings->m_ForceUnits.GetUnitSymbol();
+    const QString massFluxUnits = m_GlobalSettings->m_MassFluxUnits.GetUnitSymbol();
 
     m_lblMaxpressure->setText(QString::number(round(maxPressure)) + " "  + pressureUnits);
     m_lblCoreMassFlux->setText(QString::number(maxMassFlux, 'g', 3) + " " + massFluxUnits);
@@ -244,6 +248,7 @@ void SimulationTab::UpdateCurrentChamber(int currentSlice)
 
     const QString pressureUnits = m_GlobalSettings->m_PressureUnits.GetUnitSymbol();
     const QString forceUnits = m_GlobalSettings->m_ForceUnits.GetUnitSymbol();
+    const QString massFluxUnits = m_GlobalSettings->m_MassFluxUnits.GetUnitSymbol();
 
     const double currentThrust = m_GlobalSettings->m_ForceUnits.ConvertFrom(
         OpenBurnUnits::ForceUnits_T::pounds_force,
@@ -253,7 +258,9 @@ void SimulationTab::UpdateCurrentChamber(int currentSlice)
         OpenBurnUnits::PressureUnits_T::psi,
         data->pressure);
 
-    const double currentMassFlux = data->massflux;
+    const double currentMassFlux = m_GlobalSettings->m_MassFluxUnits.ConvertFrom(
+        OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in,
+        data->massflux);
     m_lblCurrentThrust->setText(QString::number(currentThrust, 'f', 1) + " " + forceUnits);
     m_lblCurrentPressure->setText(QString::number(currentPressure, 'f', 1) +  " " + pressureUnits);
     m_lblCurrentCoreMassFlux->setText(QString::number(currentMassFlux, 'f', 3) + " " + massFluxUnits);
@@ -334,14 +341,19 @@ void SimulationTab::UpdateCurrentXPos(double xpos)
     m_MotorDisplayScene->update();
 
     const QString lengthUnits = m_GlobalSettings->m_LengthUnits.GetUnitSymbol();
+    const QString massFluxUnits = m_GlobalSettings->m_MassFluxUnits.GetUnitSymbol();
+
+    const double xSlice = xpos - (m_Motor->GetMotorLength() - GetCurrentSliceMotor()->GetMotorLength());
+
     const double x = m_GlobalSettings->m_LengthUnits.ConvertFrom(
         OpenBurnUnits::LengthUnits_T::inches,
         xpos);
-    double xSlice = xpos - (m_Motor->GetMotorLength() - GetCurrentSliceMotor()->GetMotorLength());
-    const double massFluxAtX = MotorSim::CalcMassFlux(GetCurrentSliceMotor(), xSlice);
+    const double massFluxAtX = m_GlobalSettings->m_MassFluxUnits.ConvertFrom(
+        OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in,
+        MotorSim::CalcMassFlux(GetCurrentSliceMotor(), xSlice));
     const double machNumberAtX = MotorSim::CalcMachNumber(GetCurrentSliceMotor(), xSlice);
-    m_lblXPos->setText(QString::number(x, 'f', 2) + " " + lengthUnits);
 
+    m_lblXPos->setText(QString::number(x, 'f', 2) + " " + lengthUnits);
     m_lblXPosMassFlux->setText(QString::number(massFluxAtX, 'f', 3) + " " + massFluxUnits);
     m_lblXPosMachNumber->setText(QString::number(machNumberAtX, 'f', 3));
 }

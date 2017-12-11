@@ -45,4 +45,7 @@ private:
     PressureUnitsComboBox* m_unitsPressure;
     ForceUnitsComboBox* m_unitsForce;
     MassUnitsComboBox* m_unitsMass;
+    VelocityUnitsComboBox* m_unitsVelocity;
+    MassFluxUnitsComboBox* m_unitsMassFlux;
+    DensityUnitsComboBox* m_unitsDensity;
 };

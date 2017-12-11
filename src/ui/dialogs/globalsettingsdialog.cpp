@@ -55,6 +55,13 @@ void GlobalSettingsDialog::SetupUI()
     unitsLayout->addWidget(m_unitsForce = new ForceUnitsComboBox, 4, 1);
     unitsLayout->addWidget(new QLabel(tr("Mass")), 5, 0);
     unitsLayout->addWidget(m_unitsMass = new MassUnitsComboBox, 5, 1);
+    unitsLayout->addWidget(new QLabel(tr("Velocity")), 6, 0);
+    unitsLayout->addWidget(m_unitsVelocity = new VelocityUnitsComboBox, 6, 1);
+    unitsLayout->addWidget(new QLabel(tr("Mass Flux")), 7, 0);
+    unitsLayout->addWidget(m_unitsMassFlux = new MassFluxUnitsComboBox, 7, 1);
+    unitsLayout->addWidget(new QLabel(tr("Density")), 8, 0);
+    unitsLayout->addWidget(m_unitsDensity = new DensityUnitsComboBox, 8, 1);
+
     unitsLayout->addWidget(m_btnDefaultUnits = new QPushButton(tr("Default")), 255, 0);
     unitsLayout->addWidget(m_btnMetricUnits = new QPushButton(tr("Metric")), 255, 1);
     unitsLayout->addWidget(m_btnImperialUnits = new QPushButton(tr("Imperial")), 255, 2);
@@ -80,6 +87,10 @@ void GlobalSettingsDialog::ApplySettings()
         m_GlobalSettings->m_TemperatureUnits = m_unitsTemperature->GetCurrentUnits().unit;
         m_GlobalSettings->m_ForceUnits = m_unitsForce->GetCurrentUnits().unit;
         m_GlobalSettings->m_MassUnits = m_unitsMass->GetCurrentUnits().unit;
+        m_GlobalSettings->m_VelocityUnits = m_unitsVelocity->GetCurrentUnits().unit;
+        m_GlobalSettings->m_MassFluxUnits = m_unitsMassFlux->GetCurrentUnits().unit;
+        m_GlobalSettings->m_DensityUnits = m_unitsDensity->GetCurrentUnits().unit;
+
         m_GlobalSettings->m_redrawOnChanges = m_chbxReSimOnChanges->isChecked();
         emit m_GlobalSettings->SettingsChanged();
     }
@@ -97,6 +108,9 @@ void GlobalSettingsDialog::PopulateSettings(SETTINGS_POPULATE_TYPE type)
             m_unitsTemperature->setCurrentIndex(int(m_GlobalSettings->m_TemperatureUnits));
             m_unitsForce->setCurrentIndex(int(m_GlobalSettings->m_ForceUnits));
             m_unitsMass->setCurrentIndex(int(m_GlobalSettings->m_MassUnits));
+            m_unitsVelocity->setCurrentIndex(int(m_GlobalSettings->m_VelocityUnits));
+            m_unitsMassFlux->setCurrentIndex(int(m_GlobalSettings->m_MassFluxUnits));
+            m_unitsDensity->setCurrentIndex(int(m_GlobalSettings->m_DensityUnits));
         }
         else if (type == SETTINGS_POPULATE_TYPE::def)
         {
@@ -106,6 +120,9 @@ void GlobalSettingsDialog::PopulateSettings(SETTINGS_POPULATE_TYPE type)
             m_unitsTemperature->setCurrentIndex(int(OpenBurnUnits::TemperatureUnits_T::fahrenheit));
             m_unitsForce->setCurrentIndex(int(OpenBurnUnits::ForceUnits_T::newtons));
             m_unitsMass->setCurrentIndex(int(OpenBurnUnits::MassUnits_T::pounds_mass));
+            m_unitsVelocity->setCurrentIndex(int(OpenBurnUnits::VelocityUnits_T::feet_per_second));
+            m_unitsMassFlux->setCurrentIndex(int(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in));
+            m_unitsDensity->setCurrentIndex(int(OpenBurnUnits::DensityUnits_T::lbs_per_in_cu));
         }
         else if (type == SETTINGS_POPULATE_TYPE::metric)
         {
@@ -115,6 +132,9 @@ void GlobalSettingsDialog::PopulateSettings(SETTINGS_POPULATE_TYPE type)
             m_unitsTemperature->setCurrentIndex(int(OpenBurnUnits::TemperatureUnits_T::kelvin));
             m_unitsForce->setCurrentIndex(int(OpenBurnUnits::ForceUnits_T::newtons));
             m_unitsMass->setCurrentIndex(int(OpenBurnUnits::MassUnits_T::kilograms));
+            m_unitsVelocity->setCurrentIndex(int(OpenBurnUnits::VelocityUnits_T::meters_per_second));
+            m_unitsMassFlux->setCurrentIndex(int(OpenBurnUnits::MassFluxUnits_T::kg_sec_sq_meter));
+            m_unitsDensity->setCurrentIndex(int(OpenBurnUnits::DensityUnits_T::kg_per_m_cu));
         }
         else if (type == SETTINGS_POPULATE_TYPE::imperial)
         {
@@ -124,6 +144,9 @@ void GlobalSettingsDialog::PopulateSettings(SETTINGS_POPULATE_TYPE type)
             m_unitsTemperature->setCurrentIndex(int(OpenBurnUnits::TemperatureUnits_T::fahrenheit));
             m_unitsForce->setCurrentIndex(int(OpenBurnUnits::ForceUnits_T::pounds_force));
             m_unitsMass->setCurrentIndex(int(OpenBurnUnits::MassUnits_T::pounds_mass));
+            m_unitsVelocity->setCurrentIndex(int(OpenBurnUnits::VelocityUnits_T::feet_per_second));
+            m_unitsMassFlux->setCurrentIndex(int(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in));
+            m_unitsDensity->setCurrentIndex(int(OpenBurnUnits::DensityUnits_T::slugs_per_foot_cu));
         }
     }
 }

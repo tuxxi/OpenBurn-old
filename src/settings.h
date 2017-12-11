@@ -21,6 +21,9 @@ public:
     OpenBurnUnits::PressureUnits m_PressureUnits;
     OpenBurnUnits::ForceUnits m_ForceUnits;
     OpenBurnUnits::MassUnits m_MassUnits;
+    OpenBurnUnits::VelocityUnits m_VelocityUnits;
+    OpenBurnUnits::MassFluxUnits m_MassFluxUnits;
+    OpenBurnUnits::DensityUnits m_DensityUnits;
 
     bool m_redrawOnChanges;
 signals:

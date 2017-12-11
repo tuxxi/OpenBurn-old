@@ -504,7 +504,7 @@ namespace OpenBurnUnits
         static constexpr double FAHRENHEIT_TO_CELSIUS = 5.0 / 9.0;
         static constexpr double CELSIUS_TO_FAHRENHEIT = 1.0 / FAHRENHEIT_TO_CELSIUS;
     };
-    //=============================================================================
+//=============================================================================
 //*************FORCE UNITS********************
 //=============================================================================
     enum class ForceUnits_T
@@ -592,15 +592,11 @@ namespace OpenBurnUnits
                     default:
                     case MassUnits_T::pounds_mass:
                         return value;
-                        break;
                     case MassUnits_T::kilograms:
                         return KILOGRAMS_PER_POUND * value;
-                        break;
                     case MassUnits_T::slugs:
                         return SLUGS_PER_POUND * value;
-                        break;
                     }
-                    break;
                 }
                 case MassUnits_T::kilograms:
                 {
@@ -609,15 +605,11 @@ namespace OpenBurnUnits
                     default:
                     case MassUnits_T::kilograms:
                         return value;
-                        break;
                     case MassUnits_T::pounds_mass:
                         return POUNDS_PER_KILOGRAM * value;
-                        break;
                     case MassUnits_T::slugs:
                         return SLUGS_PER_KILOGRAM * value;
-                        break;
                     }
-                    break;
                 }
 
                 case MassUnits_T::slugs:
@@ -627,15 +619,11 @@ namespace OpenBurnUnits
                     default:
                     case MassUnits_T::slugs:
                         return value;
-                        break;
                     case MassUnits_T::kilograms:
                         return KILOGRAMS_PER_SLUG * value;
-                        break;
                     case MassUnits_T::pounds_mass:
                         return POUNDS_PER_SLUG * value;
-                        break;
                     }
-                    break;
                 }
             }
         }
@@ -660,5 +648,264 @@ namespace OpenBurnUnits
         static constexpr double KILOGRAMS_PER_SLUG = 1.0 / POUNDS_PER_KILOGRAM * POUNDS_PER_SLUG;
         static constexpr double SLUGS_PER_POUND = 1.0 / POUNDS_PER_SLUG;
         static constexpr double SLUGS_PER_KILOGRAM = 1.0 / KILOGRAMS_PER_SLUG;
+    };
+//=============================================================================
+//*************VELOCITY UNITS********************
+//=============================================================================
+    enum class VelocityUnits_T
+    {
+        inches_per_second,
+        millimeters_per_second,
+        feet_per_second,
+        meters_per_second,
+    };
+    class VelocityUnits : public OpenBurnUnit<VelocityUnits_T, VelocityUnits>
+    {
+    public:
+        using OpenBurnUnit::OpenBurnUnit;
+        static double Convert(VelocityUnits_T oldUnits, VelocityUnits_T newUnits, double value)
+        {
+            switch(oldUnits)
+            {
+                default:
+                case VelocityUnits_T::inches_per_second:
+                {
+                    switch (newUnits)
+                    {
+                    default:
+                    case VelocityUnits_T::inches_per_second:
+                        return value;
+                    case VelocityUnits_T::millimeters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::millimeters, value);
+                    case VelocityUnits_T::feet_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::feet, value);
+                    case VelocityUnits_T::meters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::inches, LengthUnits_T::meters, value);
+                    }
+                }
+                case VelocityUnits_T::millimeters_per_second:
+                {
+                    switch (newUnits)
+                    {
+                    case VelocityUnits_T::inches_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::millimeters, LengthUnits_T::inches, value);
+                    default:
+                    case VelocityUnits_T::millimeters_per_second:
+                        return value;
+                    case VelocityUnits_T::feet_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::millimeters, LengthUnits_T::feet, value);
+                    case VelocityUnits_T::meters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::meters, value);
+                    }
+                }
+                case VelocityUnits_T::feet_per_second:
+                {
+                    switch (newUnits)
+                    {
+                    case VelocityUnits_T::inches_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::feet, LengthUnits_T::inches, value);
+                    case VelocityUnits_T::millimeters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::feet, LengthUnits_T::millimeters, value);
+                    default:
+                    case VelocityUnits_T::feet_per_second:
+                        return value;
+                    case VelocityUnits_T::meters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::feet, LengthUnits_T::meters, value);
+                    }
+                }
+                case VelocityUnits_T::meters_per_second:
+                {
+                    switch (newUnits)
+                    {
+                    case VelocityUnits_T::inches_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::inches, value);
+                    case VelocityUnits_T::millimeters_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::millimeters, value);
+                    case VelocityUnits_T::feet_per_second:
+                        return LengthUnits::Convert(LengthUnits_T::meters, LengthUnits_T::feet, value);
+                    default:
+                    case VelocityUnits_T::meters_per_second:
+                        return value;
+                    }
+                }
+            }
+        }
+
+        static const QStringList GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("in/sec") <<
+                QString("mm/sec") <<
+                QString("feet/sec") <<
+                QString("m/sec");
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Inches / Second") <<
+                QObject::tr("Millimeters / Second") <<
+                QObject::tr("Feet / Second") <<
+                QObject::tr("Meters / Second");
+        }
+    };
+    enum class MassFluxUnits_T
+    {
+        lbs_sec_sq_in,
+        kg_sec_sq_meter
+    };
+//=============================================================================
+//*************MASS FLUX UNITS********************
+//=============================================================================
+    class MassFluxUnits : public OpenBurnUnit<MassFluxUnits_T, MassFluxUnits>
+    {
+    public:
+        using OpenBurnUnit::OpenBurnUnit;
+        static double Convert(MassFluxUnits_T oldUnits, MassFluxUnits_T newUnits, double value)
+        {
+            switch (oldUnits)
+            {
+            default:
+            case MassFluxUnits_T::lbs_sec_sq_in:
+            {
+                switch (newUnits)
+                {
+                default:
+                case MassFluxUnits_T::lbs_sec_sq_in:
+                    return value;
+                case MassFluxUnits_T::kg_sec_sq_meter:
+                    return ENGLISH_PER_SI * value;
+                }
+            }
+            case MassFluxUnits_T::kg_sec_sq_meter:
+            {
+                switch (newUnits)
+                {
+                case MassFluxUnits_T::lbs_sec_sq_in:
+                    return SI_PER_ENGLISH * value;
+                default:
+                case MassFluxUnits_T::kg_sec_sq_meter:
+                    return value;
+                }
+            }
+            }
+        }
+        static const QStringList GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("lbs/sec/in²") <<
+                QString("kg/sec/m²");
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Pounds / Second / Square Inch") <<
+                QObject::tr("Kilograms / Second / Square Meter");
+        }
+    private:
+        static constexpr double SI_PER_ENGLISH = 0.00142233433;
+        static constexpr double ENGLISH_PER_SI = 1.0 / SI_PER_ENGLISH;
+    };
+//=============================================================================
+//*************DENSITY UNITS********************
+//=============================================================================
+    enum class DensityUnits_T
+    {
+        lbs_per_in_cu,
+        kg_per_m_cu,
+        g_per_cc,
+        slugs_per_foot_cu
+    };
+    class DensityUnits : public OpenBurnUnit<DensityUnits_T, DensityUnits>
+    {
+    public:
+        using OpenBurnUnit::OpenBurnUnit;
+        static double Convert(DensityUnits_T oldUnits, DensityUnits_T newUnits, double value)
+        {
+            switch (oldUnits)
+            {
+            default:
+            case DensityUnits_T::lbs_per_in_cu:
+            {
+                switch (newUnits)
+                {
+                default:
+                case DensityUnits_T::lbs_per_in_cu:
+                    return value;
+                case DensityUnits_T::kg_per_m_cu:
+                    return SI_PER_ENGLISH * value;
+                case DensityUnits_T::g_per_cc:
+                    return (SI_PER_ENGLISH / 1000) * value / 1000;
+                case DensityUnits_T::slugs_per_foot_cu:
+                    return LBSIN3_PER_SLUGFT3 * value;
+                }
+            }
+            case DensityUnits_T::kg_per_m_cu:
+            {
+                switch (newUnits)
+                {
+                default:
+                case DensityUnits_T::lbs_per_in_cu:
+                    return ENGLISH_PER_SI * value;
+                case DensityUnits_T::kg_per_m_cu:
+                    return value;
+                case DensityUnits_T::g_per_cc:
+                    return value / 1000.0;
+                case DensityUnits_T::slugs_per_foot_cu:
+                    return ENGLISH_PER_SI * LBSIN3_PER_SLUGFT3 * value;
+                }
+            }
+            case DensityUnits_T::g_per_cc:
+            {
+                switch (newUnits)
+                {
+                default:
+                case DensityUnits_T::lbs_per_in_cu:
+                    return 1000 * ENGLISH_PER_SI * value;
+                case DensityUnits_T::kg_per_m_cu:
+                    return 1000 * value;
+                case DensityUnits_T::g_per_cc:
+                    return value;
+                case DensityUnits_T::slugs_per_foot_cu:
+                    return (ENGLISH_PER_SI / 1000) * LBSIN3_PER_SLUGFT3 * value;
+                }
+            }
+            case DensityUnits_T::slugs_per_foot_cu:
+            {
+                switch (newUnits)
+                {
+                default:
+                case DensityUnits_T::lbs_per_in_cu:
+                    return SLUGFT3_PER_LBSIN3 * value;
+                case DensityUnits_T::kg_per_m_cu:
+                    return SLUGFT3_PER_LBSIN3 * SI_PER_ENGLISH * value;
+                case DensityUnits_T::g_per_cc:
+                    return SLUGFT3_PER_LBSIN3 * (SI_PER_ENGLISH / 1000) * value;
+                case DensityUnits_T::slugs_per_foot_cu:
+                    return value;
+                }
+            }
+            }
+        }
+        static const QStringList GetAllUnitSymbols()
+        {
+            return QStringList() <<
+                QString("lbs/in³") <<
+                QString("kg/m²") <<
+                QString("g/cc") <<
+                QString("slugs/ft³");
+        }
+        static const QStringList GetAllUnitNames()
+        {
+            return QStringList() <<
+                QObject::tr("Pounds / Cubic Inch") <<
+                QObject::tr("Kilograms / Cubic Meter") <<
+                QObject::tr("Grams / Cubic Centimeter") <<
+                QObject::tr("Slugs / Cubic Foot");
+        }
+    private:
+        static constexpr double SI_PER_ENGLISH = 27679.9; //lbs/in^3 per kg/m^3
+        static constexpr double ENGLISH_PER_SI = 1.0 / SI_PER_ENGLISH;
+        static constexpr double LBSIN3_PER_SLUGFT3 = 53.7079;
+        static constexpr double SLUGFT3_PER_LBSIN3 = 1.0 / LBSIN3_PER_SLUGFT3;
     };
 }

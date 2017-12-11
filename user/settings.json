@@ -1,13 +1,16 @@
 {
     "settings": {
-        "redrawOnChanges": true
+        "redraw": false
     },
     "units": {
-        "angleunits": 0,
-        "forceunits": 1,
-        "lengthunits": 0,
-        "massunits": 0,
-        "pressureunits": 0,
-        "temperatureunits": 0
+        "angle": 0,
+        "density": 0,
+        "force": 1,
+        "length": 0,
+        "mass": 0,
+        "massflux": 0,
+        "pressure": 0,
+        "temperature": 0,
+        "velocity": 2
     }
 }
