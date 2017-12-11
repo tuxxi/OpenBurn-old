@@ -25,7 +25,7 @@ public:
     OpenBurnMotor(OpenBurnNozzle* nozz, GrainVector grains);
     ~OpenBurnMotor();
 
-    double CalcStaticKn(KN_STATIC_CALC_TYPE type); //static kn calc based on regression derivitiave
+    double CalcStaticKn(KN_STATIC_CALC_TYPE type); //static kn calc based on regression derivative
     double CalcKn(); //instantaneous Kn calc for the current motor configuration
 
     double GetTotalMassFlow();
@@ -72,6 +72,8 @@ signals:
 	void NozzleUpdated(OpenBurnNozzle*);
 	void GrainRemoved(int);
 	void NozzleRemoved();
+	void DuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDatabase);
+    void NewPropellantFound(OpenBurnPropellant prop);
 private:
 	void UpdateDesign();
 	NozzlePtr m_Nozzle;

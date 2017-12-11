@@ -192,10 +192,16 @@ void PropellantTab::OnPropellantUpdated()
     m_cbPropSelection->setItemText(idx, m_lnePropName->text());    
     prop.SetPropellantName(m_lnePropName->text());
     prop.SetBasicParams(
-        m_lnePropBRCoef->text().toDouble(),
+        m_GlobalSettings->m_BurnRateUnits.ConvertTo(
+            OpenBurnUnits::BurnRateUnits_T::inches_per_second,
+            m_lnePropBRCoef->text().toDouble()),
         m_lnePropBRExp->text().toDouble(),
-        m_lnePropCStar->text().toDouble(),
-        m_lnePropDensity->text().toDouble(),
+        m_GlobalSettings->m_VelocityUnits.ConvertTo(
+            OpenBurnUnits::VelocityUnits_T::feet_per_second,
+            m_lnePropCStar->text().toDouble()),
+        m_GlobalSettings->m_DensityUnits.ConvertTo(
+            OpenBurnUnits::DensityUnits_T::lbs_per_in_cu,
+            m_lnePropDensity->text().toDouble()),
         m_lnePropGasSpecificHeatRatio->text().toDouble()
     );
 }
@@ -258,4 +264,16 @@ void PropellantTab::UpdateSettings()
     m_unitsBRCoef->SetUnits(m_GlobalSettings->m_BurnRateUnits);
     m_unitsDensity->SetUnits(m_GlobalSettings->m_DensityUnits);
     m_unitsCStar->SetUnits(m_GlobalSettings->m_VelocityUnits);
+}
+void PropellantTab::AddNewPropellantToDatabase(const OpenBurnPropellant& prop)
+{
+    m_Propellants->push_back(prop);
+    SaveDatabase();
+
+    //force combo box to update
+    m_cbPropSelection->clear();
+    for (auto i : *m_Propellants)
+    {
+        m_cbPropSelection->addItem(i.GetPropellantName());
+    }
 }

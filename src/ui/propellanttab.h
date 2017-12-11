@@ -23,6 +23,8 @@ public:
     explicit PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent = nullptr);
     ~PropellantTab() = default;
     void UpdateSettings();
+    void AddNewPropellantToDatabase(const OpenBurnPropellant& prop);
+    bool SaveDatabase();
 
 signals:
     void PropellantsUpdated();
@@ -39,7 +41,6 @@ private:
     void SetDefaultValues();
     //Propellant Database
     bool LoadDatabase(const QString& filename);
-    bool SaveDatabase();
 
     PropellantList* m_Propellants;
     OpenBurnSettings* m_GlobalSettings;

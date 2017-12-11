@@ -323,11 +323,18 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
         QJsonObject propellantObject = i.toObject();
         OpenBurnPropellant prop;
         prop.ReadJSON(propellantObject);
-        for (auto k : *database)
+        auto newPropellant = std::find(database->begin(), database->end(), prop);
+        if (newPropellant == database->end()) //didn't find it, lets check to see if it's a duplicate
         {
-            if (prop.GetPropellantName() == k.GetPropellantName())
+            auto duplicatePropellant = std::find_if(database->begin(), database->end(),
+                [&](const OpenBurnPropellant& p) { return p.GetPropellantName() == prop.GetPropellantName(); });
+            if (duplicatePropellant != database->end()) //we found a duplicate with the same name but different params
             {
-                //duplicate stuff
+                emit DuplicatePropellantFound(prop, *duplicatePropellant);
+            }
+            else
+            {
+                emit NewPropellantFound(prop);
             }
         }
         propellants.push_back(prop);

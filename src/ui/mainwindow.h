@@ -39,6 +39,8 @@ private slots:
     void OnPropellantsUpdated();
     void OnSettingsChanged();
     void OnTabChanged(int index);
+	void OnNewPropellantFound(OpenBurnPropellant prop);
+    void OnDuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDb);
 private:
     void SetupUI();
     void SaveFile(QString filename);

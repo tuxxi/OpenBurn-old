@@ -4,6 +4,8 @@
 #include "src/export.h"
 #include "src/ui/dialogs/exportdialog.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ImplicitIntegerAndEnumConversion"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -25,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::OnSettingsChanged);
     connect(m_TabWidget, &QTabWidget::currentChanged,
             this, &MainWindow::OnTabChanged);
+    connect(m_DesignMotor.get(), &OpenBurnMotor::NewPropellantFound,
+            this, &MainWindow::OnNewPropellantFound);
+    connect(m_DesignMotor.get(), &OpenBurnMotor::DuplicatePropellantFound,
+            this, &MainWindow::OnDuplicatePropellantFound);
 }
 MainWindow::~MainWindow()
 {
@@ -125,7 +131,12 @@ void MainWindow::ResetCurrentDesign()
 	m_DesignTab.reset();
 	m_SimTab.reset();
 	m_DesignMotor = std::make_unique<OpenBurnMotor>();
-	m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
+    connect(m_DesignMotor.get(), &OpenBurnMotor::NewPropellantFound,
+            this, &MainWindow::OnNewPropellantFound);
+    connect(m_DesignMotor.get(), &OpenBurnMotor::DuplicatePropellantFound,
+            this, &MainWindow::OnDuplicatePropellantFound);
+
+    m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
 	m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get(), m_UndoStack);
 	m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
 
@@ -345,3 +356,106 @@ void MainWindow::OnTabChanged(int index)
         simTab->resizeEvent(new QResizeEvent(simTab->size(), simTab->size()));
     }
 }
+void MainWindow::OnNewPropellantFound(OpenBurnPropellant prop)
+{
+    const auto brCoef = QString::number(m_GlobalSettings->m_BurnRateUnits.ConvertFrom(
+        OpenBurnUnits::BurnRateUnits_T::inches_per_second,
+        prop.GetBurnRateCoef()));
+    const auto cStar = QString::number(m_GlobalSettings->m_VelocityUnits.ConvertFrom(
+        OpenBurnUnits::VelocityUnits_T::feet_per_second,
+        prop.GetCharVelocity()));
+    const auto rho = QString::number(m_GlobalSettings->m_DensityUnits.ConvertFrom(
+        OpenBurnUnits::DensityUnits_T::lbs_per_in_cu,
+        prop.GetDensity()));
+
+    const auto brUnits = m_GlobalSettings->m_BurnRateUnits.GetUnitName();
+    const auto cstarUnits = m_GlobalSettings->m_VelocityUnits.GetUnitName();
+    const auto rhoUnits = m_GlobalSettings->m_DensityUnits.GetUnitName();
+    QMessageBox::StandardButton resBtn =
+        QMessageBox::question( this, "New Propellant Found",
+           tr("Propellant ") + prop.GetPropellantName() + tr(" not found in database!\n\n") +
+           tr("BR Coef (a): ") + brCoef + " " + brUnits + "\n" +
+           tr("Br Exp (n): ") + QString::number(prop.GetBurnRateExp()) + "\n" +
+           tr("Characteristic Velocity (C*): ") + cStar + " " + cstarUnits + "\n" +
+           tr("Density (rho): ") + rho + " " + rhoUnits + "\n" +
+           tr("Specific Heat Ratio (gamma, Cp/Cv): ") + QString::number(prop.GetSpecificHeatRatio()) + "\n\n" +
+           tr("Would you like to add it to the database?\n"),
+           QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes)
+    {
+        m_PropellantTab->AddNewPropellantToDatabase(prop);
+    }
+}
+void MainWindow::OnDuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant &prop)
+{
+    const auto brUnits = m_GlobalSettings->m_BurnRateUnits.GetUnitName();
+    const auto cstarUnits = m_GlobalSettings->m_VelocityUnits.GetUnitName();
+    const auto rhoUnits = m_GlobalSettings->m_DensityUnits.GetUnitName();
+    const auto loaded = tr("Loaded from file: ");
+    const auto db = tr(" -- database: ");
+    QString brCoef, brExp, cStar, rho, gmma;
+    if (dupe.GetBurnRateCoef() != prop.GetBurnRateCoef())
+    {
+        const auto a = QString::number(m_GlobalSettings->m_BurnRateUnits.ConvertFrom(
+            OpenBurnUnits::BurnRateUnits_T::inches_per_second,
+            prop.GetBurnRateCoef()));
+        const auto a_dupe = QString::number(m_GlobalSettings->m_BurnRateUnits.ConvertFrom(
+            OpenBurnUnits::BurnRateUnits_T::inches_per_second,
+            dupe.GetBurnRateCoef()));
+        brCoef = tr("br Coef (a) ") + loaded + a_dupe + db + a + " " + brUnits;
+    }
+    if (dupe.GetBurnRateExp() != prop.GetBurnRateExp())
+    {
+        const auto n = QString::number(prop.GetBurnRateExp());
+        const auto n_dupe = QString::number(dupe.GetBurnRateExp());
+        brExp = tr("br Exp (n) ") + loaded + n_dupe + db + n;
+    }
+    if (dupe.GetCharVelocity() != prop.GetCharVelocity())
+    {
+        const auto cs = QString::number(m_GlobalSettings->m_VelocityUnits.ConvertFrom(
+            OpenBurnUnits::VelocityUnits_T::feet_per_second,
+            prop.GetCharVelocity()));
+        const auto cs_dupe = QString::number(m_GlobalSettings->m_VelocityUnits.ConvertFrom(
+            OpenBurnUnits::VelocityUnits_T::feet_per_second,
+            dupe.GetCharVelocity()));
+        cStar = tr("Characteristic Velocity (C*) ") + loaded + cs_dupe + db + cs + " " + cstarUnits;
+    }
+    if (dupe.GetDensity() != prop.GetDensity())
+    {
+        const auto r = QString::number(m_GlobalSettings->m_DensityUnits.ConvertFrom(
+            OpenBurnUnits::DensityUnits_T::lbs_per_in_cu,
+            prop.GetDensity()));
+        const auto r_dupe = QString::number(m_GlobalSettings->m_DensityUnits.ConvertFrom(
+            OpenBurnUnits::DensityUnits_T::lbs_per_in_cu,
+            dupe.GetDensity()));
+        rho = tr("Density (rho) ") + loaded + r_dupe + db + r + " " + rhoUnits;
+    }
+    if (dupe.GetSpecificHeatRatio() != prop.GetSpecificHeatRatio())
+    {
+        const auto y = QString::number(prop.GetSpecificHeatRatio());
+        const auto y_dupe =  QString::number(dupe.GetSpecificHeatRatio());
+        gmma = tr("Specific Heat Ratio (cp/cv, gamma) ") + loaded + y_dupe + db + y;
+    }
+    QMessageBox::StandardButton resBtn =
+        QMessageBox::question( this, "Duplicate Propellant Found",
+            tr("Propellant ") + dupe.GetPropellantName() + tr(" different from database!\n\n") +
+                brCoef + "\n" +
+                brExp + "\n" +
+                cStar + "\n" +
+                rho + "\n" +
+                gmma + "\n" +
+                tr("Would you like to update the database?\n"),
+           QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes)
+    {
+        auto oldProp = std::find(m_Propellants->begin(), m_Propellants->end(), prop);
+        if (oldProp != m_Propellants->end())
+        {
+            m_Propellants->erase(oldProp);
+            m_Propellants->push_back(dupe);
+            m_PropellantTab->SaveDatabase();
+        }
+    }
+}
+
+#pragma clang diagnostic pop
