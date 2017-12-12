@@ -1,9 +1,9 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QGroupBox>
-#include "simsettingsdialog.h"
+#include "simsettingsdialog.hpp"
 
-#include "src/units.h"
+#include "src/units.hpp"
 SimSettingsDialog::SimSettingsDialog(MotorSimSettings* settings, OpenBurnSettings* globalSettings, QWidget* parent)
     : QDialog(parent),
       m_Settings(settings)

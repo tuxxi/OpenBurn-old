@@ -5,7 +5,7 @@
 #include <QGraphicsSceneEvent>
 #include <QtCore>
 #include <QPainter>
-#include "src/grain.h"
+#include "src/grain.hpp"
 
 //this class represents the 2D cross sectional view of a grain
 class GrainGraphicsItem : public QGraphicsObject

@@ -6,7 +6,7 @@
 
 #include <QDebug>
 
-#include "src/ui/dialogs/graindialog.h"
+#include "src/ui/dialogs/graindialog.hpp"
 
 GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
 	const GrainVector& grains, QWidget *parent)

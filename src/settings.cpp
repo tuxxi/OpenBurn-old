@@ -1,6 +1,6 @@
 #include <QJsonObject>
 #include <string>
-#include "settings.h"
+#include "settings.hpp"
 
 OpenBurnSettings::OpenBurnSettings()
     : m_LengthUnits(OpenBurnUnits::LengthUnits_T::inches),

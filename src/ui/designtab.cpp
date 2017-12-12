@@ -1,7 +1,7 @@
 #include <QDebug>
 
-#include "src/commands.h"
-#include "src/ui/designtab.h"
+#include "src/commands.hpp"
+#include "src/ui/designtab.hpp"
 
 DesignTab::DesignTab(OpenBurnMotor* motor, 
 	PropellantList* propellantTypes, OpenBurnSettings* settings, 

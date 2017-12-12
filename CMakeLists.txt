@@ -26,57 +26,57 @@ add_executable(OpenBurn
         src/thirdparty/qcustomplot/qcustomplot.cpp
         src/thirdparty/qcustomplot/qcustomplot.h
         src/ui/dialogs/exportdialog.cpp
-        src/ui/dialogs/exportdialog.h
+        src/ui/dialogs/exportdialog.hpp
         src/ui/dialogs/globalsettingsdialog.cpp
-        src/ui/dialogs/globalsettingsdialog.h
+        src/ui/dialogs/globalsettingsdialog.hpp
         src/ui/dialogs/graindesigntypes.cpp
-        src/ui/dialogs/graindesigntypes.h
+        src/ui/dialogs/graindesigntypes.hpp
         src/ui/dialogs/graindialog.cpp
-        src/ui/dialogs/graindialog.h
+        src/ui/dialogs/graindialog.hpp
         src/ui/dialogs/nozzledesigntypes.cpp
-        src/ui/dialogs/nozzledesigntypes.h
+        src/ui/dialogs/nozzledesigntypes.hpp
         src/ui/dialogs/nozzledialog.cpp
-        src/ui/dialogs/nozzledialog.h
+        src/ui/dialogs/nozzledialog.hpp
         src/ui/dialogs/simsettingsdialog.cpp
-        src/ui/dialogs/simsettingsdialog.h
+        src/ui/dialogs/simsettingsdialog.hpp
         src/ui/graphics/graingraphicsitem.cpp
-        src/ui/graphics/graingraphicsitem.h
+        src/ui/graphics/graingraphicsitem.hpp
         src/ui/graphics/motorgraphicsitem.cpp
-        src/ui/graphics/motorgraphicsitem.h
+        src/ui/graphics/motorgraphicsitem.hpp
         src/ui/graphics/nozzlegraphicsitem.cpp
-        src/ui/graphics/nozzlegraphicsitem.h
+        src/ui/graphics/nozzlegraphicsitem.hpp
         src/ui/widgets/graintablewidget.cpp
-        src/ui/widgets/graintablewidget.h
+        src/ui/widgets/graintablewidget.hpp
         src/ui/widgets/unitscombobox.cpp
-        src/ui/widgets/unitscombobox.h
+        src/ui/widgets/unitscombobox.hpp
         src/ui/designtab.cpp
-        src/ui/designtab.h
+        src/ui/designtab.hpp
         src/ui/mainwindow.cpp
-        src/ui/mainwindow.h
+        src/ui/mainwindow.hpp
         src/ui/propellanttab.cpp
-        src/ui/propellanttab.h
+        src/ui/propellanttab.hpp
         src/ui/simtab.cpp
-        src/ui/simtab.h
-        src/commands.h
+        src/ui/simtab.hpp
+        src/commands.hpp
         src/commands.cpp
-        src/export.h
+        src/export.hpp
         src/export.cpp
         src/grain.cpp
-        src/grain.h
+        src/grain.hpp
         src/main.cpp
         src/motor.cpp
-        src/motor.h
+        src/motor.hpp
         src/motorsim.cpp
-        src/motorsim.h
+        src/motorsim.hpp
         src/nozzle.cpp
-        src/nozzle.h
+        src/nozzle.hpp
         src/propellant.cpp
-        src/propellant.h
+        src/propellant.hpp
         src/settings.cpp
-        src/settings.h
+        src/settings.hpp
         src/units.cpp
-        src/units.h
+        src/units.hpp
         src/util.cpp
-        src/util.h)
+        src/util.hpp)
 
 target_link_libraries(OpenBurn Qt5::Widgets Qt5::Core Qt5::Gui Qt5::PrintSupport)

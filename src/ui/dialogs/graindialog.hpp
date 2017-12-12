@@ -10,10 +10,10 @@
 
 #include <QList>
 
-#include "src/motor.h"
-#include "src/settings.h"
-#include "graindesigntypes.h"
-#include "src/ui/graphics/graingraphicsitem.h"
+#include "src/motor.hpp"
+#include "src/settings.hpp"
+#include "graindesigntypes.hpp"
+#include "src/ui/graphics/graingraphicsitem.hpp"
 
 class GrainDialog : public QDialog
 {

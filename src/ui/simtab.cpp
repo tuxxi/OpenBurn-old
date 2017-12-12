@@ -3,8 +3,8 @@
 #include <QPen>
 #include <QFrame>
 
-#include "simtab.h"
-#include "src/units.h"
+#include "simtab.hpp"
+#include "src/units.hpp"
 
 static const double pressureMultiplier = 1.10;
 static const double motorLenMultiplier = 100;

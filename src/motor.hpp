@@ -5,8 +5,8 @@
 #include <vector>
 #include <memory>
 
-#include "grain.h"
-#include "nozzle.h"
+#include "grain.hpp"
+#include "nozzle.hpp"
 enum KN_STATIC_CALC_TYPE
 {
     KN_CALC_INITIAL,

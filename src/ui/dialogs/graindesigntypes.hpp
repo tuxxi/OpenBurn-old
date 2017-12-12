@@ -9,10 +9,10 @@
 #include <QComboBox>
 #include <QToolButton>
 
-#include "src/grain.h"
-#include "src/settings.h"
-#include "src/propellant.h"
-#include "src/ui/widgets/unitscombobox.h"
+#include "src/grain.hpp"
+#include "src/settings.hpp"
+#include "src/propellant.hpp"
+#include "src/ui/widgets/unitscombobox.hpp"
 
 //This class represents the "default" parameters for grain design:
 //Length, Diameter, bore shape, propellant, and inhibited faces.

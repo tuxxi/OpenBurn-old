@@ -1,5 +1,5 @@
 #include <QDebug>
-#include "motor.h"
+#include "motor.hpp"
 
 OpenBurnMotor::OpenBurnMotor()
     : OpenBurnMotor(nullptr, GrainVector())

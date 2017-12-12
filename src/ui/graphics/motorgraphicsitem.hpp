@@ -10,12 +10,12 @@
 #include <vector>
 #include <memory>
 
-#include "src/ui/graphics/graingraphicsitem.h"
-#include "src/ui/graphics/nozzlegraphicsitem.h"
+#include "src/ui/graphics/graingraphicsitem.hpp"
+#include "src/ui/graphics/nozzlegraphicsitem.hpp"
 
-#include "src/grain.h"
-#include "src/nozzle.h"
-#include "src/motor.h"
+#include "src/grain.hpp"
+#include "src/nozzle.hpp"
+#include "src/motor.hpp"
 
 //this class represents the 2D cross sectional view of the whole motor
 class MotorGraphicsItem : public QGraphicsObject

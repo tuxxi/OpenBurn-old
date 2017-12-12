@@ -7,11 +7,11 @@
 
 #include <memory>
 
-#include "src/motorsim.h"
-#include "src/settings.h"
+#include "src/motorsim.hpp"
+#include "src/settings.hpp"
 #include "src/thirdparty/qcustomplot/qcustomplot.h"
-#include "src/ui/dialogs/simsettingsdialog.h"
-#include "src/ui/graphics/motorgraphicsitem.h"
+#include "src/ui/dialogs/simsettingsdialog.hpp"
+#include "src/ui/graphics/motorgraphicsitem.hpp"
 
 class SimulationTab : public QWidget
 {

@@ -6,8 +6,8 @@
 #include <QPushButton>
 #include <QComboBox>
 
-#include "src/motorsim.h"
-#include "src/ui/widgets/unitscombobox.h"
+#include "src/motorsim.hpp"
+#include "src/ui/widgets/unitscombobox.hpp"
 class SimSettingsDialog : public QDialog
 {
     Q_OBJECT

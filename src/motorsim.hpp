@@ -3,8 +3,8 @@
 #include <vector>
 #include <memory>
 
-#include "motor.h"
-#include "settings.h"
+#include "motor.hpp"
+#include "settings.hpp"
 
 struct MotorSimDataPoint
 {

@@ -1,5 +1,5 @@
-#include "graintablewidget.h"
-#include "src/units.h"
+#include "graintablewidget.hpp"
+#include "src/units.hpp"
 
 GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent) 
     : QTableWidget(parent),

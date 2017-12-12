@@ -3,8 +3,8 @@
 #include <QPushButton>
 #include <QCheckBox>
 
-#include "src/settings.h"
-#include "src/ui/widgets/unitscombobox.h"
+#include "src/settings.hpp"
+#include "src/ui/widgets/unitscombobox.hpp"
 
 enum class SETTINGS_POPULATE_TYPE
 {

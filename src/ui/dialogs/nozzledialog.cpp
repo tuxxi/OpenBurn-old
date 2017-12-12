@@ -5,7 +5,7 @@
 #include <QFrame>
 #include <QCloseEvent>
 
-#include "src/ui/dialogs/nozzledialog.h"
+#include "src/ui/dialogs/nozzledialog.hpp"
 NozzleDialog::NozzleDialog(const OpenBurnNozzle* seed, OpenBurnSettings* settings, QWidget* parent)
     : QDialog(parent),
       m_GlobalSettings(settings)

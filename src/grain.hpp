@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "src/propellant.h"
+#include "src/propellant.hpp"
 
 class OpenBurnGrain;
 typedef std::shared_ptr<OpenBurnGrain> GrainPtr;

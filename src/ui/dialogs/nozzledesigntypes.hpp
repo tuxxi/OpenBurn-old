@@ -9,10 +9,10 @@
 #include <QComboBox>
 #include <QToolButton>
 
-#include "src/nozzle.h"
-#include "src/settings.h"
-#include "src/units.h"
-#include "src/ui/widgets/unitscombobox.h"
+#include "src/nozzle.hpp"
+#include "src/settings.hpp"
+#include "src/units.hpp"
+#include "src/ui/widgets/unitscombobox.hpp"
 //this class represents the default design for a nozzle
 
 class OpenBurnDesignNozzle : public QWidget

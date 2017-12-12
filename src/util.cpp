@@ -1,5 +1,5 @@
 #include <cmath>
-#include "util.h"
+#include "util.hpp"
 
 namespace OpenBurnUtil
 {

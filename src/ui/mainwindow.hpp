@@ -5,15 +5,15 @@
 #include <QWidget>
 #include <memory>
 
-#include "src/motor.h"
-#include "src/settings.h"
+#include "src/motor.hpp"
+#include "src/settings.hpp"
 
-#include "src/ui/widgets/graintablewidget.h"
-#include "src/ui/dialogs/graindialog.h"
-#include "src/ui/designtab.h"
-#include "src/ui/simtab.h"
-#include "src/ui/propellanttab.h"
-#include "src/ui/dialogs/globalsettingsdialog.h"
+#include "src/ui/widgets/graintablewidget.hpp"
+#include "src/ui/dialogs/graindialog.hpp"
+#include "src/ui/designtab.hpp"
+#include "src/ui/simtab.hpp"
+#include "src/ui/propellanttab.hpp"
+#include "src/ui/dialogs/globalsettingsdialog.hpp"
 
 class MainWindow : public QMainWindow
 {

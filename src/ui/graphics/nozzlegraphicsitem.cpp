@@ -1,4 +1,4 @@
-#include "src/ui/graphics/nozzlegraphicsitem.h"
+#include "src/ui/graphics/nozzlegraphicsitem.hpp"
 
 NozzleGraphicsItem::NozzleGraphicsItem(const OpenBurnNozzle* nozzle, int scale_factor, double nozzle_height,
 	bool crossSection, QGraphicsItem* parent)

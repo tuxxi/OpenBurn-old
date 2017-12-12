@@ -1,5 +1,5 @@
-#include "motorsim.h"
-#include "units.h"
+#include "motorsim.hpp"
+#include "units.hpp"
 
 #include <QtDebug>
 

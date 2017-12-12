@@ -12,9 +12,9 @@
 #include <vector>
 #include <utility>
 
-#include <src/settings.h>
-#include <src/ui/widgets/unitscombobox.h>
-#include "src/propellant.h"
+#include "src/settings.hpp"
+#include "src/ui/widgets/unitscombobox.hpp"
+#include "src/propellant.hpp"
 
 class PropellantTab : public QWidget
 {

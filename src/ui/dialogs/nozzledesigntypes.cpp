@@ -1,7 +1,7 @@
 #include <QLabel>
 
-#include "nozzledesigntypes.h"
-#include "src/util.h"
+#include "nozzledesigntypes.hpp"
+#include "src/util.hpp"
 
 OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz, OpenBurnSettings* settings)
     : QWidget(parent),

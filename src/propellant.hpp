@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "util.h"
+#include "util.hpp"
 
 class OpenBurnPropellant
 {

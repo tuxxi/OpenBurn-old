@@ -3,8 +3,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 
-#include "src/ui/widgets/unitscombobox.h"
-#include "src/export.h"
+#include "src/ui/widgets/unitscombobox.hpp"
+#include "src/export.hpp"
 class EngExportDialog : public QDialog
 {
 public:

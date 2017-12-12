@@ -1,6 +1,6 @@
 #include <QDebug>
 
-#include "unitscombobox.h"
+#include "unitscombobox.hpp"
 
 UnitsComboBoxBase::UnitsComboBoxBase(QWidget* parent)
     : QComboBox(parent)

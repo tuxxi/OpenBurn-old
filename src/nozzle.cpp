@@ -1,4 +1,4 @@
-#include "nozzle.h"
+#include "nozzle.hpp"
 #include <QtMath>
 
 OpenBurnNozzle::OpenBurnNozzle(double throat, double exit)

@@ -1,4 +1,4 @@
-#include "src/ui/graphics/graingraphicsitem.h"
+#include "src/ui/graphics/graingraphicsitem.hpp"
 
 GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
     : QGraphicsObject(parent),

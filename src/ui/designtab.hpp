@@ -5,13 +5,13 @@
 #include <QUndoStack>
 #include <memory>
 
-#include "src/ui/graphics/motorgraphicsitem.h"
+#include "src/ui/graphics/motorgraphicsitem.hpp"
 
-#include "src/ui/dialogs/graindialog.h"
-#include "src/ui/dialogs/nozzledialog.h"
-#include "src/ui/widgets/graintablewidget.h"
-#include "src/motorsim.h"
-#include "src/settings.h"
+#include "src/ui/dialogs/graindialog.hpp"
+#include "src/ui/dialogs/nozzledialog.hpp"
+#include "src/ui/widgets/graintablewidget.hpp"
+#include "src/motorsim.hpp"
+#include "src/settings.hpp"
 
 
 class DesignTab : public QWidget

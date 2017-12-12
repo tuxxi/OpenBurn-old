@@ -14,31 +14,33 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 - Mass flux at any point in the chamber
 
 ### OpenBurn Design
-![OpenBurn main screen](https://i.imgur.com/afWFBhU.png)
+![OpenBurn main screen](https://i.imgur.com/4S46Jeo.jpg)
 
 ### OpenBurn Simulation
-![OpenBurn results screen](https://i.imgur.com/7noiiTj.png)
+![OpenBurn results screen](https://i.imgur.com/962SPRA.png)
 
-## Planned/In-Progress Features (\* - in progress)
+## Planned/In-Progress Features
 
 - Every major 2D port (core) geometry
 - A 2D geometric-based regression model allowing for any arbitrary 2D grain shape. 
-- An internal chemical equilibrium solver for shifting or frozen equlibrium, so the user can easily
-calculate necesscary propellant constants such as C\*, rho, gamma, T0, Pr, and more. 
-- \*If the user supplies advanced propellant interal ballistics parameters such as Prandtl number, adiabatic flame temperature, and gas viscosity (calculated using OpenBurn's internal CE solver), OpenBurn will calculate erosive burning effects on the grain surface.
+- An internal chemical equilibrium solver for shifting or frozen equilibrium, so the user can easily
+calculate necessary propellant constants such as C\*, rho, gamma, T0, Pr, and more. 
+- \*If the user supplies advanced propellant internal ballistics parameters such as Prandtl number, adiabatic flame temperature, and gas viscosity (calculated using OpenBurn's internal CE solver), OpenBurn will calculate erosive burning effects on the grain surface.
 
 ## Compiling
 
-Compiling OpenBurn _should_ be easy on any platform as long as you have the [latest version of the Qt SDK.](https://www.qt.io/download-qt-for-application-development) Note that OpenBurn requires at least Qt5, so you may have to update your Qt installation.
+##### OpenBurn has the following dependencies:
+- CMake 2.8.11 or greater
+- Qt 5.6 or greater
+- A C++14 compiler (MSVC 2015 / g++5.0 / Clang 3.4)
 
-On Linux/OSX: 
+To build and run on Linux/OSX: 
 
 ```
-$ qmake OpenBurn.pro
-$ make
+$ cd OpenBurn
+$ cmake -H. -Bbuild
+$ cmake --build build -- -j4
+...
+$ cd build
 $ ./OpenBurn
 ```  
-
-Notes:  
-1) If you wish to add new source files to OpenBurn, run the following to generate a new OpenBurn.pro file:  
-`$ qmake -project "QT+= core gui widgets printsupport" "greaterThan(QT_MAJOR_VERSION, 5):"`

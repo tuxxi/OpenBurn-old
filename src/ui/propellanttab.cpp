@@ -7,7 +7,7 @@
 
 #include <QDebug>
 
-#include "propellanttab.h"
+#include "propellanttab.hpp"
 
 const static QString DEFAULT_NAME = QString("New Propellant");
 

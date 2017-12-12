@@ -1,7 +1,7 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
-#include "exportdialog.h"
+#include "exportdialog.hpp"
 #include <QFileDialog>
 
 EngExportDialog::EngExportDialog(const EngExport &exporter,

@@ -1,8 +1,8 @@
 #include <QLabel>
 #include <QDebug>
 
-#include "src/ui/dialogs/graindesigntypes.h"
-#include "src/units.h"
+#include "src/ui/dialogs/graindesigntypes.hpp"
+#include "src/units.hpp"
 
 OpenBurnDesignGrain::OpenBurnDesignGrain(PropellantList* prop, OpenBurnGrain* seed,
                                          OpenBurnSettings* settings, QWidget* parent)

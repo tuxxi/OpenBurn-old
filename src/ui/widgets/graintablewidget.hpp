@@ -5,8 +5,8 @@
 #include <QHeaderView>
 #include <QList>
 
-#include "src/motor.h"
-#include "src/settings.h"
+#include "src/motor.hpp"
+#include "src/settings.hpp"
 
 //This class manages the table of grains displayed in the design window.
 

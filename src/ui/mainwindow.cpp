@@ -1,8 +1,8 @@
 #include <QFileDialog>
 #include <QFile>
-#include "mainwindow.h"
-#include "src/export.h"
-#include "src/ui/dialogs/exportdialog.h"
+#include "mainwindow.hpp"
+#include "src/export.hpp"
+#include "src/ui/dialogs/exportdialog.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ImplicitIntegerAndEnumConversion"

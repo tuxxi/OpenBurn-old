@@ -1,4 +1,4 @@
-#include "src/ui/graphics/motorgraphicsitem.h"
+#include "src/ui/graphics/motorgraphicsitem.hpp"
 
 
 MotorGraphicsItem::MotorGraphicsItem(int scale_factor, OpenBurnMotor* motor, bool allowSlice, QGraphicsItem *parent)

@@ -8,10 +8,10 @@
 #include <QComboBox>
 #include <QGroupBox>
 
-#include "src/nozzle.h"
-#include "src/settings.h"
-#include "nozzledesigntypes.h"
-#include "src/ui/graphics/nozzlegraphicsitem.h"
+#include "src/nozzle.hpp"
+#include "src/settings.hpp"
+#include "nozzledesigntypes.hpp"
+#include "src/ui/graphics/nozzlegraphicsitem.hpp"
 
 class NozzleDialog : public QDialog
 {

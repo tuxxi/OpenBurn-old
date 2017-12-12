@@ -7,7 +7,7 @@
 #include <QtCore>
 #include <QPainter>
 
-#include "src/nozzle.h"
+#include "src/nozzle.hpp"
 
 //this class represents the 2D cross sectional view of a nozzle
 class NozzleGraphicsItem : public QGraphicsObject

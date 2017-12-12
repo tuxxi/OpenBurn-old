@@ -1,6 +1,6 @@
 #include <QDebug>
 
-#include "grain.h"
+#include "grain.hpp"
 OpenBurnGrain::OpenBurnGrain(double diameter, double length, OpenBurnPropellant prop, int inhibited)
     : m_GrainDia(diameter),
       m_GrainLen(length),

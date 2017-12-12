@@ -3,7 +3,7 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
-#include "src/units.h"
+#include "src/units.hpp"
 
 //template classes cannot use Q_OBJECT for signals and slots so we have to use this workaround base class that
 //handles all the signals and slots for us

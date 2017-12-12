@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "commands.hpp"
 
 AddGrainCommand::AddGrainCommand(const GrainPtr& grain, OpenBurnMotor* motor, 
 	QUndoCommand* parent)

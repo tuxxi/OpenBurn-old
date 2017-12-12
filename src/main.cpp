@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "src/ui/mainwindow.h"
+#include "src/ui/mainwindow.hpp"
 
 #define QT_AUTO_SCREEN_SCALE_FACTOR 1
 

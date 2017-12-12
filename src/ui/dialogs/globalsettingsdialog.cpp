@@ -2,7 +2,7 @@
 #include <QLabel>
 #include <QGridLayout>
 
-#include "globalsettingsdialog.h"
+#include "globalsettingsdialog.hpp"
 
 GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* parent)
     : QDialog(parent),
