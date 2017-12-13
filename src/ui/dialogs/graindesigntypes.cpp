@@ -38,10 +38,18 @@ void OpenBurnDesignGrain::SetupUI()
     QLabel* label = new QLabel(tr("Propellant Type"), this);
     if (m_Propellants)
     {
+        //add all propellants in DB to the combo box
         for (auto i : *m_Propellants)
         {
-            m_cbPropellantType->addItem(i.GetPropellantName());            
+            m_cbPropellantType->addItem(i.GetPropellantName());
         }
+        //find the seed's propellant type in the combo box
+        QModelIndexList Items = m_cbPropellantType->model()->match(
+            m_cbPropellantType->model()->index(0, 0),
+            Qt::DisplayRole,
+            QVariant::fromValue(m_grainSeed->GetPropellantType().GetPropellantName()));
+        //set the propellant type combo box to that idx
+        m_cbPropellantType->setCurrentIndex(Items.begin()->row());
     }
     m_btntModifyPropellant = new QToolButton(this);
     m_btntModifyPropellant->setText("...");    

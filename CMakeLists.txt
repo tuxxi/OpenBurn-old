@@ -74,7 +74,6 @@ add_executable(OpenBurn
         src/propellant.hpp
         src/settings.cpp
         src/settings.hpp
-        src/units.cpp
         src/units.hpp
         src/util.cpp
         src/util.hpp)
