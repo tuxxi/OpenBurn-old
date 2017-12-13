@@ -32,8 +32,6 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
     connect(m_GrainTable, &GrainTableWidget::cellDoubleClicked, //Double clicking on a row edits that grain
             this, &DesignTab::OnEditGrainButtonClicked);
     connect(m_Motor, &OpenBurnMotor::DesignUpdated,
-            m_GrainTable, &GrainTableWidget::OnMotorUpdated);
-    connect(m_Motor, &OpenBurnMotor::DesignUpdated,
             this, &DesignTab::OnDesignUpdated);
     UpdateDesign();
 }
@@ -374,38 +372,31 @@ void DesignTab::ToggleDesignButtons(bool on)
 }
 void DesignTab::OnMoveGrainUpButtonClicked()
 {
-    QList<int> indices = m_GrainTable->GetSelectedGrainIndices();
+    auto indices = m_GrainTable->GetSelectedGrainIndices();
     while (!indices.empty())
     {
-        int selectedIdx = indices.first();  
-        indices.pop_front();   
+        const int selectedIdx = indices.first();
+        indices.pop_front();
         if (selectedIdx <= 0)   
         {
             return;
         }
-        else
-        {
-            m_Motor->SwapGrains(selectedIdx, selectedIdx-1);
-        }
+        m_Motor->SwapGrains(selectedIdx, selectedIdx - 1);
     }
     UpdateDesign();
 }
 void DesignTab::OnMoveGrainDownButtonClicked()
 {
-    UpdateDesign();
-    QList<int> indices = m_GrainTable->GetSelectedGrainIndices();
+    auto indices = m_GrainTable->GetSelectedGrainIndices();
     while (!indices.empty())
     {
-        int selectedIdx = indices.last();  
+        const int selectedIdx = indices.last();  
         indices.pop_front();   
         if (selectedIdx >= int(m_Motor->GetNumGrains() - 1))   
         {
             return;
         }
-        else
-        {
-            m_Motor->SwapGrains(selectedIdx, selectedIdx+1);
-        }
+        m_Motor->SwapGrains(selectedIdx, selectedIdx + 1);
     }
     UpdateDesign();
 }

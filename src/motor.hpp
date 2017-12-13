@@ -70,6 +70,8 @@ signals:
     void DesignUpdated();
 	void GrainAdded(OpenBurnGrain*);
 	void NozzleUpdated(OpenBurnNozzle*);
+    void GrainUpdated(OpenBurnGrain* grain, int idx);
+    void GrainsSwapped(int idx1, int idx2);
 	void GrainRemoved(int);
 	void NozzleRemoved();
 	void DuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDatabase);

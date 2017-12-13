@@ -22,15 +22,16 @@ public:
     GrainVector GetSelectedGrains();
 
 public slots:
-    void OnMotorUpdated();
+    void OnGrainAdded(OpenBurnGrain* grain);
+    void OnGrainUpdated(OpenBurnGrain* grain, int idx);
+    void OnGrainRemoved(int idx);
+    void OnGrainsSwapped(int idx1, int idx2);
 
 protected:
     virtual void dropEvent(QDropEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    //TODO: use these and get rid of the ugly hack I was doing before :^)
-    void Move(bool up);
     QList<QTableWidgetItem*> TakeRow(int row);
     void SetRow(int row, const QList<QTableWidgetItem*>& rowItems);
 

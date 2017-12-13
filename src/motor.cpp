@@ -51,12 +51,13 @@ void OpenBurnMotor::AddGrain(const GrainPtr& grain)
 }
 void OpenBurnMotor::AddGrain(const GrainPtr& grain, int index)
 {
+    emit GrainAdded(grain.get());
 	m_Grains.emplace(m_Grains.begin() + index, std::move(grain));
-	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
 void OpenBurnMotor::UpdateGrain(const GrainPtr& grain, int index)
 {
+    emit GrainUpdated(grain.get(), index);
 	m_Grains.at(index) = std::move(grain);
 	UpdateDesign();
 }
@@ -95,6 +96,7 @@ int OpenBurnMotor::GetGrainIndex(const GrainPtr& grain)
 void OpenBurnMotor::SwapGrains(int oldPos, int newPos)
 {
     std::swap(m_Grains[oldPos], m_Grains[newPos]);
+    emit GrainsSwapped(oldPos, newPos);
     emit DesignUpdated();
 }
 OpenBurnGrain* OpenBurnMotor::GetGrainAtX(double x)

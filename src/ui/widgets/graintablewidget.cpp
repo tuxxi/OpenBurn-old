@@ -1,5 +1,6 @@
 #include "graintablewidget.hpp"
 #include "src/units.hpp"
+#include <QDebug>
 
 GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent) 
     : QTableWidget(parent),
@@ -32,6 +33,15 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
     //disable drag drop for now until i can fox it
     //m_grainsDisplay->setDragEnabled(true);
     //m_grainsDisplay->setDragDropMode(QAbstractItemView::DragDrop);
+
+    connect(m_Motor, &OpenBurnMotor::GrainAdded,
+        this, &GrainTableWidget::OnGrainAdded);
+    connect(m_Motor, &OpenBurnMotor::GrainRemoved,
+        this, &GrainTableWidget::OnGrainRemoved);
+    connect(m_Motor, &OpenBurnMotor::GrainsSwapped,
+        this, &GrainTableWidget::OnGrainsSwapped);
+    connect(m_Motor, &OpenBurnMotor::GrainUpdated,
+        this, &GrainTableWidget::OnGrainUpdated);
 }
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
 {
@@ -41,43 +51,77 @@ void GrainTableWidget::resizeEvent(QResizeEvent* event)
         setColumnWidth(i, this->width()/columnCount());
     }    
 }
-void GrainTableWidget::OnMotorUpdated()
+void GrainTableWidget::OnGrainRemoved(int idx)
+{
+    removeRow(idx);
+}
+void GrainTableWidget::OnGrainAdded(OpenBurnGrain* grain)
 {
     const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
-    setRowCount(0);
-    for (auto& grain : m_Motor->GetGrains())
-    {
-        int numItems = rowCount();
-        setRowCount(numItems+1);
-    
-        setItem(numItems, 0, new QTableWidgetItem(QString::number(
-            m_Settings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                grain->GetLength()), 'f', 3) +
-            " " +
-            lengthUnits));
-        
-        setItem(numItems, 1, new QTableWidgetItem(QString::number(
-            m_Settings->m_LengthUnits.ConvertFrom(
-                OpenBurnUnits::LengthUnits_T::inches,
-                grain->GetDiameter()), 'f', 3) +
-            " " +
-            lengthUnits));
+    setRowCount(rowCount() + 1);
 
-        
-        setItem(numItems, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
-        setItem(numItems, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
-    
-        if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain.get()))
-        {
-            setItem(numItems, 2, new QTableWidgetItem(QString::number(
-                m_Settings->m_LengthUnits.ConvertFrom(
+    const int idx = rowCount() - 1;
+    setItem(idx, 0, new QTableWidgetItem(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetLength()), 'f', 3) +
+        " " + lengthUnits));
+
+    setItem(idx, 1, new QTableWidgetItem(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetDiameter()), 'f', 3) +
+        " " + lengthUnits));
+
+    setItem(idx, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
+    setItem(idx, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
+
+    if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
+    {
+        setItem(idx, 2, new QTableWidgetItem(QString::number(
+            m_Settings->m_LengthUnits.ConvertFrom(
                 OpenBurnUnits::LengthUnits_T::inches,
                 bates->GetCoreDiameter()), 'f', 3) +
-            " " +
-            lengthUnits));
-        }    
+            " " + lengthUnits));
     }
+}
+
+void GrainTableWidget::OnGrainUpdated(OpenBurnGrain* grain, int idx)
+{
+    const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
+
+    item(idx, 0)->setText(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetLength()), 'f', 3) +
+        " " + lengthUnits);
+
+    item(idx, 1)->setText(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetDiameter()), 'f', 3) +
+        " " + lengthUnits);
+
+    item(idx, 3)->setText(grain->GetPropellantType().GetPropellantName());
+    item(idx, 4)->setText(QString::number(grain->GetInhibitedFaces()));
+
+    if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
+    {
+        item(idx, 2)->setText(QString::number(
+            m_Settings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                bates->GetCoreDiameter()), 'f', 3) +
+            " " + lengthUnits);
+    }
+}
+
+void GrainTableWidget::OnGrainsSwapped(int idx1, int idx2)
+{
+    auto row = TakeRow(idx1);
+    auto row2 = TakeRow(idx2);
+    SetRow(idx1, row2);
+    SetRow(idx2, row);
+    selectRow(idx2);
 }
 
 QList<int> GrainTableWidget::GetSelectedGrainIndices()
@@ -110,22 +154,6 @@ GrainVector GrainTableWidget::GetSelectedGrains()
     }
     return selectedList;
 }
-void GrainTableWidget::Move(bool up)
-{
-    Q_ASSERT(selectedItems().count() > 0);
-    const int sourceRow = row(selectedItems().at(0));
-    const int destRow = (up ? sourceRow-1 : sourceRow+1);
-    Q_ASSERT(destRow >= 0 && destRow < rowCount());
- 
-    // take whole rows
-    QList<QTableWidgetItem*> sourceItems = TakeRow(sourceRow);
-    QList<QTableWidgetItem*> destItems = TakeRow(destRow);
- 
-    // set back in reverse order
-    SetRow(sourceRow, destItems);
-    SetRow(destRow, sourceItems);
-    selectRow(destRow);
-}
 // takes and returns the whole row
 QList<QTableWidgetItem*> GrainTableWidget::TakeRow(int row)
 {
@@ -144,10 +172,8 @@ void GrainTableWidget::SetRow(int row, const QList<QTableWidgetItem*>& rowItems)
         setItem(row, col, rowItems.at(col));
     }
 }
-
 //thank you to honiahaka10 on stack overflow
 //https://stackoverflow.com/a/41203632/8508673
-
 void GrainTableWidget::dropEvent(QDropEvent* event)
 {
     Q_UNUSED(event);
