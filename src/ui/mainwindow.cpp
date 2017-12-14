@@ -17,20 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     LoadSettings("user/settings.json");
     SetupUI();
 
-    connect(m_Simulator.get(), &MotorSim::SimulationStarted,
-            this, &MainWindow::OnSimulationStarted);
-    connect(m_Simulator.get(), &MotorSim::SimulationFinished,
-            this, &MainWindow::OnSimulationFinished);
-    connect(m_PropellantTab.get(), &PropellantTab::PropellantsUpdated,
-            this, &MainWindow::OnPropellantsUpdated);
-    connect(m_GlobalSettings.get(), &OpenBurnSettings::SettingsChanged,
-            this, &MainWindow::OnSettingsChanged);
+    ConnectChildObjects();
+
     connect(m_TabWidget, &QTabWidget::currentChanged,
-            this, &MainWindow::OnTabChanged);
-    connect(m_DesignMotor.get(), &OpenBurnMotor::NewPropellantFound,
-            this, &MainWindow::OnNewPropellantFound);
-    connect(m_DesignMotor.get(), &OpenBurnMotor::DuplicatePropellantFound,
-            this, &MainWindow::OnDuplicatePropellantFound);
+        this, &MainWindow::OnTabChanged);
+
 }
 MainWindow::~MainWindow()
 {
@@ -44,71 +35,66 @@ void MainWindow::SetupUI()
     m_StatusBar = new QStatusBar;
     setStatusBar(m_StatusBar);
     
-    m_MenuFile = new QMenu(m_MenuBar);
-    m_MenuFile->setTitle(tr("File"));
+    m_MenuFile = new QMenu(tr("File"), m_MenuBar);
     m_MenuBar->addAction(m_MenuFile->menuAction());
 
-    m_ActionNew = new QAction(this);
-    m_ActionNew->setText(tr("New"));
+    m_ActionNew = new QAction(tr("New"), this);
     m_ActionNew->setShortcuts(QKeySequence::New);    
     connect(m_ActionNew, &QAction::triggered, this, &MainWindow::OnMenuNew);
     m_MenuFile->addAction(m_ActionNew);
 
-    m_ActionOpen = new QAction(this);
-    m_ActionOpen->setText(tr("Open"));
+    m_ActionOpen = new QAction(tr("Open"), this);
     m_ActionOpen->setShortcuts(QKeySequence::Open);    
     connect(m_ActionOpen, &QAction::triggered, this, &MainWindow::OnMenuOpen);
     m_MenuFile->addAction(m_ActionOpen);
 
-    m_ActionSave = new QAction(this);
-    m_ActionSave->setText(tr("Save"));
+    m_ActionSave = new QAction(tr("Save"), this);
     m_ActionSave->setShortcuts(QKeySequence::Save);
     connect(m_ActionSave, &QAction::triggered, this, &MainWindow::OnMenuSave);
     m_MenuFile->addAction(m_ActionSave);
 
-    m_ActionSaveAs = new QAction(this);
-    m_ActionSaveAs->setText(tr("Save As..."));
+    m_ActionSaveAs = new QAction(tr("Save As..."), this);
     m_ActionSaveAs->setShortcuts(QKeySequence::SaveAs);
     connect(m_ActionSaveAs, &QAction::triggered, this, &MainWindow::OnMenuSaveAs);
     m_MenuFile->addAction(m_ActionSaveAs);
 
     m_MenuExport = m_MenuFile->addMenu(tr("Export"));
-    m_ActionEngExport = new QAction(this);
-    m_ActionEngExport->setText(tr("To .eng (RockSim, OpenRocket)"));
+    m_ActionEngExport = new QAction(tr("To .eng (RockSim, OpenRocket)"), this);
     m_MenuExport->addAction(m_ActionEngExport);
     connect(m_ActionEngExport, &QAction::triggered, this, &MainWindow::OnMenuEngExport);
 
     m_MenuFile->addSeparator();
 
-    m_ActionQuit = new QAction(this);
-    m_ActionQuit->setText(tr("Quit"));
+    m_ActionQuit = new QAction(tr("Quit"), this);
     m_ActionQuit->setShortcuts(QKeySequence::Quit);
     connect(m_ActionQuit, &QAction::triggered, this, &MainWindow::OnMenuQuit);
     m_MenuFile->addAction(m_ActionQuit);
 
 
-    m_MenuEdit = new QMenu(m_MenuBar);
-    m_MenuEdit->setTitle(tr("Edit"));
+    m_MenuEdit = new QMenu(tr("Edit"), m_MenuBar);
     m_MenuBar->addAction(m_MenuEdit->menuAction());
 	m_ActionUndo = m_UndoStack->createUndoAction(this, tr("&Undo"));
 	m_ActionUndo->setShortcuts(QKeySequence::Undo);
 	m_ActionRedo = m_UndoStack->createRedoAction(this, tr("&Redo"));
 	m_ActionRedo->setShortcuts(QKeySequence::Redo);
+
+    m_ActionDelete = new QAction(tr("&Delete"), this);
+    m_ActionDelete->setShortcuts(QKeySequence::Delete);
+    m_ActionDelete->setEnabled(false); //we start disabled because nothing is selected! the action will be re-enabled later
+    connect(m_ActionDelete, &QAction::triggered, this, &MainWindow::OnMenuDelete);
 	m_MenuEdit->addAction(m_ActionUndo);
 	m_MenuEdit->addAction(m_ActionRedo);
+    m_MenuEdit->addAction(m_ActionDelete);
 
-    m_MenuTools = new QMenu(m_MenuBar);
-    m_MenuTools->setTitle(tr("Tools"));    
+    m_MenuTools = new QMenu(tr("Tools"), m_MenuBar);
     m_MenuBar->addAction(m_MenuTools->menuAction());
 
-    m_ActionSettings = new QAction(this);
-    m_ActionSettings->setText(tr("Settings"));
+    m_ActionSettings = new QAction(tr("Settings"), this);
     m_ActionSettings->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
     connect(m_ActionSettings, &QAction::triggered, this, &MainWindow::OnMenuSettings);
     m_MenuTools->addAction(m_ActionSettings);
 
-    m_MenuHelp = new QMenu(m_MenuBar);
-    m_MenuHelp->setTitle(tr("Help"));
+    m_MenuHelp = new QMenu(tr("Help"), m_MenuBar);
     m_MenuBar->addAction(m_MenuHelp->menuAction());
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -123,22 +109,40 @@ void MainWindow::SetupUI()
     m_TabWidget->addTab(m_PropellantTab.get(), tr("Propellants"));
     setCentralWidget(m_TabWidget);
 }
+
+void MainWindow::ConnectChildObjects()
+{
+    connect(m_Simulator.get(), &MotorSim::SimulationStarted,
+        this, &MainWindow::OnSimulationStarted);
+    connect(m_Simulator.get(), &MotorSim::SimulationFinished,
+        this, &MainWindow::OnSimulationFinished);
+    connect(m_PropellantTab.get(), &PropellantTab::PropellantsUpdated,
+        this, &MainWindow::OnPropellantsUpdated);
+    connect(m_GlobalSettings.get(), &OpenBurnSettings::SettingsChanged,
+        this, &MainWindow::OnSettingsChanged);
+    connect(m_DesignMotor.get(), &OpenBurnMotor::NewPropellantFound,
+        this, &MainWindow::OnNewPropellantFound);
+    connect(m_DesignMotor.get(), &OpenBurnMotor::DuplicatePropellantFound,
+        this, &MainWindow::OnDuplicatePropellantFound);
+    connect(m_DesignTab.get(), &DesignTab::SelectionChanged,
+        this, &MainWindow::OnSelectionChanged);
+}
+
 void MainWindow::ResetCurrentDesign()
 {
-    int currentIndex = m_TabWidget->currentIndex();
+    const int currentIndex = m_TabWidget->currentIndex();
+    //it's probably not the best way, but it works ;)
+
+    //delete everything and re-create our children
 	m_DesignMotor.reset();
 	m_Simulator.reset();
 	m_DesignTab.reset();
 	m_SimTab.reset();
 	m_DesignMotor = std::make_unique<OpenBurnMotor>();
-    connect(m_DesignMotor.get(), &OpenBurnMotor::NewPropellantFound,
-            this, &MainWindow::OnNewPropellantFound);
-    connect(m_DesignMotor.get(), &OpenBurnMotor::DuplicatePropellantFound,
-            this, &MainWindow::OnDuplicatePropellantFound);
-
     m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
 	m_DesignTab = std::make_unique<DesignTab>(m_DesignMotor.get(), m_Propellants.get(), m_GlobalSettings.get(), m_UndoStack);
 	m_SimTab = std::make_unique<SimulationTab>(m_DesignMotor.get(), m_Simulator.get(), m_GlobalSettings.get());
+    ConnectChildObjects(); //connect everything that we just made 
 
 	m_TabWidget->insertTab(0, m_DesignTab.get(), tr("Design"));
     m_TabWidget->insertTab(1, m_SimTab.get(), tr("Simulation"));
@@ -231,6 +235,11 @@ void MainWindow::OnMenuSettings()
     dialog->activateWindow();
     dialog->show();
     dialog->raise();
+}
+
+void MainWindow::OnMenuDelete()
+{
+    m_DesignTab->DeleteSelectedGrains();
 }
 
 void MainWindow::OnMenuEngExport()
@@ -356,6 +365,12 @@ void MainWindow::OnTabChanged(int index)
         simTab->resizeEvent(new QResizeEvent(simTab->size(), simTab->size()));
     }
 }
+
+void MainWindow::OnSelectionChanged(bool isSelected)
+{
+    m_ActionDelete->setEnabled(isSelected);
+}
+
 void MainWindow::OnNewPropellantFound(OpenBurnPropellant prop)
 {
     const auto brCoef = QString::number(m_GlobalSettings->m_BurnRateUnits.ConvertFrom(

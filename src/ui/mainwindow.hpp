@@ -26,25 +26,42 @@ protected:
     virtual void closeEvent(QCloseEvent*) override;
     virtual void resizeEvent(QResizeEvent*) override;
 private slots:
-    void OnMenuQuit();
+    //file
+    void OnMenuNew();
     void OnMenuOpen();
     void OnMenuSave();
     void OnMenuSaveAs();
-    void OnMenuNew();
-    void OnMenuSettings();
-    
     void OnMenuEngExport();
+    void OnMenuQuit();
+
+    //tools
+    void OnMenuSettings();
+
+    //edit
+    void OnMenuDelete();
+
+    //simulator
     void OnSimulationStarted();
     void OnSimulationFinished(bool success);
+
+    //databases
     void OnPropellantsUpdated();
     void OnSettingsChanged();
+
+    //usability
     void OnTabChanged(int index);
+    void OnSelectionChanged(bool isSelected);
+    //file load
 	void OnNewPropellantFound(OpenBurnPropellant prop);
     void OnDuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDb);
 private:
     void SetupUI();
-    void SaveFile(QString filename);
+    //connects the signals from objects that this class manages (unique ptrs) 
+    void ConnectChildObjects();
+
     void ResetCurrentDesign();
+
+    void SaveFile(QString filename);
     bool LoadSettings(const QString& filename);
     bool SaveSettings();
 
@@ -66,7 +83,7 @@ private:
     //tools
     QAction *m_ActionSettings;
 	//edit
-	QAction *m_ActionUndo, *m_ActionRedo;
+	QAction *m_ActionUndo, *m_ActionRedo, *m_ActionDelete;
 	QUndoStack *m_UndoStack;
 
     QStatusBar *m_StatusBar;

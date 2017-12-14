@@ -27,10 +27,11 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
     connect(m_btntMoveGrainDown, &QPushButton::clicked,
             this, &DesignTab::OnMoveGrainDownButtonClicked);
 
-    connect(m_GrainTable, &GrainTableWidget::cellClicked,
-            this, &DesignTab::OnGrainTableCellClicked);
     connect(m_GrainTable, &GrainTableWidget::cellDoubleClicked, //Double clicking on a row edits that grain
             this, &DesignTab::OnEditGrainButtonClicked);
+    connect(m_GrainTable, &GrainTableWidget::itemSelectionChanged,
+        this, &DesignTab::OnTableSelectionChanged);
+
     connect(m_Motor, &OpenBurnMotor::DesignUpdated,
             this, &DesignTab::OnDesignUpdated);
     UpdateDesign();
@@ -38,6 +39,12 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
 DesignTab::~DesignTab() 
 {
 }
+void DesignTab::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    UpdateGraphics();
+}
+
 void DesignTab::SetupUI()
 {
     //controls 
@@ -60,18 +67,11 @@ void DesignTab::SetupUI()
     m_btntMoveGrainUp->setArrowType(Qt::ArrowType::UpArrow);
     m_btntMoveGrainDown = new QToolButton;
     m_btntMoveGrainDown->setArrowType(Qt::ArrowType::DownArrow);
-    /*
-    m_moveGrainToTop = new QToolButton;
-    m_moveGrainToTop->setArrowType(Qt::ArrowType::RightArrow);
-    m_moveGrainToBottom = new QToolButton;
-    m_moveGrainToBottom->setArrowType(Qt::ArrowType::LeftArrow);
-    */
+
     m_btnDeleteGrain->setEnabled(false);
     m_btnEditGrain->setEnabled(false);
     m_btntMoveGrainUp->setEnabled(false);
     m_btntMoveGrainDown->setEnabled(false);
-    //m_moveGrainToTop->setEnabled(false);
-    //m_moveGrainToBottom->setEnabled(false);
 
     QGridLayout* gLayout = new QGridLayout;    
     gLayout->addWidget(m_btnNewGrain, 0, 1, 4, 4);
@@ -80,8 +80,6 @@ void DesignTab::SetupUI()
 
     gLayout->addWidget(m_btntMoveGrainUp, 2, 0);
     gLayout->addWidget(m_btntMoveGrainDown, 3, 0);
-    //gLayout->addWidget(m_moveGrainToTop, 4, 0);
-    //gLayout->addWidget(m_moveGrainToBottom, 5, 0);
     
     gb_GrainDesign->setLayout(gLayout);
 
@@ -130,9 +128,6 @@ void DesignTab::SetupUI()
     gb_nozz_params->setLayout(gl_Nozzle);
     gb_prop_params->setLayout(gl_Propellant);
     
-    //QGroupBox* gb_sim_quick_results = new QGroupBox(tr("Sim Results"));
-    //QGridLayout* gridLayoutSimResults = new QGridLayout;
-
     QGridLayout* designLayout = new QGridLayout;
     designLayout->addWidget(gb_design_params, 0, 2, 1, 1);
     designLayout->addWidget(gb_nozz_params, 0, 1, 1, 1);
@@ -147,7 +142,6 @@ void DesignTab::SetupUI()
     layout->addWidget(gb_GrainDesign, 0, 1);
     layout->addWidget(gb_frame_Params, 0, 2);
     layout->addWidget(gb_design_overview, 1, 0, 1, 3);
-    //takes up 1 row, and two columns
     setLayout(layout);
 }
 
@@ -240,10 +234,94 @@ void DesignTab::UpdateGraphics()
     //update again just in case 
     repaint();
 }
-void DesignTab::resizeEvent(QResizeEvent* event)
+
+void DesignTab::EditSelectedGrains()
 {
-    Q_UNUSED(event);
-    UpdateGraphics();
+    //we want to be able to click "edit" and edit differently selected grains, so we reset the
+    //unique_ptr every time the edit button is clicked
+    m_GrainDialog.reset();
+
+    m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
+        m_GrainTable->GetSelectedGrains()[0].get(),
+        m_GlobalSettings,
+        m_GrainTable->GetSelectedGrains());
+    connect(m_GrainDialog.get(), &GrainDialog::GrainsEdited,
+        this, &DesignTab::OnGrainsModified);
+    connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
+        this, &DesignTab::OnGrainDialogClosed);
+
+    m_GrainDialog->show();
+    m_GrainDialog->activateWindow();
+    m_GrainDialog->raise();
+    m_btnEditGrain->setEnabled(false);
+
+}
+void DesignTab::DeleteSelectedGrains()
+{
+    const auto selected = m_GrainTable->GetSelectedGrains();
+    QUndoCommand* removeGrainCommand = new RemoveGrainCommand(selected, m_Motor);
+    m_UndoStack->push(removeGrainCommand);
+
+    UpdateDesign();
+}
+void DesignTab::CreateNewGrain()
+{
+    if (!m_GrainDialog) //only make one!!
+    {
+        m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
+            m_grainSeed.get(),
+            m_GlobalSettings);
+        connect(m_GrainDialog.get(), &GrainDialog::GrainAdded
+            , this, &DesignTab::OnNewGrain);
+        connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
+            this, &DesignTab::OnGrainDialogClosed);
+    }
+    m_GrainDialog->show();
+    m_GrainDialog->activateWindow();
+    m_GrainDialog->raise();
+}
+
+void DesignTab::MoveGrains(bool up)
+{
+    auto indices = m_GrainTable->GetSelectedGrainIndices();
+    while (!indices.empty())
+    {
+        const int selectedIdx = indices.first();
+        indices.pop_front();
+        //we should only move the grains up or down if the destination is not outside the bounds of the motor
+        const bool shouldNotMove = up ? selectedIdx <= 0 : selectedIdx >= int(m_Motor->GetNumGrains() - 1);
+        if (shouldNotMove)
+        {
+            return;
+        }
+        m_Motor->SwapGrains(selectedIdx, up ? selectedIdx - 1 : selectedIdx + 1);
+    }
+    UpdateDesign();
+}
+
+void DesignTab::EditNozzle()
+{
+    if (!m_NozzleDialog) //only make one at a time
+    {
+        m_NozzleDialog = std::make_unique<NozzleDialog>(m_Motor->GetNozzle(), m_GlobalSettings);
+        connect(m_NozzleDialog.get(), &NozzleDialog::NozzleModified,
+            this, &DesignTab::OnNozzleUpdated);
+        connect(m_NozzleDialog.get(), &NozzleDialog::DialogClosed,
+            this, &DesignTab::OnNozzleDialogClosed);
+        connect(m_NozzleDialog.get(), &NozzleDialog::NewNozzle,
+            this, &DesignTab::OnNewNozzle);
+    }
+    m_NozzleDialog->show();
+    m_NozzleDialog->activateWindow();
+    m_NozzleDialog->raise();
+}
+
+void DesignTab::ToggleDesignButtons(bool on)
+{
+    m_btnDeleteGrain->setEnabled(on);
+    m_btnEditGrain->setEnabled(on);
+    m_btntMoveGrainUp->setEnabled(on);
+    m_btntMoveGrainDown->setEnabled(on);
 }
 // allocates a new ptr owned by *this so we can store "seed" values
 void DesignTab::SetSeed(OpenBurnGrain* seed)
@@ -294,109 +372,41 @@ void DesignTab::OnDesignUpdated()
 }
 void DesignTab::OnNewGrainButtonClicked()
 {
-    if (!m_GrainDialog) //only make one!!
-    {
-        m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
-                m_grainSeed.get(),
-                m_GlobalSettings);
-        connect(m_GrainDialog.get(), &GrainDialog::GrainAdded
-			, this, &DesignTab::OnNewGrain);
-        connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
-			this, &DesignTab::OnGrainDialogClosed);
-    }
-    m_GrainDialog->show();
-    m_GrainDialog->activateWindow();
-    m_GrainDialog->raise();
+    CreateNewGrain();
 }
 void DesignTab::OnEditGrainButtonClicked()
 {
-    //we want to be able to click "edit" and edit differently selected grains, so we reset the
-	//unique_ptr every time the edit button is clicked
-	m_GrainDialog.reset();
-
-    m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
-            m_GrainTable->GetSelectedGrains()[0].get(),
-            m_GlobalSettings,
-            m_GrainTable->GetSelectedGrains());
-	connect(m_GrainDialog.get(), &GrainDialog::GrainsEdited,
-		this, &DesignTab::OnGrainsModified);
-	connect(m_GrainDialog.get(), &GrainDialog::DialogClosed,
-		this, &DesignTab::OnGrainDialogClosed);
-
-    m_GrainDialog->show();
-    m_GrainDialog->activateWindow();
-    m_GrainDialog->raise();
-    m_btnEditGrain->setEnabled(false);
+    EditSelectedGrains();
 }
 void DesignTab::OnDeleteGrainButtonClicked()
 {
-	const auto selected = m_GrainTable->GetSelectedGrains();
-    QUndoCommand* removeGrainCommand = new RemoveGrainCommand(selected, m_Motor);
-	m_UndoStack->push(removeGrainCommand);
-
-	//TODO: fix this by moving to some type of "selection" signal
-    //disable the button again since we no longer have anything selected
-	ToggleDesignButtons(false);
-    UpdateDesign();
+    DeleteSelectedGrains();
 }
 void DesignTab::OnNozzleButtonClicked()
 {
-    if (!m_NozzleDialog) //only make one at a time
-    {
-        m_NozzleDialog = std::make_unique<NozzleDialog>(m_Motor->GetNozzle(), m_GlobalSettings);
-        connect(m_NozzleDialog.get(), &NozzleDialog::NozzleModified, 
-			this, &DesignTab::OnNozzleUpdated);
-        connect(m_NozzleDialog.get(), &NozzleDialog::DialogClosed,
-			this, &DesignTab::OnNozzleDialogClosed);
-		connect(m_NozzleDialog.get(), &NozzleDialog::NewNozzle,
-			this, &DesignTab::OnNewNozzle);
-    }
-    m_NozzleDialog->show();
-    m_NozzleDialog->activateWindow();
-    m_NozzleDialog->raise();
+    EditNozzle();
 }
-void DesignTab::OnGrainTableCellClicked(int row, int column)
+void DesignTab::OnTableSelectionChanged()
 {
-    Q_UNUSED(column);
-    Q_UNUSED(row);
-    SetSeed(m_Motor->GetGrains()[row].get());
-	ToggleDesignButtons(true);
+    if (!m_GrainTable->selectedItems().empty()) //we have something selected
+    {
+        OpenBurnGrain* grain = m_GrainTable->GetSelectedGrains()[0].get(); //seed is first grain
+        SetSeed(grain);
+        ToggleDesignButtons(true);
+        emit SelectionChanged(true);
+    }
+    else
+    {
+        ToggleDesignButtons(false);
+        emit SelectionChanged(false);
+    }
 }
 
-void DesignTab::ToggleDesignButtons(bool on)
-{
-	m_btnDeleteGrain->setEnabled(on);
-	m_btnEditGrain->setEnabled(on);
-	m_btntMoveGrainUp->setEnabled(on);
-	m_btntMoveGrainDown->setEnabled(on);
-}
 void DesignTab::OnMoveGrainUpButtonClicked()
 {
-    auto indices = m_GrainTable->GetSelectedGrainIndices();
-    while (!indices.empty())
-    {
-        const int selectedIdx = indices.first();
-        indices.pop_front();
-        if (selectedIdx <= 0)   
-        {
-            return;
-        }
-        m_Motor->SwapGrains(selectedIdx, selectedIdx - 1);
-    }
-    UpdateDesign();
+    MoveGrains(true);
 }
 void DesignTab::OnMoveGrainDownButtonClicked()
 {
-    auto indices = m_GrainTable->GetSelectedGrainIndices();
-    while (!indices.empty())
-    {
-        const int selectedIdx = indices.last();  
-        indices.pop_front();   
-        if (selectedIdx >= int(m_Motor->GetNumGrains() - 1))   
-        {
-            return;
-        }
-        m_Motor->SwapGrains(selectedIdx, selectedIdx + 1);
-    }
-    UpdateDesign();
+    MoveGrains(false);
 }

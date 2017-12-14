@@ -24,22 +24,32 @@ public:
 		QUndoStack* undoStack, 
 		QWidget* parent = nullptr);
     ~DesignTab();
+    void resizeEvent(QResizeEvent* event) override;
 
     void UpdateDesign();  
     void UpdateGraphics();
 
-    void resizeEvent(QResizeEvent* event) override;
+    void CreateNewGrain();
+    void MoveGrains(bool up);
+    void EditSelectedGrains();
+    void DeleteSelectedGrains();
+
+    void EditNozzle();
+signals:
+    //we selected (or un selected) something
+    void SelectionChanged(bool selected);
 public slots:
-	//recieved from the grain dialog
+	//grain dialog
     void OnNewGrain(const GrainPtr& grain); 
-	void OnGrainsModified(const GrainVector& newGrains, 
-		const GrainVector& originalGrains); 
+	void OnGrainsModified(const GrainVector& newGrains, const GrainVector& originalGrains); 
 	//nozzle dialog
 	void OnNewNozzle(NozzlePtr& newNozzle);
     void OnNozzleUpdated(NozzlePtr& newNozzle, NozzlePtr& oldNozzle);
 
+    //motor
     void OnDesignUpdated();
 private slots:
+    //buttons
     void OnNewGrainButtonClicked();
     void OnEditGrainButtonClicked();
     void OnNozzleButtonClicked();
@@ -47,15 +57,21 @@ private slots:
     void OnMoveGrainUpButtonClicked();
     void OnMoveGrainDownButtonClicked();
 
-
+    //dialogs
     void OnGrainDialogClosed();
     void OnNozzleDialogClosed();
-    void OnGrainTableCellClicked(int row, int column);
-	void ToggleDesignButtons(bool on);
+
+    //table view
+    void OnTableSelectionChanged();
 private:
     void SetSeed(OpenBurnGrain* grain);
+    void ToggleDesignButtons(bool on);
     void SetupUI();
-    
+
+    //main widget: grain info table    
+    GrainTableWidget* m_GrainTable;
+
+    //commands that modify motor state get pushed in here. this is owned by MainWindow.
 	QUndoStack* m_UndoStack;
 
     //grain design overview - static
@@ -65,13 +81,6 @@ private:
     //motor general overview
     QLabel *m_lblKn, *m_lblPortThroatRatio;
 
-    //simulated results - requires a sim to be run
-    //for quick reference only- more detailed results are available on results tab
-    //QLabel* m_maxPressureLabel, *m_motorDesignationLabel, *m_totalImpulseLabel;
-	GrainTableWidget* m_GrainTable;
-
-    QPushButton* m_btnNozzleSettings;
-
     //grain settings
     std::unique_ptr<OpenBurnGrain> m_grainSeed; //stores settings to "seed" the dialog
     QPushButton *m_btnNewGrain, *m_btnDeleteGrain, *m_btnEditGrain;
@@ -79,6 +88,10 @@ private:
     //controls
     QToolButton *m_btntMoveGrainUp, *m_btntMoveGrainDown;
 
+    //nozzle settings
+    QPushButton* m_btnNozzleSettings;
+
+    //dialogs
 	std::unique_ptr<GrainDialog> m_GrainDialog;
 	std::unique_ptr<NozzleDialog> m_NozzleDialog;
 
@@ -87,7 +100,8 @@ private:
     QGraphicsView* m_MotorDisplayView;
     QGraphicsScene* m_MotorDisplayScene;
 
-    OpenBurnMotor* m_Motor; //The initial design
+    //for reference pnly - these are all owned by MainWindow
+    OpenBurnMotor* m_Motor; 
     PropellantList* m_Propellants;
     OpenBurnSettings* m_GlobalSettings;
 };

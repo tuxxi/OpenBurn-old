@@ -2,11 +2,6 @@
 
 #include <QGridLayout>
 #include <QDialog>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QGraphicsView>
-#include <QPushButton>
-#include <QComboBox>
 #include <QToolButton>
 
 #include "src/grain.hpp"
@@ -30,10 +25,10 @@ public:
 
     virtual ~OpenBurnDesignGrain() = default;
 
-    double GetLength();
-    double GetDiameter();
-    int GetInhibitedFaces();
-    OpenBurnPropellant GetPropellant();
+    double GetLength() const;
+    double GetDiameter() const;
+    int GetInhibitedFaces() const;
+    OpenBurnPropellant GetPropellant() const;
 signals:
     void GrainDesignChanged();
 protected:
@@ -72,7 +67,7 @@ public:
         
     ~CylindricalGrainDesign() = default;
 
-    double GetCoreDiameter();
+    double GetCoreDiameter() const;
 protected:
     virtual void SeedValues() override;
     

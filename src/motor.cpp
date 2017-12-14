@@ -45,13 +45,13 @@ void OpenBurnMotor::SetNozzle(NozzlePtr&& nozzle)
 }
 void OpenBurnMotor::AddGrain(const GrainPtr& grain)
 {
+    emit GrainAdded(grain.get());
     m_Grains.emplace_back(std::move(grain));
-	emit GrainAdded(grain.get());
 	UpdateDesign();
 }
 void OpenBurnMotor::AddGrain(const GrainPtr& grain, int index)
 {
-    emit GrainAdded(grain.get());
+    emit GrainEmplaced(grain.get(), index);
 	m_Grains.emplace(m_Grains.begin() + index, std::move(grain));
 	UpdateDesign();
 }

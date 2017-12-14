@@ -12,7 +12,7 @@ OpenBurnDesignGrain::OpenBurnDesignGrain(PropellantList* prop, OpenBurnGrain* se
       m_Propellants(prop)
 {
     SetupUI();
-    SeedValues();
+    OpenBurnDesignGrain::SeedValues();
     //new function pointer syntax does not work for overloaded signals or slots >.<
     connect(m_sbGrainDia, SIGNAL(valueChanged(double)),
             this, SIGNAL(GrainDesignChanged()));
@@ -36,20 +36,24 @@ void OpenBurnDesignGrain::SetupUI()
     //Propellant Selection Box 
     m_cbPropellantType = new QComboBox(this);
     QLabel* label = new QLabel(tr("Propellant Type"), this);
-    if (m_Propellants)
+    //add all propellants in DB to the combo box
+    for (auto i : *m_Propellants)
     {
-        //add all propellants in DB to the combo box
-        for (auto i : *m_Propellants)
-        {
-            m_cbPropellantType->addItem(i.GetPropellantName());
-        }
+        m_cbPropellantType->addItem(i.GetPropellantName());
+    }
+    if (m_grainSeed)
+    {
         //find the seed's propellant type in the combo box
-        QModelIndexList Items = m_cbPropellantType->model()->match(
+        QModelIndexList items = m_cbPropellantType->model()->match(
             m_cbPropellantType->model()->index(0, 0),
             Qt::DisplayRole,
             QVariant::fromValue(m_grainSeed->GetPropellantType().GetPropellantName()));
-        //set the propellant type combo box to that idx
-        m_cbPropellantType->setCurrentIndex(Items.begin()->row());
+
+        if (!items.empty())
+        {
+            //set the propellant type combo box to that idx
+            m_cbPropellantType->setCurrentIndex(items.begin()->row());
+        }
     }
     m_btntModifyPropellant = new QToolButton(this);
     m_btntModifyPropellant->setText("...");    
@@ -110,23 +114,23 @@ void OpenBurnDesignGrain::SeedValues()
         //propellant ..     
     }
 }
-double OpenBurnDesignGrain::GetLength()
+double OpenBurnDesignGrain::GetLength() const
 {
     return m_unitsGrainLen->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 
         m_sbGrainLen->value());
 }
-double OpenBurnDesignGrain::GetDiameter()
+double OpenBurnDesignGrain::GetDiameter() const
 {
     return m_unitsGrainDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 
         m_sbGrainDia->value());
 }
-int OpenBurnDesignGrain::GetInhibitedFaces()
+int OpenBurnDesignGrain::GetInhibitedFaces() const
 {
     return m_sbGrainInhibit->value();
 }
-OpenBurnPropellant OpenBurnDesignGrain::GetPropellant()
+OpenBurnPropellant OpenBurnDesignGrain::GetPropellant() const
 {
     if (!m_Propellants->empty())
     {
@@ -164,10 +168,10 @@ CylindricalGrainDesign::CylindricalGrainDesign(
     setTabOrder(m_sbGrainDia, m_sbGrainCoreDia);        
     setTabOrder(m_sbGrainCoreDia, m_sbGrainInhibit);
 
-    SeedValues();
+    CylindricalGrainDesign::SeedValues();
     connect(m_sbGrainCoreDia, SIGNAL(valueChanged(double)), this, SIGNAL(GrainDesignChanged()));
 }
-double CylindricalGrainDesign::GetCoreDiameter()
+double CylindricalGrainDesign::GetCoreDiameter() const
 {
     return m_unitsGrainCoreDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches, 

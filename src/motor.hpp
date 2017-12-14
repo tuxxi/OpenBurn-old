@@ -65,15 +65,19 @@ public:
     void WriteJSON(QJsonObject &object);
 
 signals:
+    void DesignUpdated();
     void DesignReady();
 	void DesignNotReady();
-    void DesignUpdated();
-	void GrainAdded(OpenBurnGrain*);
-	void NozzleUpdated(OpenBurnNozzle*);
+
+	void GrainAdded(OpenBurnGrain*); //new grain at bottom
+    void GrainEmplaced(OpenBurnGrain*, int idx); //new grain somewhere else (usually from undo /redo move)
     void GrainUpdated(OpenBurnGrain* grain, int idx);
     void GrainsSwapped(int idx1, int idx2);
-	void GrainRemoved(int);
+    void GrainRemoved(int);
+
+	void NozzleUpdated(OpenBurnNozzle*);
 	void NozzleRemoved();
+
 	void DuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDatabase);
     void NewPropellantFound(OpenBurnPropellant prop);
 private:

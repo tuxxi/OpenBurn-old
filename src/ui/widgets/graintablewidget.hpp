@@ -8,9 +8,9 @@
 #include "src/motor.hpp"
 #include "src/settings.hpp"
 
-//This class manages the table of grains displayed in the design window.
-
 //TODO: maybe move to tree view?
+
+//This class manages the table of grains displayed in the design window.
 class GrainTableWidget : public QTableWidget
 {
     Q_OBJECT
@@ -18,11 +18,13 @@ public:
     explicit GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* settings, QWidget *parent = nullptr);
     ~GrainTableWidget() = default;
 
-    QList<int>GetSelectedGrainIndices();
-    GrainVector GetSelectedGrains();
+    QList<int>GetSelectedGrainIndices() const;
+    GrainVector GetSelectedGrains() const;
 
 public slots:
     void OnGrainAdded(OpenBurnGrain* grain);
+    void OnGrainEmplaced(OpenBurnGrain* grain, int idx); //
+
     void OnGrainUpdated(OpenBurnGrain* grain, int idx);
     void OnGrainRemoved(int idx);
     void OnGrainsSwapped(int idx1, int idx2);

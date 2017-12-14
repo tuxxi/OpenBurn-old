@@ -7,22 +7,21 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
       m_Motor(motor),
       m_Settings(settings)
 {
-    setEditTriggers(QAbstractItemView::NoEditTriggers);
-    setColumnCount(5); //propellant, len, core dia, dia, inhibited face
+    setEditTriggers(NoEditTriggers);
     setAlternatingRowColors(true);
-    setSelectionMode(QAbstractItemView::ExtendedSelection);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    //setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setSelectionMode(ExtendedSelection);
+    setSelectionBehavior(SelectRows);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QStringList tableHeader = (QStringList() << 
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    setColumnCount(5); //propellant, len, core dia, dia, inhibited face
+    const auto tableHeader = QStringList() << 
         tr("Length") << 
         tr("Diameter") << 
         tr("Core Diameter") << 
         tr("Propellant") << 
-        tr("Inhibited Faces"));
+        tr("Inhibited Faces");
 
     setHorizontalHeaderLabels(tableHeader);
     resizeColumnsToContents();
@@ -36,6 +35,9 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
 
     connect(m_Motor, &OpenBurnMotor::GrainAdded,
         this, &GrainTableWidget::OnGrainAdded);
+    connect(m_Motor, &OpenBurnMotor::GrainEmplaced,
+        this, &GrainTableWidget::OnGrainEmplaced);
+
     connect(m_Motor, &OpenBurnMotor::GrainRemoved,
         this, &GrainTableWidget::OnGrainRemoved);
     connect(m_Motor, &OpenBurnMotor::GrainsSwapped,
@@ -43,6 +45,7 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
     connect(m_Motor, &OpenBurnMotor::GrainUpdated,
         this, &GrainTableWidget::OnGrainUpdated);
 }
+//automatically resize columns to fit new widget size
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
@@ -86,6 +89,36 @@ void GrainTableWidget::OnGrainAdded(OpenBurnGrain* grain)
     }
 }
 
+void GrainTableWidget::OnGrainEmplaced(OpenBurnGrain* grain, int idx)
+{
+    const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
+    insertRow(idx);
+
+    setItem(idx, 0, new QTableWidgetItem(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetLength()), 'f', 3) +
+        " " + lengthUnits));
+
+    setItem(idx, 1, new QTableWidgetItem(QString::number(
+        m_Settings->m_LengthUnits.ConvertFrom(
+            OpenBurnUnits::LengthUnits_T::inches,
+            grain->GetDiameter()), 'f', 3) +
+        " " + lengthUnits));
+
+    setItem(idx, 3, new QTableWidgetItem(grain->GetPropellantType().GetPropellantName()));
+    setItem(idx, 4, new QTableWidgetItem(QString::number(grain->GetInhibitedFaces())));
+
+    if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain))
+    {
+        setItem(idx, 2, new QTableWidgetItem(QString::number(
+            m_Settings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                bates->GetCoreDiameter()), 'f', 3) +
+            " " + lengthUnits));
+    }
+
+}
 void GrainTableWidget::OnGrainUpdated(OpenBurnGrain* grain, int idx)
 {
     const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
@@ -124,7 +157,7 @@ void GrainTableWidget::OnGrainsSwapped(int idx1, int idx2)
     selectRow(idx2);
 }
 
-QList<int> GrainTableWidget::GetSelectedGrainIndices()
+QList<int> GrainTableWidget::GetSelectedGrainIndices() const
 {
     QList<int> selectedList;
     int counter = 0;    
@@ -139,13 +172,13 @@ QList<int> GrainTableWidget::GetSelectedGrainIndices()
     }
     return selectedList;
 }
-GrainVector GrainTableWidget::GetSelectedGrains()
+GrainVector GrainTableWidget::GetSelectedGrains() const
 {
     GrainVector selectedList;
     int counter = 0;    
     for (auto* i : selectedItems())
     {
-        int idx = row(i);
+        const int idx = row(i);
         counter++;
         if (idx != -1 && counter % columnCount() == 0)
         {
