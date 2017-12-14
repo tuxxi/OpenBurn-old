@@ -47,46 +47,55 @@ void DesignTab::resizeEvent(QResizeEvent* event)
 
 void DesignTab::SetupUI()
 {
-    //controls 
-    QGroupBox* gb_GrainDesign = new QGroupBox(tr("Grain Design"));
-    QGroupBox* gb_frame_Params = new QGroupBox(tr("Chamber Design"));
-    QGroupBox* gb_design_overview = new QGroupBox(tr("Design Overview"));
-
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
     setSizePolicy(sizePolicy);    
 
-    m_GrainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this);
-    //grain buttons
-    m_btnNewGrain = new QPushButton(tr("New Grain"));
-    m_btnDeleteGrain = new QPushButton(tr("Delete"));
-    m_btnEditGrain = new QPushButton(tr("Edit"));
+    QHBoxLayout* grainLayout = new QHBoxLayout;
+    QVBoxLayout* grainControls = new QVBoxLayout;
+    grainLayout->addWidget(m_GrainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this));
 
-    m_btntMoveGrainUp = new QToolButton;
+    //controls
+    grainControls->addWidget(m_btnNewGrain = new QPushButton(tr("New Grain")));
+    m_btnNewGrain->setMinimumHeight(50);
+    //add a dividing line
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    grainControls->addSpacing(5);
+    grainControls->addWidget(line);
+    grainControls->addStretch(10);
+    grainControls->addWidget(m_btnEditGrain = new QPushButton(tr("Edit")));
+    grainControls->addWidget(m_btnDeleteGrain = new QPushButton(tr("Delete")));
+    m_btnEditGrain->setMinimumHeight(30);
+    m_btnDeleteGrain->setMinimumHeight(30);
+
+    QHBoxLayout* moveUp = new QHBoxLayout;
+    moveUp->addWidget(m_btntMoveGrainUp = new QToolButton);
     m_btntMoveGrainUp->setArrowType(Qt::ArrowType::UpArrow);
-    m_btntMoveGrainDown = new QToolButton;
+    moveUp->addWidget(new QLabel(tr("Move Up")));
+    grainControls->addLayout(moveUp);
+
+    QHBoxLayout* moveDown = new QHBoxLayout;
+    moveDown->addWidget(m_btntMoveGrainDown = new QToolButton);
     m_btntMoveGrainDown->setArrowType(Qt::ArrowType::DownArrow);
+    moveDown->addWidget(new QLabel(tr("Move Down")));
+    grainControls->addLayout(moveDown);
+    ToggleDesignButtons(false); //disable on startup
 
-    m_btnDeleteGrain->setEnabled(false);
-    m_btnEditGrain->setEnabled(false);
-    m_btntMoveGrainUp->setEnabled(false);
-    m_btntMoveGrainDown->setEnabled(false);
+    //overall grain design layout
+    QGroupBox* gb_GrainDesign = new QGroupBox(tr("Grain Design"));
+    grainLayout->addLayout(grainControls);
+    grainLayout->setStretch(0, 5);
+    grainLayout->setStretch(1, 1);
+    gb_GrainDesign->setLayout(grainLayout);
 
-    QGridLayout* gLayout = new QGridLayout;    
-    gLayout->addWidget(m_btnNewGrain, 0, 1, 4, 4);
-    gLayout->addWidget(m_btnDeleteGrain, 0, 0);
-    gLayout->addWidget(m_btnEditGrain, 1, 0);
-
-    gLayout->addWidget(m_btntMoveGrainUp, 2, 0);
-    gLayout->addWidget(m_btntMoveGrainDown, 3, 0);
-    
-    gb_GrainDesign->setLayout(gLayout);
-
-    //nozzle and sim settings
+    //nozzle
     m_btnNozzleSettings = new QPushButton(tr("Edit Nozzle"));
     QVBoxLayout* vLayout_2 = new QVBoxLayout;
     vLayout_2->addWidget(m_btnNozzleSettings);
+    QGroupBox* gb_frame_Params = new QGroupBox(tr("Chamber Design"));
     gb_frame_Params->setLayout(vLayout_2);
 
     //design overview
@@ -127,24 +136,20 @@ void DesignTab::SetupUI()
     gb_design_params->setLayout(gl_Motor);
     gb_nozz_params->setLayout(gl_Nozzle);
     gb_prop_params->setLayout(gl_Propellant);
-    
-    QGridLayout* designLayout = new QGridLayout;
-    designLayout->addWidget(gb_design_params, 0, 2, 1, 1);
-    designLayout->addWidget(gb_nozz_params, 0, 1, 1, 1);
-    designLayout->addWidget(gb_prop_params, 0, 0, 1, 1);
-    
-    designLayout->addWidget(m_MotorDisplayView, 1, 0, 1, 3);
-    gb_design_overview->setLayout(designLayout);
+
+    QVBoxLayout* designLayout = new QVBoxLayout;
+    designLayout->addWidget(gb_prop_params);
+    designLayout->addWidget(gb_nozz_params);
+    designLayout->addWidget(gb_design_params);
 
     //master layout
     QGridLayout* layout = new QGridLayout;
-    layout->addWidget(m_GrainTable, 0, 0);
-    layout->addWidget(gb_GrainDesign, 0, 1);
-    layout->addWidget(gb_frame_Params, 0, 2);
-    layout->addWidget(gb_design_overview, 1, 0, 1, 3);
+    layout->addWidget(gb_GrainDesign, 0, 0, 2, 1);
+    layout->addWidget(gb_frame_Params, 0, 1);
+    layout->addLayout(designLayout, 1, 1);
+    layout->addWidget(m_MotorDisplayView, 2, 0, 1, 2);
     setLayout(layout);
 }
-
 //this MUST be called AFTER we setup the basic UI layout.
 void DesignTab::UpdateDesign()
 {
@@ -157,20 +162,17 @@ void DesignTab::UpdateDesign()
         m_GlobalSettings->m_LengthUnits.ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches,
             m_Motor->GetMotorLength()), 'f', 2) +
-        " " +
-        lengthUnitSymbol);
+        " " + lengthUnitSymbol);
     m_lblMotorMajorDia->setText(QString::number(
         m_GlobalSettings->m_LengthUnits.ConvertFrom(
             OpenBurnUnits::LengthUnits_T::inches,
             m_Motor->GetMotorMajorDiameter()), 'f', 2) +
-        " " +
-        lengthUnitSymbol);
+        " " + lengthUnitSymbol);
     m_lblPropellantMass->setText(QString::number(
         m_GlobalSettings->m_MassUnits.ConvertFrom(
             OpenBurnUnits::MassUnits_T::pounds_mass,
             m_Motor->GetMotorPropellantMass() ), 'f', 2) +
-        " " +
-        massUnitSymbol);
+        " " + massUnitSymbol);
     m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.0, 'f', 2) + '%');
     if (m_Motor->HasNozzle())
     {
@@ -178,14 +180,12 @@ void DesignTab::UpdateDesign()
 			m_GlobalSettings->m_LengthUnits.ConvertFrom(
 				OpenBurnUnits::LengthUnits_T::inches,
 				m_Motor->GetNozzle()->GetNozzleThroat()), 'f', 2) +
-			" " +
-			lengthUnitSymbol);
+			" " + lengthUnitSymbol);
 		m_lblNozzleExitDia->setText(QString::number(
 			m_GlobalSettings->m_LengthUnits.ConvertFrom(
 				OpenBurnUnits::LengthUnits_T::inches,
 				m_Motor->GetNozzle()->GetNozzleExit()), 'f', 2) +
-			" " +
-			lengthUnitSymbol);
+			" " + lengthUnitSymbol);
 		m_lblNozzleExpansionRatio->setText(QString::number(m_Motor->GetNozzle()->GetNozzleExpansionRatio(), 'f', 2));
 
         QString initialKn = QString::number(round(m_Motor->CalcStaticKn(KN_CALC_INITIAL)));
@@ -214,8 +214,7 @@ void DesignTab::UpdateGraphics()
         m_MotorDisplayScene->addItem(m_gfxMotor.get());
     }
 
-	//these functions are technically unnesscary as the updating is done behind the scenes with OpenBurnMotor's signals
-	//which are recieved by MotorGraphicsObject's slots, however, it's useful to be able to force an update.
+	//these functions are technically unnecessary as the updating is done behind the scenes with OpenBurnMotor's signals
 	if (m_Motor->HasGrains())
 	{
 		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());

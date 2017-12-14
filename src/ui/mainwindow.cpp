@@ -1,5 +1,4 @@
 #include <QFileDialog>
-#include <QFile>
 #include "mainwindow.hpp"
 #include "src/export.hpp"
 #include "src/ui/dialogs/exportdialog.hpp"
@@ -338,7 +337,7 @@ void MainWindow::OnPropellantsUpdated()
             {
                 grain->SetPropellantType(prop);
             }
-        }    
+        }
     }
 }
 void MainWindow::OnSettingsChanged()
