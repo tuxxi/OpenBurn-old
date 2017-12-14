@@ -28,7 +28,7 @@ public slots:
     void OnGrainUpdated(OpenBurnGrain* grain, int idx);
     void OnGrainRemoved(int idx);
     void OnGrainsSwapped(int idx1, int idx2);
-
+    void OnSettingsUpdated();
 protected:
     virtual void dropEvent(QDropEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;

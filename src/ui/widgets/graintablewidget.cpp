@@ -44,6 +44,9 @@ GrainTableWidget::GrainTableWidget(OpenBurnMotor* motor, OpenBurnSettings* setti
         this, &GrainTableWidget::OnGrainsSwapped);
     connect(m_Motor, &OpenBurnMotor::GrainUpdated,
         this, &GrainTableWidget::OnGrainUpdated);
+
+    connect(m_Settings, &OpenBurnSettings::SettingsChanged,
+        this, &GrainTableWidget::OnSettingsUpdated);
 }
 //automatically resize columns to fit new widget size
 void GrainTableWidget::resizeEvent(QResizeEvent* event)
@@ -156,7 +159,38 @@ void GrainTableWidget::OnGrainsSwapped(int idx1, int idx2)
     SetRow(idx2, row);
     selectRow(idx2);
 }
+void GrainTableWidget::OnSettingsUpdated()
+{
+    //update all grains in table
+    for (const auto& grain : m_Motor->GetGrains())
+    {
+        const QString lengthUnits = m_Settings->m_LengthUnits.GetUnitSymbol();
+        int idx = m_Motor->GetGrainIndex(grain);
+        item(idx, 0)->setText(QString::number(
+            m_Settings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                grain->GetLength()), 'f', 3) +
+            " " + lengthUnits);
 
+        item(idx, 1)->setText(QString::number(
+            m_Settings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                grain->GetDiameter()), 'f', 3) +
+            " " + lengthUnits);
+
+        item(idx, 3)->setText(grain->GetPropellantType().GetPropellantName());
+        item(idx, 4)->setText(QString::number(grain->GetInhibitedFaces()));
+
+        if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(grain.get()))
+        {
+            item(idx, 2)->setText(QString::number(
+                m_Settings->m_LengthUnits.ConvertFrom(
+                    OpenBurnUnits::LengthUnits_T::inches,
+                    bates->GetCoreDiameter()), 'f', 3) +
+                " " + lengthUnits);
+        }
+    }
+}
 QList<int> GrainTableWidget::GetSelectedGrainIndices() const
 {
     QList<int> selectedList;
