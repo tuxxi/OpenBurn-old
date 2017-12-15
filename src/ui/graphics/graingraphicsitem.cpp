@@ -1,6 +1,6 @@
 #include "src/ui/graphics/graingraphicsitem.hpp"
 
-GrainGraphicsItem::GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection, QGraphicsItem *parent)
+GrainGraphicsItem::GrainGraphicsItem(int scale_factor, OpenBurnGrain* grain, bool crossSection, QGraphicsItem *parent)
     : QGraphicsObject(parent),
       m_Grain(grain),
       m_Color(Qt::gray),

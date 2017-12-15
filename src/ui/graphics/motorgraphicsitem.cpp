@@ -87,7 +87,7 @@ void MotorGraphicsItem::SetGrains(const GrainVector& grains)
 }
 void MotorGraphicsItem::AddGrain(OpenBurnGrain* grain)
 {
-	auto newGrain = std::make_unique<GrainGraphicsItem>(grain, m_ScaleFactor, true, this);
+	auto newGrain = std::make_unique<GrainGraphicsItem>(m_ScaleFactor, grain, true, this);
 	newGrain->setPos(m_MotorLen, 0);
 	m_gfxGrains.push_back(std::move(newGrain));
 	m_MotorLen += m_gfxGrains.rbegin()->get()->boundingRect().width();
@@ -103,7 +103,7 @@ void MotorGraphicsItem::UpdateGrains(const GrainVector& grains)
 	if (grains.size() > m_gfxGrains.size())
 	{
 		int diff = int(grains.size() - m_gfxGrains.size());
-		for (auto i = grains.rbegin(); i != grains.rbegin() + diff; ++i) //reverse iterator operator+() goes backwwards :<
+		for (auto i = grains.rbegin(); i != grains.rbegin() + diff; ++i) //reverse iterator operator+() goes backwards :<
 		{
 			AddGrain(i->get());
 		}

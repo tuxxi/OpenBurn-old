@@ -6,6 +6,7 @@
 
 namespace OpenBurnUtil
 {
+    static const int g_kGfxScaleFactor = 100;
     char GetMotorClass(double nsec);
     double GetMotorClassPercent(double nsec);
     static const double g_kGasConstantR = 8.3144621; //J / mol * k

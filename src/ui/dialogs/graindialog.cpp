@@ -118,7 +118,8 @@ void GrainDialog::UpdateGraphics()
 {
     if (!m_gfxGrain)
     {
-        m_gfxGrain = std::make_unique<GrainGraphicsItem>(m_grainsToEdit.begin()->get(), 100, false);
+        m_gfxGrain = std::make_unique<GrainGraphicsItem>(
+            OpenBurnUtil::g_kGfxScaleFactor, m_grainsToEdit.begin()->get(),  false);
         m_GraphicsScene->addItem(m_gfxGrain.get());
     }
     m_gfxGrain->setPos(0, 0);    

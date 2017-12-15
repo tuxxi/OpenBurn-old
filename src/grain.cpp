@@ -96,6 +96,10 @@ GrainPtr CylindricalGrain::Clone()
 {
 	return std::make_shared<CylindricalGrain>(*this);
 }
+std::unique_ptr<OpenBurnGrain> CylindricalGrain::CloneUnique()
+{
+    return std::make_unique<CylindricalGrain>(*this);
+}
 void CylindricalGrain::ReadJSON(const QJsonObject& object, QString& propellantNameReturn)
 {
     m_CoreDia = object["corediameter"].toDouble();

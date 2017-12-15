@@ -11,7 +11,7 @@
 class GrainGraphicsItem : public QGraphicsObject
 {
 public:
-    GrainGraphicsItem(OpenBurnGrain* grain, int scale_factor, bool crossSection = true, QGraphicsItem *parent = nullptr);
+    GrainGraphicsItem(int scale_factor, OpenBurnGrain* grain, bool crossSection = true, QGraphicsItem *parent = nullptr);
     ~GrainGraphicsItem() = default;
 
     QRectF boundingRect() const override;

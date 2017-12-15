@@ -14,7 +14,7 @@ rocketry community. OpenBurn is based on C++/Qt5, and has support across all maj
 - Mass flux at any point in the chamber
 
 ### OpenBurn Design
-![OpenBurn main screen](https://i.imgur.com/4S46Jeo.jpg)
+![OpenBurn main screen](https://i.imgur.com/KPfggFW.png)
 
 ### OpenBurn Simulation
 ![OpenBurn results screen](https://i.imgur.com/962SPRA.png)

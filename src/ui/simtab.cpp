@@ -314,7 +314,7 @@ void SimulationTab::UpdateGraphics(OpenBurnMotor *motor)
     }
     if (m_gfxMotor == nullptr)
     {
-        m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor, true);
+        m_gfxMotor = std::make_unique<MotorGraphicsItem>(OpenBurnUtil::g_kGfxScaleFactor, m_Motor, true);
         connect(m_gfxMotor.get(), &MotorGraphicsItem::MotorXPosSliceUpdated,
             this, &SimulationTab::OnXPosClicked);
         m_MotorDisplayScene->addItem(m_gfxMotor.get());

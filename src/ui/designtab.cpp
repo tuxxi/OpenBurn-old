@@ -30,10 +30,18 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
     connect(m_GrainTable, &GrainTableWidget::cellDoubleClicked, //Double clicking on a row edits that grain
             this, &DesignTab::OnEditGrainButtonClicked);
     connect(m_GrainTable, &GrainTableWidget::itemSelectionChanged,
-        this, &DesignTab::OnTableSelectionChanged);
+            this, &DesignTab::OnTableSelectionChanged);
 
     connect(m_Motor, &OpenBurnMotor::DesignUpdated,
             this, &DesignTab::OnDesignUpdated);
+
+    connect(m_spltGfx, &QSplitter::splitterMoved,
+            this, &DesignTab::OnSplitterMoved);
+    connect(m_spltDesign, &QSplitter::splitterMoved,
+            this, &DesignTab::OnSplitterMoved);
+    connect(m_spltMain, &QSplitter::splitterMoved,
+            this, &DesignTab::OnSplitterMoved);
+
     UpdateDesign();
 }
 DesignTab::~DesignTab() 
@@ -44,78 +52,43 @@ void DesignTab::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
     UpdateGraphics();
 }
-
-void DesignTab::SetupUI()
+void DesignTab::SetupGrainUI()
 {
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    setSizePolicy(sizePolicy);    
-
-    QHBoxLayout* grainLayout = new QHBoxLayout;
-    QVBoxLayout* grainControls = new QVBoxLayout;
+    auto grainLayout = new QHBoxLayout;
     grainLayout->addWidget(m_GrainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this));
 
-    //controls
+    //grain design controls
+    auto grainControls = new QVBoxLayout;
     grainControls->addWidget(m_btnNewGrain = new QPushButton(tr("New Grain")));
     m_btnNewGrain->setMinimumHeight(50);
     //add a dividing line
-    QFrame* line = new QFrame();
+    auto line = new QFrame;
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
     grainControls->addSpacing(5);
     grainControls->addWidget(line);
-    grainControls->addStretch(10);
+
     grainControls->addWidget(m_btnEditGrain = new QPushButton(tr("Edit")));
     grainControls->addWidget(m_btnDeleteGrain = new QPushButton(tr("Delete")));
     m_btnEditGrain->setMinimumHeight(30);
     m_btnDeleteGrain->setMinimumHeight(30);
 
-    QHBoxLayout* moveUp = new QHBoxLayout;
+    auto moveUp = new QHBoxLayout;
     moveUp->addWidget(m_btntMoveGrainUp = new QToolButton);
     m_btntMoveGrainUp->setArrowType(Qt::ArrowType::UpArrow);
     moveUp->addWidget(new QLabel(tr("Move Up")));
     grainControls->addLayout(moveUp);
 
-    QHBoxLayout* moveDown = new QHBoxLayout;
+    auto moveDown = new QHBoxLayout;
     moveDown->addWidget(m_btntMoveGrainDown = new QToolButton);
     m_btntMoveGrainDown->setArrowType(Qt::ArrowType::DownArrow);
     moveDown->addWidget(new QLabel(tr("Move Down")));
     grainControls->addLayout(moveDown);
+    grainControls->addStretch();
     ToggleDesignButtons(false); //disable on startup
 
-    //overall grain design layout
-    QGroupBox* gb_GrainDesign = new QGroupBox(tr("Grain Design"));
-    grainLayout->addLayout(grainControls);
-    grainLayout->setStretch(0, 5);
-    grainLayout->setStretch(1, 1);
-    gb_GrainDesign->setLayout(grainLayout);
-
-    //nozzle
-    m_btnNozzleSettings = new QPushButton(tr("Edit Nozzle"));
-    QVBoxLayout* vLayout_2 = new QVBoxLayout;
-    vLayout_2->addWidget(m_btnNozzleSettings);
-    QGroupBox* gb_frame_Params = new QGroupBox(tr("Chamber Design"));
-    gb_frame_Params->setLayout(vLayout_2);
-
-    //design overview
-    m_MotorDisplayView = new QGraphicsView;
-    m_MotorDisplayScene = new QGraphicsScene;
-    m_MotorDisplayView->setScene(m_MotorDisplayScene);
-    m_MotorDisplayView->show();
-
-    QGroupBox* gb_design_params = new QGroupBox(tr("Design Parameters"));
-    QGroupBox* gb_prop_params = new QGroupBox(tr("Propellant Parameters"));
-    QGroupBox* gb_nozz_params = new QGroupBox(tr("Nozzle Parameters")); 
-    QGridLayout* gl_Motor = new QGridLayout;    
-    QGridLayout* gl_Propellant = new QGridLayout;
-    QGridLayout* gl_Nozzle = new QGridLayout;
-
-    gl_Motor->addWidget(new QLabel(tr("Kn:")), 0, 0);
-    gl_Motor->addWidget(m_lblKn = new QLabel, 0, 1);
-    gl_Motor->addWidget(new QLabel(tr("Port/Throat Ratio:")), 2, 0);
-    gl_Motor->addWidget(m_lblPortThroatRatio = new QLabel, 2, 1);
-
+    auto gb_prop_params = new QGroupBox(tr("Propellant Parameters"));
+    auto gl_Propellant = new QGridLayout;
     gl_Propellant->addWidget(new QLabel(tr("Number of Segments:")), 0, 0);
     gl_Propellant->addWidget(m_lblNumGrains = new QLabel, 0, 1);
     gl_Propellant->addWidget(new QLabel(tr("Motor Diameter:")), 1, 0);
@@ -126,28 +99,97 @@ void DesignTab::SetupUI()
     gl_Propellant->addWidget(m_lblPropellantMass = new QLabel, 3, 1);
     gl_Propellant->addWidget(new QLabel(tr("Volume Loading:")), 4, 0);
     gl_Propellant->addWidget(m_lblVolumeLoading = new QLabel, 4, 1);
+    gb_prop_params->setLayout(gl_Propellant);
+    grainControls->addWidget(gb_prop_params);
 
+    //overall grain design layout
+    m_gbGrainDesign = new QGroupBox(tr("Grain Design"));
+    grainLayout->addLayout(grainControls);
+    m_gbGrainDesign->setLayout(grainLayout);
+}
+void DesignTab::SetupGfxUI()
+{
+    //design overview
+    m_MotorDisplayView = new QGraphicsView;
+    m_MotorDisplayView->setScene(m_MotorDisplayScene = new QGraphicsScene);
+    m_MotorDisplayView->show();
+    //slice
+    m_GrainSliceView = new QGraphicsView;
+    m_GrainSliceView->setScene(m_GrainSliceScene = new QGraphicsScene);
+    m_GrainSliceView->show();
+
+    m_spltGfx = new QSplitter(Qt::Horizontal);
+    m_spltGfx->addWidget(m_MotorDisplayView);
+    m_spltGfx->addWidget(m_GrainSliceView);
+    m_spltGfx->setStretchFactor(0, 10);
+    m_spltGfx->setStretchFactor(1, 3);
+    m_spltGfx->setMinimumHeight(50);
+}
+void DesignTab::SetupChamberUI()
+{
+    //nozzle
+    m_btnNozzleSettings = new QPushButton(tr("Edit Nozzle"));
+    m_btnNozzleSettings->setMinimumHeight(50);
+    auto chamberLayout = new QVBoxLayout;
+    chamberLayout->addWidget(m_btnNozzleSettings);
+    chamberLayout->addStretch();
+
+    auto gb_nozz_params = new QGroupBox(tr("Nozzle Parameters"));
+    auto gl_Nozzle = new QGridLayout;
     gl_Nozzle->addWidget(new QLabel(tr("Nozzle Throat Diameter:")), 0, 0);
     gl_Nozzle->addWidget(m_lblNozzleThroatDia = new QLabel, 0, 1);
     gl_Nozzle->addWidget(new QLabel(tr("Nozzle Exit Diameter:")), 1, 0);
     gl_Nozzle->addWidget(m_lblNozzleExitDia = new QLabel, 1, 1);
     gl_Nozzle->addWidget(new QLabel(tr("Expansion Ratio:")), 2, 0);
     gl_Nozzle->addWidget(m_lblNozzleExpansionRatio = new QLabel, 2, 1);
-    gb_design_params->setLayout(gl_Motor);
     gb_nozz_params->setLayout(gl_Nozzle);
-    gb_prop_params->setLayout(gl_Propellant);
+    chamberLayout->addWidget(gb_nozz_params);
 
-    QVBoxLayout* designLayout = new QVBoxLayout;
-    designLayout->addWidget(gb_prop_params);
-    designLayout->addWidget(gb_nozz_params);
-    designLayout->addWidget(gb_design_params);
+    //overall motor design
+    auto gl_Motor = new QGridLayout;
+    auto gb_motor_design = new QGroupBox(tr("Motor Parameters"));
+    gl_Motor->addWidget(new QLabel(tr("Kn:")), 0, 0);
+    gl_Motor->addWidget(m_lblKn = new QLabel, 0, 1);
+    gl_Motor->addWidget(new QLabel(tr("Port/Throat Ratio:")), 2, 0);
+    gl_Motor->addWidget(m_lblPortThroatRatio = new QLabel, 2, 1);
+    gb_motor_design->setLayout(gl_Motor);
+    chamberLayout->addWidget(gb_motor_design);
+
+    //overall chamber design
+    m_gbChamberDesign = new QGroupBox(tr("Chamber Design"));
+    m_gbChamberDesign->setLayout(chamberLayout);
+}
+
+void DesignTab::SetupUI()
+{
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    setSizePolicy(sizePolicy);
+
+    SetupGrainUI();
+    SetupChamberUI();
+    m_spltDesign = new QSplitter(Qt::Horizontal);
+    m_spltDesign->addWidget(m_gbGrainDesign);
+    m_spltDesign->addWidget(m_gbChamberDesign);
+    m_spltDesign->setStretchFactor(0, 10);
+    m_spltDesign->setStretchFactor(1, 3);
+
+    SetupGfxUI();
 
     //master layout
-    QGridLayout* layout = new QGridLayout;
-    layout->addWidget(gb_GrainDesign, 0, 0, 2, 1);
-    layout->addWidget(gb_frame_Params, 0, 1);
-    layout->addLayout(designLayout, 1, 1);
-    layout->addWidget(m_MotorDisplayView, 2, 0, 1, 2);
+    m_spltMain = new QSplitter(Qt::Vertical);
+    m_spltMain->addWidget(m_spltDesign);
+    m_spltMain->addWidget(m_spltGfx);
+
+    //setSizes() distributes the sizes given amongst the widgets, rather than _settting_ the size to the given value
+    //The value for index 0 (m_spltDesign) doesn't matter much, but the value for idx 1 (m_spltGfx)
+    //is important otherwise the addStretch() methods in the design splitter widgets will force the gfx views to
+    //be very small.
+    m_spltMain->setSizes(QList<int>() << 300 << 150);
+
+    auto layout = new QVBoxLayout;
+    layout->addWidget(m_spltMain);
     setLayout(layout);
 }
 //this MUST be called AFTER we setup the basic UI layout.
@@ -156,24 +198,40 @@ void DesignTab::UpdateDesign()
     const QString lengthUnitSymbol = m_GlobalSettings->m_LengthUnits.GetUnitSymbol();
     const QString massUnitSymbol = m_GlobalSettings->m_MassUnits.GetUnitSymbol();
 
-	m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
- 
-    m_lblMotorLen->setText(QString::number(
-        m_GlobalSettings->m_LengthUnits.ConvertFrom(
-            OpenBurnUnits::LengthUnits_T::inches,
-            m_Motor->GetMotorLength()), 'f', 2) +
-        " " + lengthUnitSymbol);
-    m_lblMotorMajorDia->setText(QString::number(
-        m_GlobalSettings->m_LengthUnits.ConvertFrom(
-            OpenBurnUnits::LengthUnits_T::inches,
-            m_Motor->GetMotorMajorDiameter()), 'f', 2) +
-        " " + lengthUnitSymbol);
-    m_lblPropellantMass->setText(QString::number(
-        m_GlobalSettings->m_MassUnits.ConvertFrom(
-            OpenBurnUnits::MassUnits_T::pounds_mass,
-            m_Motor->GetMotorPropellantMass() ), 'f', 2) +
-        " " + massUnitSymbol);
-    m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.0, 'f', 2) + '%');
+    if (m_Motor->HasGrains())
+    {
+        m_lblNumGrains->setText(QString::number(m_Motor->GetNumGrains()));
+
+        m_lblMotorLen->setText(QString::number(
+            m_GlobalSettings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_Motor->GetMotorLength()), 'f', 2) +
+            " " + lengthUnitSymbol);
+        m_lblMotorMajorDia->setText(QString::number(
+            m_GlobalSettings->m_LengthUnits.ConvertFrom(
+                OpenBurnUnits::LengthUnits_T::inches,
+                m_Motor->GetMotorMajorDiameter()), 'f', 2) +
+            " " + lengthUnitSymbol);
+        m_lblPropellantMass->setText(QString::number(
+            m_GlobalSettings->m_MassUnits.ConvertFrom(
+                OpenBurnUnits::MassUnits_T::pounds_mass,
+                m_Motor->GetMotorPropellantMass() ), 'f', 2) +
+            " " + massUnitSymbol);
+        m_lblVolumeLoading->setText(QString::number(m_Motor->GetVolumeLoading() * 100.0, 'f', 2) + '%');
+
+        if (!m_grainSeed)
+        {
+            SetSeed(m_Motor->GetGrains()[0].get());
+        }
+    }
+    else
+    {
+        m_lblNumGrains->setText("");
+        m_lblMotorLen->setText("");
+        m_lblMotorMajorDia->setText("");
+        m_lblPropellantMass->setText("");
+        m_lblVolumeLoading->setText("");
+    }
     if (m_Motor->HasNozzle())
     {
 		m_lblNozzleThroatDia->setText(QString::number(
@@ -195,7 +253,7 @@ void DesignTab::UpdateDesign()
         m_lblKn->setText(initialKn + "-" + maxKn);
         m_lblPortThroatRatio->setText(QString::number(m_Motor->GetPortThroatRatio(), 'f', 2));
     }
-	else
+    else
 	{
 		m_lblNozzleThroatDia->setText("");
 		m_lblNozzleExitDia->setText("");
@@ -210,14 +268,20 @@ void DesignTab::UpdateGraphics()
 {
     if (m_gfxMotor == nullptr)
     {
-		m_gfxMotor = std::make_unique<MotorGraphicsItem>(100, m_Motor);
+		m_gfxMotor = std::make_unique<MotorGraphicsItem>(OpenBurnUtil::g_kGfxScaleFactor, m_Motor);
         m_MotorDisplayScene->addItem(m_gfxMotor.get());
+    }
+    if (m_gfxGrain == nullptr)
+    {
+        m_gfxGrain = std::make_unique<GrainGraphicsItem>(OpenBurnUtil::g_kGfxScaleFactor, m_grainSeed.get(), false);
+        m_GrainSliceScene->addItem(m_gfxGrain.get());
     }
 
 	//these functions are technically unnecessary as the updating is done behind the scenes with OpenBurnMotor's signals
 	if (m_Motor->HasGrains())
 	{
 		m_gfxMotor->UpdateGrains(m_Motor->GetGrains());
+        m_gfxGrain->UpdateGrain(m_grainSeed.get());
 	}
 	if (m_Motor->HasNozzle())
 	{
@@ -227,8 +291,13 @@ void DesignTab::UpdateGraphics()
 	const QRectF rect = m_gfxMotor->boundingRect();
     m_MotorDisplayScene->setSceneRect(rect);
     const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
-
     m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
+
+    m_gfxGrain->setPos(0, 0);
+    const QRectF grain_rect = m_gfxGrain->boundingRect();
+    m_GrainSliceView->setSceneRect(grain_rect);
+    QRectF grain_bounds = QRectF(grain_rect.left(), grain_rect.top(), grain_rect.width() + 50, grain_rect.height() + 50);
+    m_GrainSliceView->fitInView(grain_bounds, Qt::KeepAspectRatio);
 
     //update again just in case 
     repaint();
@@ -241,7 +310,7 @@ void DesignTab::EditSelectedGrains()
     m_GrainDialog.reset();
 
     m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
-        m_GrainTable->GetSelectedGrains()[0].get(),
+        m_grainSeed.get(),
         m_GlobalSettings,
         m_GrainTable->GetSelectedGrains());
     connect(m_GrainDialog.get(), &GrainDialog::GrainsEdited,
@@ -326,10 +395,7 @@ void DesignTab::ToggleDesignButtons(bool on)
 void DesignTab::SetSeed(OpenBurnGrain* seed)
 {
 	m_grainSeed.reset();
-    if (CylindricalGrain* bates = dynamic_cast<CylindricalGrain*>(seed))
-    {
-		m_grainSeed = std::make_unique<CylindricalGrain>(*bates);
-    }
+    m_grainSeed = std::move(seed->CloneUnique());
 }
 void DesignTab::OnNozzleDialogClosed()
 {
@@ -393,6 +459,7 @@ void DesignTab::OnTableSelectionChanged()
         SetSeed(grain);
         ToggleDesignButtons(true);
         emit SelectionChanged(true);
+        UpdateGraphics();
     }
     else
     {
@@ -408,4 +475,8 @@ void DesignTab::OnMoveGrainUpButtonClicked()
 void DesignTab::OnMoveGrainDownButtonClicked()
 {
     MoveGrains(false);
+}
+void DesignTab::OnSplitterMoved()
+{
+    UpdateGraphics();
 }

@@ -42,6 +42,7 @@ public:
     virtual bool Burn(double timestep) = 0;
     virtual bool IsBurnedOut() = 0;
     virtual GrainPtr Clone() = 0;
+    virtual std::unique_ptr<OpenBurnGrain> CloneUnique() = 0;
     virtual void SetBurnRate(double steadyState, double erosiveFactor = 0);
 
     virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) = 0;
@@ -73,7 +74,8 @@ public:
     virtual bool Burn(double timestep) override;
     virtual bool IsBurnedOut() override;
     virtual GrainPtr Clone() override;
-    
+    virtual std::unique_ptr<OpenBurnGrain> CloneUnique() override;
+
     virtual double GetCoreDiameter();
     virtual void SetCoreDiameter(double dia);
 
