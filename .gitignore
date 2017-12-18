@@ -1,12 +1,8 @@
 #IDEs
-Win32/
-debug/
-release/
-x64/
 .vscode/
 .vs/
 .idea/
-cmake-build-*/
+
 
 *.sln
 *.pro.user
@@ -21,6 +17,15 @@ OpenBurn
 *.o
 moc_*.cpp
 ui_*.h
+
+cmake-build-*/
+OpenBurn_autogen
+OpenBurn.dir
+build
+Win32/
+debug/
+release/
+x64/
 
 #OpenBurn Files
 *.obm

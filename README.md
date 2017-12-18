@@ -39,8 +39,18 @@ To build and run on Linux/OSX:
 ```
 $ cd OpenBurn
 $ cmake -H. -Bbuild
-$ cmake --build build -- -j4
+$ cmake --build build --config release -- -j4
 ...
 $ cd build
 $ ./OpenBurn
 ```  
+
+On Windows:
+
+```
+_ cmake -G "Visual Studio 15 Win64" -H. -Bbuild
+_ cmake --build build --config release
+...
+_ cd build/Release
+_ OpenBurn
+```

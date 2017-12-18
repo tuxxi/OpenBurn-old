@@ -1,13 +1,35 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(OpenBurn)
 
+#set C++14
 set(CMAKE_CXX_STANDARD 14)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+if (NOT MSVC)
+# Turn on all warnings for debug mode (NOT MSVC)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic")
+endif(NOT MSVC)
+#
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+      "Choose the type of build, options are: Debug Release
+RelWithDebInfo MinSizeRel."
+      FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+if (MSVC) # - Microsoft Visual C++
+    set(GUI_TYPE WIN32)
+endif(MSVC)
+
+# Set some Apple MacOS Specific settings
+if (APPLE)
+set(GUI_TYPE MACOSX_BUNDLE)
+endif (APPLE)
+
 
 # Find the QtWidgets library
 find_package(Qt5Widgets)
@@ -22,7 +44,7 @@ get_target_property(QtGui_location Qt5::Gui LOCATION)
 find_package(Qt5PrintSupport)
 get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
 
-add_executable(OpenBurn
+set (PROJECT_SRCS 
         src/thirdparty/qcustomplot/qcustomplot.cpp
         src/thirdparty/qcustomplot/qcustomplot.h
         src/ui/dialogs/exportdialog.cpp
@@ -77,5 +99,7 @@ add_executable(OpenBurn
         src/units.hpp
         src/util.cpp
         src/util.hpp)
+
+add_executable(OpenBurn ${GUI_TYPE} ${PROJECT_SRCS} )
 
 target_link_libraries(OpenBurn Qt5::Widgets Qt5::Core Qt5::Gui Qt5::PrintSupport)
