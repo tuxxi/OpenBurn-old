@@ -293,6 +293,7 @@ void DesignTab::UpdateGraphics()
     const QRectF bounds = QRectF(rect.left(), rect.top(), rect.width() + 50, rect.height() + 15);
     m_MotorDisplayView->fitInView(bounds, Qt::KeepAspectRatio);
 
+
     m_gfxGrain->setPos(0, 0);
     const QRectF grain_rect = m_gfxGrain->boundingRect();
     m_GrainSliceView->setSceneRect(grain_rect);
@@ -395,7 +396,8 @@ void DesignTab::ToggleDesignButtons(bool on)
 void DesignTab::SetSeed(OpenBurnGrain* seed)
 {
 	m_grainSeed.reset();
-    m_grainSeed = std::move(seed->CloneUnique());
+    m_grainSeed = seed->CloneUnique();
+    m_gfxGrain->UpdateGrain(m_grainSeed.get());
 }
 void DesignTab::OnNozzleDialogClosed()
 {

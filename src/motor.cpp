@@ -359,6 +359,20 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
             }
             AddGrain(bates);
         }
+        if (grainObject["_type"] == "MOON")
+        {
+            auto moon = std::make_shared<MoonGrain>();
+            QString propellantName;
+            moon->ReadJSON(grainObject, propellantName);
+            for (auto prop : propellants)
+            {
+                if (propellantName == prop.GetPropellantName())
+                {
+                    moon->SetPropellantType(prop);
+                }
+            }
+            AddGrain(moon);
+        }
     }
     QJsonObject nozzleObject = object["nozzle"].toObject();
     if(nozzleObject["_type"] == "CONICAL")

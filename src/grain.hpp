@@ -3,6 +3,7 @@
 #include <QJsonObject>
 
 #include <memory>
+#include <QtGui/QPainter>
 
 #include "src/propellant.hpp"
 
@@ -36,7 +37,7 @@ public:
 
     virtual double GetPortArea() = 0;
     virtual double GetVolume() = 0;
-    virtual double GetHydraulicDiameter() = 0; //used for erosive burning calculation
+    virtual double GetHydraulicDiameter(); //used for erosive burning calculation
     //burn faces and regress size params based on burn rate. run this once per time step
     //Returns true if burned successfully, false IFF if the grain burned out (used up all of it's propellant)
     virtual bool Burn(double timestep) = 0;
@@ -47,6 +48,8 @@ public:
 
     virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) = 0;
     virtual void WriteJSON(QJsonObject &object) = 0;
+    virtual void PaintCrossSection(QPainter* painter, int scaleFactor) = 0;
+    virtual void PaintFace(QPainter* painter, int scaleFactor) = 0;
 
 protected:
     double m_GrainDia, m_GrainLen;
@@ -70,7 +73,6 @@ public:
     virtual double GetBurningSurfaceArea(double xVal) override;
     virtual double GetPortArea() override;
     virtual double GetVolume() override;
-    virtual double GetHydraulicDiameter() override;
     virtual bool Burn(double timestep) override;
     virtual bool IsBurnedOut() override;
     virtual GrainPtr Clone() override;
@@ -81,8 +83,40 @@ public:
 
     virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) override;
     virtual void WriteJSON(QJsonObject &object) override;
-
-private:
+    virtual void PaintCrossSection(QPainter* painter, int scaleFactor) override;
+    virtual void PaintFace(QPainter* painter, int scaleFactor) override;
+protected:
     double m_CoreDia;
+};
+
+//an offset cylindrical core "moonburner"
+class MoonGrain : public CylindricalGrain
+{
+public:
+    MoonGrain();
+    MoonGrain(double dia, double coredia, double len, double offset, OpenBurnPropellant prop, int inhibited = 0);
+
+    virtual ~MoonGrain() = default;
+
+    virtual double GetBurningSurfaceArea() override;
+    virtual double GetBurningSurfaceArea(double xVal) override;
+    virtual double GetPortArea() override;
+    virtual double GetVolume() override;
+    virtual bool Burn(double timestep) override;
+    virtual bool IsBurnedOut() override;
+
+    virtual GrainPtr Clone() override;
+    virtual std::unique_ptr<OpenBurnGrain> CloneUnique() override;
+
+    virtual double GetCoreOffset();
+    virtual void SetCoreOffset(double offset);
+
+    virtual void ReadJSON(const QJsonObject& object, QString& propellantNameReturn) override;
+    virtual void WriteJSON(QJsonObject &object) override;
+    virtual void PaintCrossSection(QPainter* painter, int scaleFactor) override;
+    virtual void PaintFace(QPainter* painter, int scaleFactor) override;
+
+protected:
+    double m_CoreOffset;
 };
 
