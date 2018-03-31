@@ -9,12 +9,14 @@ class OpenBurnSettings : public QObject
 {
     Q_OBJECT
 public:
+    //TODO: make settings emit changes via accessor and mutator functions
+
     OpenBurnSettings();
     ~OpenBurnSettings() = default;
     
     void ReadJSON(const QJsonObject& object);
     void WriteJSON(QJsonObject &object);
-    
+
     OpenBurnUnits::LengthUnits m_LengthUnits;
     OpenBurnUnits::AngleUnits m_AngleUnits;
     OpenBurnUnits::TemperatureUnits m_TemperatureUnits;
@@ -36,6 +38,8 @@ class MotorSimSettings : public QObject
 {
     Q_OBJECT
 public:
+    //TODO: make settings emit changes via accessor and mutator functions
+
     //default settings
     MotorSimSettings();
     MotorSimSettings(double ambientPress, double ambientTemperature, double twophase, double skinfriction,

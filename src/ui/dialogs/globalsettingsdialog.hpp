@@ -2,6 +2,7 @@
 #include <QDialog>
 #include <QPushButton>
 #include <QCheckBox>
+#include <src/application.hpp>
 
 #include "src/settings.hpp"
 #include "src/ui/widgets/unitscombobox.hpp"
@@ -17,7 +18,7 @@ class GlobalSettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* parent = nullptr);
+    explicit GlobalSettingsDialog(OpenBurnApplication& app, QWidget* parent = nullptr);
     ~GlobalSettingsDialog() = default;
 private slots:
     void OnApplyButtonClicked();
@@ -31,8 +32,8 @@ private:
     void SetupUI();
     void ApplySettings();
     void PopulateSettings(SETTINGS_POPULATE_TYPE type);
-    OpenBurnSettings* m_GlobalSettings;
 
+    OpenBurnApplication& m_app;
     QPushButton* m_btnApply, *m_btnCancel;
 
     QCheckBox* m_chbxReSimOnChanges;

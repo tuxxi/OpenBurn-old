@@ -137,27 +137,6 @@ bool PropellantTab::LoadDatabase(const QString& filename)
     }
     return false;
 }
-bool PropellantTab::SaveDatabase()
-{
-    QFile file(m_DatabaseFileName);
-    if (file.open(QIODevice::WriteOnly))
-    {
-        QJsonObject propellantObject;
-        QJsonArray propellantArray;
-        for (auto i : *m_Propellants)
-        {
-            QJsonObject prop;
-            i.WriteJSON(prop);
-            propellantArray.append(prop);
-        }
-        propellantObject["propellants"] = propellantArray;
-        QJsonDocument saveDoc(propellantObject);
-        file.write(saveDoc.toJson());
-        return true;
-    }
-    return false;
-
-}
 void PropellantTab::OnPropellantComboBoxIndexChanged(int idx)
 {
     if (idx > -1) //is the group box selection valid?
@@ -264,16 +243,4 @@ void PropellantTab::UpdateSettings()
     m_unitsBRCoef->SetUnits(m_GlobalSettings->m_BurnRateUnits);
     m_unitsDensity->SetUnits(m_GlobalSettings->m_DensityUnits);
     m_unitsCStar->SetUnits(m_GlobalSettings->m_VelocityUnits);
-}
-void PropellantTab::AddNewPropellantToDatabase(const OpenBurnPropellant& prop)
-{
-    m_Propellants->push_back(prop);
-    SaveDatabase();
-
-    //force combo box to update
-    m_cbPropSelection->clear();
-    for (auto i : *m_Propellants)
-    {
-        m_cbPropSelection->addItem(i.GetPropellantName());
-    }
 }

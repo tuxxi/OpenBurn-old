@@ -7,6 +7,7 @@
 
 #include "src/motor.hpp"
 #include "src/settings.hpp"
+#include "src/application.hpp"
 
 #include "src/ui/widgets/graintablewidget.hpp"
 #include "src/ui/dialogs/graindialog.hpp"
@@ -20,7 +21,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(OpenBurnApplication& app, QWidget *parent = 0);
     ~MainWindow();
 protected:
     virtual void closeEvent(QCloseEvent*) override;
@@ -51,28 +52,10 @@ private slots:
     //usability
     void OnTabChanged(int index);
     void OnSelectionChanged(bool isSelected);
-    //file load
-	void OnNewPropellantFound(OpenBurnPropellant prop);
-    void OnDuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant& propInDb);
 private:
     void SetupUI();
-    //connects the signals from objects that this class manages (unique ptrs) 
-    void ConnectChildObjects();
 
-    void ResetCurrentDesign();
-
-    void SaveFile(QString filename);
-    bool LoadSettings(const QString& filename);
-    bool SaveSettings();
-
-	std::unique_ptr<OpenBurnMotor> m_DesignMotor;
-	std::unique_ptr<PropellantList> m_Propellants;
-    std::unique_ptr<MotorSim> m_Simulator;
-    std::unique_ptr<OpenBurnSettings> m_GlobalSettings;
-
-    QString m_CurrentDesignFilename;
-    QString m_SettingsFileName;
-    
+    OpenBurnApplication& m_app;
     QWidget *m_CentralWidget;
 
     QMenuBar *m_MenuBar;
@@ -84,13 +67,12 @@ private:
     QAction *m_ActionSettings;
 	//edit
 	QAction *m_ActionUndo, *m_ActionRedo, *m_ActionDelete;
-	QUndoStack *m_UndoStack;
 
     QStatusBar *m_StatusBar;
 
     QTabWidget *m_TabWidget;
-	std::unique_ptr<DesignTab> m_DesignTab;
-	std::unique_ptr<SimulationTab> m_SimTab;
-	std::unique_ptr<PropellantTab> m_PropellantTab;
+	DesignTab* m_DesignTab;
+	SimulationTab* m_SimTab;
+	PropellantTab* m_PropellantTab;
 
 };

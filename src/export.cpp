@@ -6,20 +6,16 @@
 
 #include "export.hpp"
 
-EngExport::EngExport()
-    : EngExport(nullptr)
-{
-}
 
-EngExport::EngExport(MotorSim* sim)
-    : m_Simulator(sim), 
+EngExport::EngExport(OpenBurnApplication& app)
+    : m_app(app),
     m_totalMass(0), m_propMass(0), m_MotorLen(0), m_MotorDia(0)
 
 {
 }
 
 EngExport::EngExport(const EngExport& other)
-    : EngExport(other.m_Simulator)
+    : EngExport(other.m_app)
 {
 }
 
@@ -34,7 +30,7 @@ void EngExport::SetMotorDetails(const double caseMass, const int len, const int 
     m_propMass = OpenBurnUnits::MassUnits::Convert(
         OpenBurnUnits::MassUnits_T::pounds_mass,
         OpenBurnUnits::MassUnits_T::kilograms,
-         m_Simulator->GetDesignMotor()->GetMotorPropellantMass());
+         m_app.GetDesignMotor().GetMotorPropellantMass());
     m_totalMass = m_propMass + caseMass;
 }
 
@@ -49,7 +45,7 @@ void EngExport::WriteToEngFile(const QString& filename) const
     {
         QTextStream stream(&file);
 
-        stream << "; " << m_Simulator->GetMotorDesignation() << '\n';
+        stream << "; " << m_app.GetSimulator().GetMotorDesignation() << '\n';
         stream << "; Exported with OpenBurn!\n";
 
         //--eng header: code, dia in mm, len in mm
@@ -59,8 +55,8 @@ void EngExport::WriteToEngFile(const QString& filename) const
         stream << " P " << m_propMass << " " << m_totalMass << " " << m_mfgName << "\n";
 
         int counter = 0;
-        const int divisor = int(m_Simulator->GetNumPoints()) / 30;
-        for (auto iter = m_Simulator->GetResultsBegin(); iter != m_Simulator->GetResultsEnd(); ++iter, ++counter)
+        const int divisor = int(m_app.GetSimulator().GetNumPoints()) / 30;
+        for (auto iter = m_app.GetSimulator().GetResultsBegin(); iter != m_app.GetSimulator().GetResultsEnd(); ++iter, ++counter)
         {
             const double thrustN = OpenBurnUnits::ForceUnits::Convert(
                 OpenBurnUnits::ForceUnits_T::pounds_force,

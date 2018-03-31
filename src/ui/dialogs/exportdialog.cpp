@@ -4,13 +4,10 @@
 #include "exportdialog.hpp"
 #include <QFileDialog>
 
-EngExportDialog::EngExportDialog(const EngExport &exporter,
-                                 MotorSim *simulator,
-                                 OpenBurnSettings *settings,
-                                 QWidget *parent)
+EngExportDialog::EngExportDialog(const EngExport &exporter, OpenBurnApplication &app, QWidget *parent)
     : QDialog(parent),
-    m_Exporter(exporter),
-    m_Simulator(simulator)
+      m_Exporter(exporter),
+      m_app(app)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
@@ -18,15 +15,14 @@ EngExportDialog::EngExportDialog(const EngExport &exporter,
         this, &EngExportDialog::OnOKButtonClicked);
     connect(m_btnCancel, &QPushButton::clicked,
         this, &EngExportDialog::OnCancelButtonClicked);
-    if (m_Simulator)
-    {
-        m_sbMotorLen->setValue(m_Simulator->GetDesignMotor()->GetMotorLength());
-        m_sbMotorDia->setValue(m_Simulator->GetDesignMotor()->GetMotorMajorDiameter());
-        m_lneMotorName->setText(m_Simulator->GetMotorDesignation());
-    }
-    m_UnitsCaseMass->SetUnits(settings->m_MassUnits);
-    m_UnitsMotorDia->SetUnits(settings->m_LengthUnits);
-    m_UnitsMotorLen->SetUnits(settings->m_LengthUnits);
+
+    m_sbMotorLen->setValue(m_app.GetDesignMotor().GetMotorLength());
+    m_sbMotorDia->setValue(m_app.GetDesignMotor().GetMotorMajorDiameter());
+    m_lneMotorName->setText(m_app.GetSimulator().GetMotorDesignation());
+
+    m_UnitsCaseMass->SetUnits(m_app.GetGlobalSettings().m_MassUnits);
+    m_UnitsMotorDia->SetUnits(m_app.GetGlobalSettings().m_LengthUnits);
+    m_UnitsMotorLen->SetUnits(m_app.GetGlobalSettings().m_LengthUnits);
 
 }
 void EngExportDialog::SetupUI()

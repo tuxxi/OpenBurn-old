@@ -61,7 +61,7 @@ public:
     double GetPortThroatRatio() const;
 
 
-    void ReadJSON(const QJsonObject& object, PropellantList* database);
+    void ReadJSON(const QJsonObject& object);
     void WriteJSON(QJsonObject &object);
 
 signals:

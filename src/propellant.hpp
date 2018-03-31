@@ -55,4 +55,3 @@ private:
     double m_gasViscosity; //mu, kg/m-sec
     double m_prandtlNumber; //Pr
 };
-typedef std::vector<OpenBurnPropellant> PropellantList;

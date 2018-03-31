@@ -2,6 +2,7 @@
 #include <QDialog>
 #include <QPushButton>
 #include <QLineEdit>
+#include <src/application.hpp>
 
 #include "src/ui/widgets/unitscombobox.hpp"
 #include "src/export.hpp"
@@ -10,8 +11,7 @@ class EngExportDialog : public QDialog
 public:
     explicit EngExportDialog(
         const EngExport& exporter,
-        MotorSim* simulator,
-        OpenBurnSettings* settings,
+        OpenBurnApplication& app,
         QWidget* parent = nullptr);
 private slots:
     void OnOKButtonClicked();
@@ -19,6 +19,9 @@ private slots:
 private:
     void SetupUI();
     void SetParams();
+
+    OpenBurnApplication& m_app;
+
     LengthUnitsComboBox *m_UnitsMotorLen, *m_UnitsMotorDia;
     QDoubleSpinBox *m_sbMotorLen, *m_sbMotorDia;
 
@@ -28,5 +31,4 @@ private:
     QLineEdit *m_lneMotorMfg, *m_lneMotorName;
     QPushButton *m_btnOk, *m_btnCancel;
     EngExport m_Exporter;
-    MotorSim* m_Simulator;
 };

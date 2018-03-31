@@ -4,13 +4,13 @@
 
 #include "globalsettingsdialog.hpp"
 
-GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnSettings* settings, QWidget* parent)
+GlobalSettingsDialog::GlobalSettingsDialog(OpenBurnApplication& app, QWidget* parent)
     : QDialog(parent),
-      m_GlobalSettings(settings)
+      m_app(app)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     SetupUI();
-    if (settings)
+    if (m_app.AreSettingsLoaded())
     {
         PopulateSettings(SETTINGS_POPULATE_TYPE::current);
     }
@@ -83,80 +83,75 @@ void GlobalSettingsDialog::SetupUI()
 }
 void GlobalSettingsDialog::ApplySettings()
 {
-    if (m_GlobalSettings)
-    {
-        m_GlobalSettings->m_LengthUnits = m_unitsLength->GetCurrentUnits().unit;
-        m_GlobalSettings->m_AngleUnits = m_unitsAngle->GetCurrentUnits().unit;
-        m_GlobalSettings->m_PressureUnits = m_unitsPressure->GetCurrentUnits().unit;
-        m_GlobalSettings->m_TemperatureUnits = m_unitsTemperature->GetCurrentUnits().unit;
-        m_GlobalSettings->m_ForceUnits = m_unitsForce->GetCurrentUnits().unit;
-        m_GlobalSettings->m_MassUnits = m_unitsMass->GetCurrentUnits().unit;
-        m_GlobalSettings->m_VelocityUnits = m_unitsVelocity->GetCurrentUnits().unit;
-        m_GlobalSettings->m_MassFluxUnits = m_unitsMassFlux->GetCurrentUnits().unit;
-        m_GlobalSettings->m_DensityUnits = m_unitsDensity->GetCurrentUnits().unit;
-        m_GlobalSettings->m_BurnRateUnits = m_unitsBurnRate->GetCurrentUnits().unit;
-        m_GlobalSettings->m_redrawOnChanges = m_chbxReSimOnChanges->isChecked();
-        emit m_GlobalSettings->SettingsChanged();
-    }
+    m_app.GetGlobalSettings().m_LengthUnits = m_unitsLength->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_AngleUnits = m_unitsAngle->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_PressureUnits = m_unitsPressure->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_TemperatureUnits = m_unitsTemperature->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_ForceUnits = m_unitsForce->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_MassUnits = m_unitsMass->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_VelocityUnits = m_unitsVelocity->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_MassFluxUnits = m_unitsMassFlux->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_DensityUnits = m_unitsDensity->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_BurnRateUnits = m_unitsBurnRate->GetCurrentUnits().unit;
+    m_app.GetGlobalSettings().m_redrawOnChanges = m_chbxReSimOnChanges->isChecked();
+    emit m_app.GetGlobalSettings().SettingsChanged();
+
 }
 void GlobalSettingsDialog::PopulateSettings(SETTINGS_POPULATE_TYPE type)
 {
-    if (m_GlobalSettings)
+    m_chbxReSimOnChanges->setChecked(m_app.GetGlobalSettings().m_redrawOnChanges);
+    if (type == SETTINGS_POPULATE_TYPE::current)
     {
-        m_chbxReSimOnChanges->setChecked(m_GlobalSettings->m_redrawOnChanges);
-        if (type == SETTINGS_POPULATE_TYPE::current)
-        {
-            m_unitsLength->SetUnits(m_GlobalSettings->m_LengthUnits);
-            m_unitsAngle->SetUnits(m_GlobalSettings->m_AngleUnits);
-            m_unitsPressure->SetUnits(m_GlobalSettings->m_PressureUnits);
-            m_unitsTemperature->SetUnits(m_GlobalSettings->m_TemperatureUnits);
-            m_unitsForce->SetUnits(m_GlobalSettings->m_ForceUnits);
-            m_unitsMass->SetUnits(m_GlobalSettings->m_MassUnits);
-            m_unitsVelocity->SetUnits(m_GlobalSettings->m_VelocityUnits);
-            m_unitsMassFlux->SetUnits(m_GlobalSettings->m_MassFluxUnits);
-            m_unitsDensity->SetUnits(m_GlobalSettings->m_DensityUnits);
-            m_unitsBurnRate->SetUnits(m_GlobalSettings->m_BurnRateUnits);
-        }
-        else if (type == SETTINGS_POPULATE_TYPE::def)
-        {
-            m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::inches);
-            m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
-            m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::psi);
-            m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::fahrenheit);
-            m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::newtons);
-            m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::pounds_mass);
-            m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second);
-            m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in);
-            m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::lbs_per_in_cu);
-            m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::inches_per_second);
-        }
-        else if (type == SETTINGS_POPULATE_TYPE::metric)
-        {
-            m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::millimeters);
-            m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
-            m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::kilopascals);
-            m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::kelvin);
-            m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::newtons);
-            m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::kilograms);
-            m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::meters_per_second);
-            m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::kg_sec_sq_meter);
-            m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::kg_per_m_cu);
-            m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::millimeters_per_second);
+        m_unitsLength->SetUnits(m_app.GetGlobalSettings().m_LengthUnits);
+        m_unitsAngle->SetUnits(m_app.GetGlobalSettings().m_AngleUnits);
+        m_unitsPressure->SetUnits(m_app.GetGlobalSettings().m_PressureUnits);
+        m_unitsTemperature->SetUnits(m_app.GetGlobalSettings().m_TemperatureUnits);
+        m_unitsForce->SetUnits(m_app.GetGlobalSettings().m_ForceUnits);
+        m_unitsMass->SetUnits(m_app.GetGlobalSettings().m_MassUnits);
+        m_unitsVelocity->SetUnits(m_app.GetGlobalSettings().m_VelocityUnits);
+        m_unitsMassFlux->SetUnits(m_app.GetGlobalSettings().m_MassFluxUnits);
+        m_unitsDensity->SetUnits(m_app.GetGlobalSettings().m_DensityUnits);
+        m_unitsBurnRate->SetUnits(m_app.GetGlobalSettings().m_BurnRateUnits);
+    }
+    else if (type == SETTINGS_POPULATE_TYPE::def)
+    {
+        m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::inches);
+        m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
+        m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::psi);
+        m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::fahrenheit);
+        m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::newtons);
+        m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::pounds_mass);
+        m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second);
+        m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in);
+        m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::lbs_per_in_cu);
+        m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::inches_per_second);
+    }
+    else if (type == SETTINGS_POPULATE_TYPE::metric)
+    {
+        m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::millimeters);
+        m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
+        m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::kilopascals);
+        m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::kelvin);
+        m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::newtons);
+        m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::kilograms);
+        m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::meters_per_second);
+        m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::kg_sec_sq_meter);
+        m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::kg_per_m_cu);
+        m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::millimeters_per_second);
 
-        }
-        else if (type == SETTINGS_POPULATE_TYPE::imperial)
-        {
-            m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::inches);
-            m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
-            m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::psi);
-            m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::fahrenheit);
-            m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::pounds_force);
-            m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::pounds_mass);
-            m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second);
-            m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in);
-            m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::slugs_per_foot_cu);
-            m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::inches_per_second);
-        }
+    }
+    else if (type == SETTINGS_POPULATE_TYPE::imperial)
+    {
+        m_unitsLength->SetUnits(OpenBurnUnits::LengthUnits_T::inches);
+        m_unitsAngle->SetUnits(OpenBurnUnits::AngleUnits_T::degrees);
+        m_unitsPressure->SetUnits(OpenBurnUnits::PressureUnits_T::psi);
+        m_unitsTemperature->SetUnits(OpenBurnUnits::TemperatureUnits_T::fahrenheit);
+        m_unitsForce->SetUnits(OpenBurnUnits::ForceUnits_T::pounds_force);
+        m_unitsMass->SetUnits(OpenBurnUnits::MassUnits_T::pounds_mass);
+        m_unitsVelocity->SetUnits(OpenBurnUnits::VelocityUnits_T::feet_per_second);
+        m_unitsMassFlux->SetUnits(OpenBurnUnits::MassFluxUnits_T::lbs_sec_sq_in);
+        m_unitsDensity->SetUnits(OpenBurnUnits::DensityUnits_T::slugs_per_foot_cu);
+        m_unitsBurnRate->SetUnits(OpenBurnUnits::BurnRateUnits_T::inches_per_second);
     }
 }
 void GlobalSettingsDialog::OnApplyButtonClicked()

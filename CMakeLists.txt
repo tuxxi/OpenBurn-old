@@ -98,7 +98,7 @@ set (PROJECT_SRCS
         src/settings.hpp
         src/units.hpp
         src/util.cpp
-        src/util.hpp)
+        src/util.hpp src/application.cpp src/application.hpp)
 
 add_executable(OpenBurn ${GUI_TYPE} ${PROJECT_SRCS} )
 

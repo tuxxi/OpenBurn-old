@@ -20,11 +20,9 @@ class PropellantTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent = nullptr);
+    explicit PropellantTab(QWidget* parent = nullptr);
     ~PropellantTab() = default;
     void UpdateSettings();
-    void AddNewPropellantToDatabase(const OpenBurnPropellant& prop);
-    bool SaveDatabase();
 
 signals:
     void PropellantsUpdated();
@@ -39,13 +37,6 @@ private:
     void SetupUI();
     void ConnectLineEditSignals();
     void SetDefaultValues();
-    //Propellant Database
-    bool LoadDatabase(const QString& filename);
-
-    PropellantList* m_Propellants;
-    OpenBurnSettings* m_GlobalSettings;
-
-    QString m_DatabaseFileName;
 
     QComboBox* m_cbPropSelection;
     QPushButton* m_btnSaveProp, *m_btnDeleteProp, *m_btnNewProp, *m_btnCalculate;

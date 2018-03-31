@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QApplication app(argc, argv);
-    MainWindow w;
+    OpenBurnApplication OpenBurn;
+    MainWindow w(OpenBurn);
     w.show();
     return app.exec();
 }

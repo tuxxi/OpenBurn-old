@@ -3,15 +3,10 @@
 #include "src/commands.hpp"
 #include "src/ui/designtab.hpp"
 
-DesignTab::DesignTab(OpenBurnMotor* motor, 
-	PropellantList* propellantTypes, OpenBurnSettings* settings, 
-	QUndoStack* stack, QWidget* parent)
+DesignTab::DesignTab(OpenBurnApplication& app, QWidget* parent)
     : QWidget(parent),
-	m_UndoStack(stack),
     m_grainSeed(nullptr), m_GrainDialog(nullptr), m_NozzleDialog(nullptr), m_gfxMotor(nullptr),
-    m_Motor(motor),
-    m_Propellants(propellantTypes),
-    m_GlobalSettings(settings)
+    m_app(app)
 {   
     SetupUI();
     connect(m_btnNewGrain, &QPushButton::clicked,
@@ -22,9 +17,9 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
             this, &DesignTab::OnDeleteGrainButtonClicked);
     connect(m_btnEditGrain, &QPushButton::clicked,
             this, &DesignTab::OnEditGrainButtonClicked);
-    connect(m_btntMoveGrainUp, &QPushButton::clicked,
+    connect(m_btntMoveGrainUp, &QToolButton::clicked,
             this, &DesignTab::OnMoveGrainUpButtonClicked);
-    connect(m_btntMoveGrainDown, &QPushButton::clicked,
+    connect(m_btntMoveGrainDown, &QToolButton::clicked,
             this, &DesignTab::OnMoveGrainDownButtonClicked);
 
     connect(m_GrainTable, &GrainTableWidget::cellDoubleClicked, //Double clicking on a row edits that grain
@@ -32,7 +27,7 @@ DesignTab::DesignTab(OpenBurnMotor* motor,
     connect(m_GrainTable, &GrainTableWidget::itemSelectionChanged,
             this, &DesignTab::OnTableSelectionChanged);
 
-    connect(m_Motor, &OpenBurnMotor::DesignUpdated,
+    connect(&m_app.GetDesignMotor(), &OpenBurnMotor::DesignUpdated,
             this, &DesignTab::OnDesignUpdated);
 
     connect(m_spltGfx, &QSplitter::splitterMoved,
@@ -195,6 +190,7 @@ void DesignTab::SetupUI()
 //this MUST be called AFTER we setup the basic UI layout.
 void DesignTab::UpdateDesign()
 {
+    /*
     const QString lengthUnitSymbol = m_GlobalSettings->m_LengthUnits.GetUnitSymbol();
     const QString massUnitSymbol = m_GlobalSettings->m_MassUnits.GetUnitSymbol();
 
@@ -261,11 +257,13 @@ void DesignTab::UpdateDesign()
 		m_lblKn->setText("");
 		m_lblPortThroatRatio->setText("");
 	}
+     */
     
     UpdateGraphics(); 
 }
 void DesignTab::UpdateGraphics()
 {
+    /*
     if (m_gfxMotor == nullptr)
     {
 		m_gfxMotor = std::make_unique<MotorGraphicsItem>(OpenBurnUtil::g_kGfxScaleFactor, m_Motor);
@@ -302,6 +300,7 @@ void DesignTab::UpdateGraphics()
 
     //update again just in case 
     repaint();
+     */
 }
 
 void DesignTab::EditSelectedGrains()

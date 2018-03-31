@@ -7,6 +7,7 @@
 #include <QGroupBox>
 
 #include <memory>
+#include <src/application.hpp>
 
 #include "src/ui/graphics/motorgraphicsitem.hpp"
 
@@ -21,10 +22,7 @@ class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnMotor* motor, 
-		PropellantList* propellant, 
-		OpenBurnSettings* settings, 
-		QUndoStack* undoStack, 
+    explicit DesignTab(OpenBurnApplication& app
 		QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;
@@ -115,8 +113,5 @@ private:
     QGraphicsView* m_MotorDisplayView, *m_GrainSliceView;
     QGraphicsScene* m_MotorDisplayScene, *m_GrainSliceScene;
 
-    //for reference pnly - these are all owned by MainWindow
-    OpenBurnMotor* m_Motor; 
-    PropellantList* m_Propellants;
-    OpenBurnSettings* m_GlobalSettings;
+    OpenBurnApplication& m_app;
 };

@@ -65,8 +65,6 @@ public:
     size_t GetNumPoints() const;
     bool GetResultsEmpty() const;
 
-    OpenBurnMotor* GetDesignMotor() const;
-    void SetDesignMotor(OpenBurnMotor* motor);
 signals:
     void SimulationStarted();
     //false if there was an error

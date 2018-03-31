@@ -396,11 +396,6 @@ size_t MotorSim::GetNumPoints() const
 {
     return m_SimResultData.size();
 }
-
-OpenBurnMotor* MotorSim::GetDesignMotor() const
-{
-    return m_InitialDesignMotor;
-}
 bool MotorSim::GetResultsEmpty() const
 {
     return qFuzzyIsNull(m_TotalBurnTime) || m_SimResultData.empty();
@@ -412,8 +407,4 @@ double MotorSim::GetAvgThrust() const
 void MotorSim::ClearAllData()
 {
     m_SimResultData.clear();
-}
-void MotorSim::SetDesignMotor(OpenBurnMotor *motor)
-{
-    m_InitialDesignMotor = motor;
 }
