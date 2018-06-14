@@ -3,13 +3,13 @@
 .vs/
 .idea/
 
-
+#VS
 *.sln
-*.pro.user
-*.qmake.stash
 *.vcxproj.*
 *.vcxproj
 
+#Qt Creator
+*.user
 
 #Build Products
 Makefile
