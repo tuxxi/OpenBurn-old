@@ -5,7 +5,7 @@
 #include <memory>
 #include <QtGui/QPainter>
 
-#include "src/propellant.hpp"
+#include "propellant.hpp"
 
 class OpenBurnGrain;
 typedef std::shared_ptr<OpenBurnGrain> GrainPtr;

@@ -2,7 +2,7 @@
 
 #include  <QUndoCommand>
 #include <memory>
-#include "src/motor.hpp"
+#include "motor.hpp"
 
 class AddGrainCommand : public QUndoCommand
 {

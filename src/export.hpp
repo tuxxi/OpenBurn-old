@@ -1,7 +1,7 @@
 #pragma once
 #include <QString>
 #include <QObject>
-#include "src/motorsim.hpp"
+#include "motorsim.hpp"
 #include "application.hpp"
 
 //exports thrust/time curve to .eng

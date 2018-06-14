@@ -1,6 +1,7 @@
 #include <QApplication>
+#include <QQmlApplicationEngine>
 
-#include "src/ui/mainwindow.hpp"
+#include "application.hpp"
 
 #define QT_AUTO_SCREEN_SCALE_FACTOR 1
 
@@ -11,7 +12,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication app(argc, argv);
     OpenBurnApplication OpenBurn;
-    MainWindow w(OpenBurn);
-    w.show();
+
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     return app.exec();
 }

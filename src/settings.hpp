@@ -2,7 +2,7 @@
 #include <QObject>
 #include <QJsonObject>
 
-#include "src/units.hpp"
+#include "units.hpp"
 
 //Global (application-wide) settings
 class OpenBurnSettings : public QObject

@@ -1,106 +1,30 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(OpenBurn)
+set(PROJECT "OpenBurn")
+project(${PROJECT})
 
 #set C++14
 set(CMAKE_CXX_STANDARD 14)
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed.
+
+# Instruct CMake to run moc, rcc, and uic automatically when needed.
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
-if (NOT MSVC)
-# Turn on all warnings for debug mode (NOT MSVC)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -fsanitize=address")
-endif(NOT MSVC)
-#
+#if(NOT CMAKE_BUILD_TYPE)
+#  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+#      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+#      FORCE)
+#endif(NOT CMAKE_BUILD_TYPE)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
-
-if (MSVC) # - Microsoft Visual C++
+# Set some platform specific GUI bundle things
+if (MSVC)
     set(GUI_TYPE WIN32)
-endif(MSVC)
+endif()
 
-# Set some Apple MacOS Specific settings
 if (APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
-endif (APPLE)
+endif()
 
-
-# Find the QtWidgets library
-find_package(Qt5Widgets)
-get_target_property(QtWidgets_location Qt5::Widgets LOCATION)
-
-find_package(Qt5Core)
-get_target_property(QtCore_location Qt5::Core LOCATION)
-
-find_package(Qt5Gui)
-get_target_property(QtGui_location Qt5::Gui LOCATION)
-
-find_package(Qt5PrintSupport)
-get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
-
-set (PROJECT_SRCS 
-        src/thirdparty/qcustomplot/qcustomplot.cpp
-        src/thirdparty/qcustomplot/qcustomplot.h
-
-        src/ui/dialogs/exportdialog.cpp
-        src/ui/dialogs/exportdialog.hpp
-        src/ui/dialogs/globalsettingsdialog.cpp
-        src/ui/dialogs/globalsettingsdialog.hpp
-        src/ui/dialogs/graindesigntypes.cpp
-        src/ui/dialogs/graindesigntypes.hpp
-        src/ui/dialogs/graindialog.cpp
-        src/ui/dialogs/graindialog.hpp
-        src/ui/dialogs/nozzledesigntypes.cpp
-        src/ui/dialogs/nozzledesigntypes.hpp
-        src/ui/dialogs/nozzledialog.cpp
-        src/ui/dialogs/nozzledialog.hpp
-        src/ui/dialogs/simsettingsdialog.cpp
-        src/ui/dialogs/simsettingsdialog.hpp
-        src/ui/graphics/graingraphicsitem.cpp
-        src/ui/graphics/graingraphicsitem.hpp
-        src/ui/graphics/motorgraphicsitem.cpp
-        src/ui/graphics/motorgraphicsitem.hpp
-        src/ui/graphics/nozzlegraphicsitem.cpp
-        src/ui/graphics/nozzlegraphicsitem.hpp
-        src/ui/widgets/graintablewidget.cpp
-        src/ui/widgets/graintablewidget.hpp
-        src/ui/widgets/unitscombobox.cpp
-        src/ui/widgets/unitscombobox.hpp
-        src/ui/designtab.cpp
-        src/ui/designtab.hpp
-        src/ui/mainwindow.cpp
-        src/ui/mainwindow.hpp
-        src/ui/propellanttab.cpp
-        src/ui/propellanttab.hpp
-        src/ui/simtab.cpp
-        src/ui/simtab.hpp
-        src/commands.hpp
-        src/commands.cpp
-        src/export.hpp
-        src/export.cpp
-        src/grain.cpp
-        src/grain.hpp
-        src/main.cpp
-        src/motor.cpp
-        src/motor.hpp
-        src/motorsim.cpp
-        src/motorsim.hpp
-        src/nozzle.cpp
-        src/nozzle.hpp
-        src/propellant.cpp
-        src/propellant.hpp
-        src/settings.cpp
-        src/settings.hpp
-        src/units.hpp
-        src/util.cpp
-        src/util.hpp 
-		src/application.cpp src/application.hpp)
-
-add_executable(OpenBurn ${GUI_TYPE} ${PROJECT_SRCS} )
-
-target_link_libraries(OpenBurn Qt5::Widgets Qt5::Core Qt5::Gui Qt5::PrintSupport)
+find_package(Qt5 COMPONENTS PrintSupport Widgets Qml Quick REQUIRED)
+# Directory with source code
+add_subdirectory(src)
