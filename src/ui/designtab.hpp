@@ -7,7 +7,6 @@
 #include <QGroupBox>
 
 #include <memory>
-#include <src/application.hpp>
 
 #include "src/ui/graphics/motorgraphicsitem.hpp"
 
@@ -17,12 +16,13 @@
 #include "src/motorsim.hpp"
 #include "src/settings.hpp"
 
+class OpenBurnApplication;
 
 class DesignTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesignTab(OpenBurnApplication& app
+    explicit DesignTab(OpenBurnApplication& app,
 		QWidget* parent = nullptr);
     ~DesignTab();
     void resizeEvent(QResizeEvent* event) override;

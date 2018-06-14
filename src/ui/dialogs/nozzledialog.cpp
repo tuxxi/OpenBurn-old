@@ -20,7 +20,7 @@ NozzleDialog::NozzleDialog(const OpenBurnNozzle* seed, OpenBurnSettings* setting
     connect(m_btnApply, &QPushButton::clicked,
             this, &NozzleDialog::OnApplyButtonClicked);
     
-    connect(m_NozzleDesign, &OpenBurnDesignNozzle::DesignUpdated,
+    connect(m_NozzleDesign, &BaseNozzleDesign::DesignUpdated,
             this, &NozzleDialog::OnDesignUpdated);
 }
 
@@ -46,13 +46,13 @@ void NozzleDialog::SetupUI()
     m_gbFrame->setLayout(layout);
 
     auto nozz = dynamic_cast<ConicalNozzle*>(m_Nozzle.get());
-    m_NozzleDesign = new ConicalNozzleDesign(this, nozz, m_GlobalSettings);
+
     m_btnOK = new QPushButton(tr("OK"), this);
     m_btnClose = new QPushButton(tr("Cancel"), this);
     m_btnApply = new QPushButton(tr("Apply"), this);
 
     //buttons
-    layout->addWidget(m_NozzleDesign, 0, 0, 1, 3);
+    //layout->addWidget(m_NozzleDesign, 0, 0, 1, 3);
     layout->addWidget(m_btnOK, 255, 0);
     layout->addWidget(m_btnApply, 255, 1);        
     layout->addWidget(m_btnClose, 255, 2);
@@ -64,6 +64,7 @@ void NozzleDialog::SetupUI()
 }
 void NozzleDialog::OnDesignUpdated()
 {
+    /*
     ConicalNozzleDesign* design = dynamic_cast<ConicalNozzleDesign*>(m_NozzleDesign);
     if (design)
     {
@@ -82,6 +83,7 @@ void NozzleDialog::OnDesignUpdated()
             nozz->SetHalfAngle(design->GetDivergentHalfAngle());
         }
     }
+    */
 }
 void NozzleDialog::OnApplyButtonClicked()
 {
@@ -98,6 +100,7 @@ void NozzleDialog::OnOkButtonClicked()
 }
 void NozzleDialog::Accept()
 {
+    /*
     //OPENBURN_TODO: make this a small warning below the buttons or something rather than a msg box
     if (qFuzzyIsNull(m_NozzleDesign->GetThroatDiameter())) 
     {
@@ -123,4 +126,5 @@ void NozzleDialog::Accept()
 	{
 		emit NozzleModified(m_Nozzle, m_OldNozzle);
 	}
+    */
 }

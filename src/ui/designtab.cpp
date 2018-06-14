@@ -1,5 +1,6 @@
 #include <QDebug>
 
+#include "src/application.hpp"
 #include "src/commands.hpp"
 #include "src/ui/designtab.hpp"
 
@@ -50,7 +51,7 @@ void DesignTab::resizeEvent(QResizeEvent* event)
 void DesignTab::SetupGrainUI()
 {
     auto grainLayout = new QHBoxLayout;
-    grainLayout->addWidget(m_GrainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this));
+  //  grainLayout->addWidget(m_GrainTable = new GrainTableWidget(m_Motor, m_GlobalSettings, this));
 
     //grain design controls
     auto grainControls = new QVBoxLayout;
@@ -307,8 +308,9 @@ void DesignTab::EditSelectedGrains()
 {
     //we want to be able to click "edit" and edit differently selected grains, so we reset the
     //unique_ptr every time the edit button is clicked
-    m_GrainDialog.reset();
+    //m_GrainDialog.reset();
 
+    /*
     m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
         m_grainSeed.get(),
         m_GlobalSettings,
@@ -322,18 +324,21 @@ void DesignTab::EditSelectedGrains()
     m_GrainDialog->activateWindow();
     m_GrainDialog->raise();
     m_btnEditGrain->setEnabled(false);
+    */
 
 }
 void DesignTab::DeleteSelectedGrains()
 {
+    /*
     const auto selected = m_GrainTable->GetSelectedGrains();
     QUndoCommand* removeGrainCommand = new RemoveGrainCommand(selected, m_Motor);
     m_UndoStack->push(removeGrainCommand);
-
+    */
     UpdateDesign();
 }
 void DesignTab::CreateNewGrain()
 {
+    /*
     if (!m_GrainDialog) //only make one!!
     {
         m_GrainDialog = std::make_unique<GrainDialog>(m_Propellants,
@@ -347,10 +352,12 @@ void DesignTab::CreateNewGrain()
     m_GrainDialog->show();
     m_GrainDialog->activateWindow();
     m_GrainDialog->raise();
+    */
 }
 
 void DesignTab::MoveGrains(bool up)
 {
+    /*
     auto indices = m_GrainTable->GetSelectedGrainIndices();
     while (!indices.empty())
     {
@@ -365,10 +372,12 @@ void DesignTab::MoveGrains(bool up)
         m_Motor->SwapGrains(selectedIdx, up ? selectedIdx - 1 : selectedIdx + 1);
     }
     UpdateDesign();
+    */
 }
 
 void DesignTab::EditNozzle()
 {
+    /*
     if (!m_NozzleDialog) //only make one at a time
     {
         m_NozzleDialog = std::make_unique<NozzleDialog>(m_Motor->GetNozzle(), m_GlobalSettings);
@@ -382,6 +391,7 @@ void DesignTab::EditNozzle()
     m_NozzleDialog->show();
     m_NozzleDialog->activateWindow();
     m_NozzleDialog->raise();
+    */
 }
 
 void DesignTab::ToggleDesignButtons(bool on)
@@ -408,29 +418,37 @@ void DesignTab::OnGrainDialogClosed()
 }
 void DesignTab::OnNewGrain(const GrainPtr& grain)
 {
+    /*
 	QUndoCommand* addCommand = new AddGrainCommand(grain, m_Motor);
 	m_UndoStack->push(addCommand);
     SetSeed(grain.get());
+    */
 }
 
 void DesignTab::OnGrainsModified(const GrainVector& newGrains, const GrainVector& originalGrains)
 {
+    /*
 	QUndoCommand* modifyCommand = new ModifyGrainCommand(newGrains, originalGrains, m_Motor);
 	m_UndoStack->push(modifyCommand);
 	emit m_Motor->DesignUpdated();
 	SetSeed(newGrains[0].get());
+    */
 }
 
 void DesignTab::OnNewNozzle(NozzlePtr& newNozzle)
 {
+    /*
 	QUndoCommand* newNozzleCommand = new NewNozzleCommand(std::move(newNozzle), m_Motor);
 	m_UndoStack->push(newNozzleCommand);
+    */
 }
 
 void DesignTab::OnNozzleUpdated(NozzlePtr& newNozzle, NozzlePtr& oldNozzle)
 {
+    /*
 	QUndoCommand* nozzleModifyCommand = new ModifyNozzleCommand(std::move(newNozzle), std::move(oldNozzle), m_Motor);
 	m_UndoStack->push(nozzleModifyCommand);
+    */
 }
 void DesignTab::OnDesignUpdated()
 {

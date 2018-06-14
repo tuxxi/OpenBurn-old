@@ -7,24 +7,20 @@
 #include <QDebug>
 
 #include "src/ui/dialogs/graindialog.hpp"
+#include "src/application.hpp"
 
-GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBurnSettings *settings,
-	const GrainVector& grains, QWidget *parent)
+GrainDialog::GrainDialog(OpenBurnApplication& app, QWidget *parent)
     : QDialog(parent),
     m_gfxGrain(nullptr),
     m_GrainDesign(nullptr),
-    m_seedGrain(seedValues),
-    m_grainsToEdit(grains),
-    m_Propellants(prop),
-    m_GlobalSettings(settings),
-    m_isNewGrainWindow(grains.empty())
+    m_app(app)
+    //m_isNewGrainWindow(grains.empty())
 {
     //we clone the seed if it exists, otherwise just use a default cyl grain
-    m_GrainForGfx = seedValues ? seedValues->CloneUnique() : std::make_unique<CylindricalGrain>();
 
     SetupGraphics();
     SetupUI();
-    SeedValues(m_seedGrain);
+    //SeedValues(m_seedGrain);
     //new function pointer syntax does not work for overloaded signals or slots >.<
     connect(m_sbGrainDia, SIGNAL(valueChanged(double)),
             this, SLOT(OnDesignUpdated()));
@@ -40,12 +36,6 @@ GrainDialog::GrainDialog(PropellantList* prop, OpenBurnGrain* seedValues, OpenBu
     connect(m_cbGrainType, SIGNAL(currentIndexChanged(int)),
             this, SLOT(OnGrainCoreTypeChanged(int)));
 
-	//deep copy of the "grains to edit" vector, so we can store the original unmodified grain for the undo action
-	m_OriginalGrains.reserve(grains.size());
-	for (const auto& grain : grains)
-	{
-		m_OriginalGrains.emplace_back(grain->Clone());
-	}
 }
 void GrainDialog::SetupUI()
 {
@@ -70,9 +60,9 @@ void GrainDialog::SetupUI()
     //Propellant Selection Box
     m_cbPropellantType = new QComboBox(this);
     //add all propellants in DB to the combo box
-    for (auto i : *m_Propellants)
+    for (auto prop : m_app.GetAllPropellants())
     {
-        m_cbPropellantType->addItem(i.GetPropellantName());
+        m_cbPropellantType->addItem(prop.GetPropellantName());
     }
     m_layControls->addWidget(new QLabel(tr("Propellant Type")), 1, 0);
     m_layControls->addWidget(m_cbPropellantType, 1, 1);
@@ -142,6 +132,7 @@ void GrainDialog::SetupGraphics()
 }
 void GrainDialog::SetGrainValues()
 {
+    /*
     const double grainDia = m_unitsGrainDia->GetCurrentUnits().ConvertTo(
         OpenBurnUnits::LengthUnits_T::inches,
         m_sbGrainDia->value());
@@ -212,9 +203,11 @@ void GrainDialog::SetGrainValues()
             }
         }
     }
+    */
 }
 void GrainDialog::SeedValues(OpenBurnGrain *seed)
 {
+    /*
     if (m_GlobalSettings)
     {
         m_unitsGrainDia->SetUnits(m_GlobalSettings->m_LengthUnits);
@@ -248,9 +241,11 @@ void GrainDialog::SeedValues(OpenBurnGrain *seed)
         }
         UpdateGraphics();
     }
+    */
 }
 void GrainDialog::UpdateDesignControls(GrainType type)
 {
+    /*
     m_GrainDesign.reset();
     m_cbGrainType->setCurrentIndex(static_cast<int>(type));
     //seed special values
@@ -279,6 +274,7 @@ void GrainDialog::UpdateDesignControls(GrainType type)
     connect(m_GrainDesign.get(), &BaseGrainDesign::GrainDesignChanged,
             this, &GrainDialog::OnDesignUpdated);
     UpdateGraphics();
+    */
 }
 void GrainDialog::UpdateGraphics()
 {
@@ -351,6 +347,7 @@ void GrainDialog::OnApplyButtonClicked()
             QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
+    /*
     SetGrainValues();
     if (m_isNewGrainWindow)
     {
@@ -361,6 +358,7 @@ void GrainDialog::OnApplyButtonClicked()
     {
 		emit GrainsEdited(m_grainsToEdit, m_OriginalGrains);
     }
+    */
 }
 void GrainDialog::OnGrainCoreTypeChanged(int index)
 {

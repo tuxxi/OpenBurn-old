@@ -16,11 +16,13 @@
 #include "src/ui/widgets/unitscombobox.hpp"
 #include "src/propellant.hpp"
 
+class OpenBurnApplication; //forward decl
+
 class PropellantTab : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PropellantTab(QWidget* parent = nullptr);
+    explicit PropellantTab(OpenBurnApplication& app, QWidget* parent = nullptr);
     ~PropellantTab() = default;
     void UpdateSettings();
 
@@ -37,6 +39,8 @@ private:
     void SetupUI();
     void ConnectLineEditSignals();
     void SetDefaultValues();
+
+    OpenBurnApplication& m_app;
 
     QComboBox* m_cbPropSelection;
     QPushButton* m_btnSaveProp, *m_btnDeleteProp, *m_btnNewProp, *m_btnCalculate;

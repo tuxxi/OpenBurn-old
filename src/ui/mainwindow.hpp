@@ -46,7 +46,6 @@ private slots:
     void OnSimulationFinished(bool success);
 
     //databases
-    void OnPropellantsUpdated();
     void OnSettingsChanged();
 
     //usability

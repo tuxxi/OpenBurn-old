@@ -1,11 +1,7 @@
 #pragma once
 
 #include <QDialog>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QGraphicsView>
 #include <QPushButton>
-#include <QComboBox>
 #include <QGroupBox>
 
 #include "src/nozzle.hpp"
@@ -41,7 +37,7 @@ private:
 
     QPushButton *m_btnApply, *m_btnOK, *m_btnClose;
 
-    OpenBurnDesignNozzle* m_NozzleDesign;
+    BaseNozzleDesign* m_NozzleDesign;
     NozzlePtr m_Nozzle;
 	NozzlePtr m_OldNozzle;
     OpenBurnSettings* m_GlobalSettings;

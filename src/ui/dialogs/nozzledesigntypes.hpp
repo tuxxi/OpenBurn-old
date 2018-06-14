@@ -1,52 +1,30 @@
 #pragma once
 
 #include <QGridLayout>
-#include <QDialog>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QGraphicsView>
-#include <QPushButton>
-#include <QComboBox>
-#include <QToolButton>
 
 #include "src/nozzle.hpp"
 #include "src/settings.hpp"
-#include "src/units.hpp"
 #include "src/ui/widgets/unitscombobox.hpp"
-//this class represents the default design for a nozzle
 
-class OpenBurnDesignNozzle : public QWidget
+class BaseNozzleDesign : public QObject
 {
     Q_OBJECT
 public:
-    explicit OpenBurnDesignNozzle(
-        QWidget* parent = nullptr,
+    explicit BaseNozzleDesign(
+        QGridLayout* layout,
         OpenBurnNozzle* seed = nullptr,
         OpenBurnSettings* settings = nullptr);
 
-    virtual ~OpenBurnDesignNozzle() = default;
+    virtual ~BaseNozzleDesign() = default;
 
-    double GetThroatDiameter();
-    double GetExitDiameter();
-    OpenBurnNozzle* GetNozzle();
 signals:
     void DesignUpdated();
 protected:
-    virtual void SeedValues();
-    void AddNewControls(QWidget* widet, int row, int col);
-
-    QDoubleSpinBox *m_sbThroatDia, *m_sbExitDia;
-    LengthUnitsComboBox *m_unitsThroatDia, *m_unitsExitDia;
-    QComboBox *m_cbNozzleType;
-
-    OpenBurnNozzle* m_nozzleSeed;
-    OpenBurnSettings* m_GlobalSettings;
-private:
     void SetupUI();
     QGridLayout* m_Layout;
 
 };
-class ConicalNozzleDesign : public OpenBurnDesignNozzle
+class ConicalNozzleDesign : public BaseNozzleDesign
 {
     Q_OBJECT
 public:
@@ -58,7 +36,6 @@ public:
 
     double GetDivergentHalfAngle();
 protected:
-    virtual void SeedValues() override;
     QDoubleSpinBox *m_sbHalfAngle;
     AngleUnitsComboBox *m_unitsHalfAngle;
 };

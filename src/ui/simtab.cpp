@@ -372,6 +372,7 @@ void SimulationTab::OnDesignUpdated()
 }
 void SimulationTab::OnSimSettingsButtonClicked()
 {
+    /*
     if (m_SimSettingsDialog == nullptr)
     {
         m_SimSettingsDialog = std::make_unique<SimSettingsDialog>(m_SimSettings.get(), m_GlobalSettings);
@@ -381,6 +382,7 @@ void SimulationTab::OnSimSettingsButtonClicked()
     m_SimSettingsDialog->activateWindow();
     m_SimSettingsDialog->raise();
     m_sldCurrentXPos->setRange(0, static_cast<int>(m_Motor->GetMotorLength() * motorLenMultiplier));
+    */
 }
 void SimulationTab::OnRunSimButtonClicked()
 {

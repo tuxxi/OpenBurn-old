@@ -12,20 +12,17 @@ OpenBurnApplication::OpenBurnApplication()
 {
     m_UndoStack = new QUndoStack(this);
     m_DesignMotor = std::make_unique<OpenBurnMotor>();
-    m_Propellants = std::make_unique<std::vector<OpenBurnPropellant>>();
     m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
     m_GlobalSettings = std::make_unique<OpenBurnSettings>();
     LoadSettings("user/settings.json");
+    LoadDatabase("user/propellants.json");
 }
 
 void OpenBurnApplication::ResetCurrentDesign()
 {
-    //delete everything and re-create our children
-    m_DesignMotor.reset();
-    m_Simulator.reset();
+    //delete everything and re-create
     m_DesignMotor = std::make_unique<OpenBurnMotor>();
     m_Simulator = std::make_unique<MotorSim>(m_DesignMotor.get());
-
 }
 bool OpenBurnApplication::LoadSettings(const QString& filename)
 {
@@ -56,7 +53,7 @@ bool OpenBurnApplication::SaveSettings()
     }
     return false;
 }
-bool OpenBurnApplication::SaveNewFile(QFile &file)
+bool OpenBurnApplication::SaveFile(QFile &file)
 {
     if (!file.open(QIODevice::WriteOnly))
         return false;
@@ -83,7 +80,8 @@ bool OpenBurnApplication::SaveNewFile(QFile &file)
 }
 bool OpenBurnApplication::SaveCurrentFile()
 {
-    return SaveNewFile(m_CurrentDesignFilename);
+    QFile file(m_CurrentDesignFilename);
+    return SaveFile(file);
 }
 
 bool OpenBurnApplication::OpenFile(QFile& file)
@@ -123,22 +121,23 @@ void OpenBurnApplication::OnNewPropellantFound(OpenBurnPropellant prop)
     const auto brUnits = m_GlobalSettings->m_BurnRateUnits.GetUnitSymbol();
     const auto cstarUnits = m_GlobalSettings->m_VelocityUnits.GetUnitSymbol();
     const auto rhoUnits = m_GlobalSettings->m_DensityUnits.GetUnitSymbol();
+
+    const QString messageBoxQuestion = tr("Propellant ") + prop.GetPropellantName() + tr(" not found in database!\n\n") +
+        tr("BR Coef (a): ") + brCoef + " " + brUnits + "\n" +
+        tr("Br Exp (n): ") + QString::number(prop.GetBurnRateExp()) + "\n" +
+        tr("Characteristic Velocity (C*): ") + cStar + " " + cstarUnits + "\n" +
+        tr("Density (rho): ") + rho + " " + rhoUnits + "\n" +
+        tr("Specific Heat Ratio (gamma, Cp/Cv): ") + QString::number(prop.GetSpecificHeatRatio()) + "\n\n" +
+        tr("Would you like to add it to the database?\n");
     QMessageBox::StandardButton resBtn =
-        QMessageBox::question( this, "New Propellant Found",
-                               tr("Propellant ") + prop.GetPropellantName() + tr(" not found in database!\n\n") +
-                                   tr("BR Coef (a): ") + brCoef + " " + brUnits + "\n" +
-                                   tr("Br Exp (n): ") + QString::number(prop.GetBurnRateExp()) + "\n" +
-                                   tr("Characteristic Velocity (C*): ") + cStar + " " + cstarUnits + "\n" +
-                                   tr("Density (rho): ") + rho + " " + rhoUnits + "\n" +
-                                   tr("Specific Heat Ratio (gamma, Cp/Cv): ") + QString::number(prop.GetSpecificHeatRatio()) + "\n\n" +
-                                   tr("Would you like to add it to the database?\n"),
+        QMessageBox::question(nullptr, "New Propellant Found", messageBoxQuestion,
                                QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes)
     {
         AddNewPropellant(prop);
     }
 }
-void OpenBurnApplication::OnDuplicatePropellantFound(OpenBurnPropellant dupe, const OpenBurnPropellant &prop)
+void OpenBurnApplication::OnDuplicatePropellantFound(const OpenBurnPropellant& dupe, const OpenBurnPropellant &prop)
 {
     const auto brUnits = m_GlobalSettings->m_BurnRateUnits.GetUnitSymbol();
     const auto cstarUnits = m_GlobalSettings->m_VelocityUnits.GetUnitSymbol();
@@ -186,24 +185,25 @@ void OpenBurnApplication::OnDuplicatePropellantFound(OpenBurnPropellant dupe, co
         const auto y_dupe =  QString::number(dupe.GetSpecificHeatRatio());
         gmma = tr("Specific Heat Ratio (cp/cv, gamma) ") + y_dupe + "\t" +  y + "\n";
     }
+    const QString messageBoxQuestion = tr("Propellant ") + dupe.GetPropellantName() + tr(" different from database!\n\n") +
+        tr("Loaded from file: ") + "\t\t" + tr("Database: ") + "\n" +
+        brCoef +
+        brExp +
+        cStar +
+        rho +
+        gmma +
+        tr("\nWould you like to update the database?\n");
+
     QMessageBox::StandardButton resBtn =
-        QMessageBox::question( this, "Duplicate Propellant Found",
-                               tr("Propellant ") + dupe.GetPropellantName() + tr(" different from database!\n\n") +
-                                   tr("Loaded from file: ") + "\t\t" + tr("Database: ") + "\n" +
-                                   brCoef +
-                                   brExp +
-                                   cStar +
-                                   rho +
-                                   gmma +
-                                   tr("\nWould you like to update the database?\n"),
+        QMessageBox::question(nullptr, tr("Duplicate Propellant Found"), messageBoxQuestion,
                                QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes)
     {
-        auto oldProp = std::find(m_Propellants->begin(), m_Propellants->end(), prop);
-        if (oldProp != m_Propellants->end())
+        auto oldProp = std::find(m_Propellants.begin(), m_Propellants.end(), prop);
+        if (oldProp != m_Propellants.end())
         {
-            m_Propellants->erase(oldProp);
-            m_Propellants->push_back(dupe);
+            m_Propellants.erase(oldProp);
+            m_Propellants.push_back(dupe);
             SaveDatabase();
         }
     }
@@ -215,11 +215,11 @@ bool OpenBurnApplication::SaveDatabase()
     {
         QJsonObject propellantObject;
         QJsonArray propellantArray;
-        for (auto i : *m_Propellants)
+        for (auto prop : m_Propellants)
         {
-            QJsonObject prop;
-            i.WriteJSON(prop);
-            propellantArray.append(prop);
+            QJsonObject obj;
+            prop.WriteJSON(obj);
+            propellantArray.append(obj);
         }
         propellantObject["propellants"] = propellantArray;
         QJsonDocument saveDoc(propellantObject);
@@ -230,10 +230,10 @@ bool OpenBurnApplication::SaveDatabase()
 }
 bool OpenBurnApplication::AddNewPropellant(const OpenBurnPropellant& prop)
 {
-    m_Propellants->push_back(prop);
+    m_Propellants.push_back(prop);
 
     //set all the grains to a new propellant type if the propellant database happens to change
-    for (auto prop : *m_Propellants)
+    for (auto prop : m_Propellants)
     {
         for (auto grain : m_DesignMotor->GetGrains())
         {
@@ -251,7 +251,29 @@ bool OpenBurnApplication::AddNewPropellant(const OpenBurnPropellant& prop)
     }
     return false;
 }
-bool OpenBurnApplication::CurrentDesignSaved()
+bool OpenBurnApplication::CurrentDesignSaved() const
 {
     return m_UndoStack->isClean() && !m_CurrentDesignFilename.isEmpty();
+}
+
+bool OpenBurnApplication::LoadDatabase(const QString& filename)
+{
+    m_DatabaseFileName = filename;
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QByteArray data = file.readAll();
+        QJsonDocument loadDoc(QJsonDocument::fromJson(data));
+        m_Propellants.clear(); //make sure the database is clear before we add new propellants
+        QJsonArray propellantArray = loadDoc.object()["propellants"].toArray();
+        for (auto obj : propellantArray)
+        {
+            OpenBurnPropellant prop;
+            prop.ReadJSON(obj.toObject());
+            m_Propellants.push_back(prop);
+        }
+        file.close();
+        return true;
+    }
+    return false;
 }

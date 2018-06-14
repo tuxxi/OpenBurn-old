@@ -8,17 +8,16 @@
 #include <QDebug>
 
 #include "propellanttab.hpp"
+#include "src/application.hpp"
 
 const static QString DEFAULT_NAME = QString("New Propellant");
 
-PropellantTab::PropellantTab(PropellantList* propellants, OpenBurnSettings* settings, QWidget* parent)
-    : QWidget(parent),
-      m_Propellants(propellants),
-      m_GlobalSettings(settings)
+PropellantTab::PropellantTab(OpenBurnApplication& app, QWidget* parent)
+    : QWidget(parent), m_app(app)
 {
     SetupUI();
-    LoadDatabase("user/propellants.json");
     UpdateSettings();
+    /*
     if (m_Propellants->empty())
     {
         m_gbEdit->setEnabled(false);        
@@ -27,7 +26,7 @@ PropellantTab::PropellantTab(PropellantList* propellants, OpenBurnSettings* sett
     {
         OnPropellantComboBoxIndexChanged(0); //finish setting up UI so that we've got the 1st entry highlighted
     }
-
+    */
     connect(m_btnSaveProp, &QPushButton::clicked,
             this, &PropellantTab::OnSaveButtonClicked);
     connect(m_btnDeleteProp, &QPushButton::clicked,
@@ -114,31 +113,9 @@ void PropellantTab::SetupUI()
 
     setLayout(masterLayout);
 }
-bool PropellantTab::LoadDatabase(const QString& filename)
-{
-    m_DatabaseFileName = filename;
-    QFile file(filename);
-    if (file.open(QIODevice::ReadOnly))
-    {
-        QByteArray data = file.readAll();
-        QJsonDocument loadDoc(QJsonDocument::fromJson(data));
-        m_Propellants->clear();
-        QJsonArray propellantArray = loadDoc.object()["propellants"].toArray();
-        for (int i = 0; i < propellantArray.size(); ++i)
-        {
-            QJsonObject propellantObject = propellantArray[i].toObject();
-            OpenBurnPropellant prop;
-            prop.ReadJSON(propellantObject);
-            m_Propellants->push_back(prop);
-            m_cbPropSelection->addItem(prop.GetPropellantName());
-        }
-        file.close();
-        return true;
-    }
-    return false;
-}
 void PropellantTab::OnPropellantComboBoxIndexChanged(int idx)
 {
+    /*
     if (idx > -1) //is the group box selection valid?
     {
         m_gbEdit->setEnabled(true); 
@@ -153,6 +130,7 @@ void PropellantTab::OnPropellantComboBoxIndexChanged(int idx)
         m_lnePropCStar->setText(QString::number(propellant.GetCharVelocity()));
         m_lnePropGasSpecificHeatRatio->setText(QString::number(propellant.GetSpecificHeatRatio()));
     }
+    */
 }
 void PropellantTab::ConnectLineEditSignals()
 {
@@ -166,6 +144,7 @@ void PropellantTab::ConnectLineEditSignals()
 }
 void PropellantTab::OnPropellantUpdated()
 {
+    /*
     int idx = m_cbPropSelection->currentIndex() > 0 ? m_cbPropSelection->currentIndex() : 0;
     OpenBurnPropellant& prop = (*m_Propellants)[idx];
     m_cbPropSelection->setItemText(idx, m_lnePropName->text());    
@@ -183,18 +162,22 @@ void PropellantTab::OnPropellantUpdated()
             m_lnePropDensity->text().toDouble()),
         m_lnePropGasSpecificHeatRatio->text().toDouble()
     );
+    */
 }
 void PropellantTab::OnSaveButtonClicked()
 {
+    /*
     qDebug() << "Saving database!";
     OnPropellantUpdated();
     if (SaveDatabase())
     {
         emit PropellantsUpdated();
     }
+    */
 }
 void PropellantTab::OnDeleteButtonClicked()
 {
+    /*
     int oldIndex = m_cbPropSelection->currentIndex() > 0 ? m_cbPropSelection->currentIndex() : 0;    
     QMessageBox::StandardButton resBtn =
         QMessageBox::question( this, "OpenBurn", tr("Are you sure you want to delete propellant: ")
@@ -217,9 +200,11 @@ void PropellantTab::OnDeleteButtonClicked()
     {
         return;
     }
+    */
 }
 void PropellantTab::OnNewButtonClicked()
 {
+    /*
     OpenBurnPropellant prop(DEFAULT_NAME);
     m_Propellants->push_back(prop);
     m_cbPropSelection->addItem(DEFAULT_NAME);
@@ -228,6 +213,7 @@ void PropellantTab::OnNewButtonClicked()
 
     m_gbEdit->setEnabled(true);
     m_btnDeleteProp->setEnabled(true);
+    */
 }
 void PropellantTab::SetDefaultValues()
 {
@@ -240,7 +226,9 @@ void PropellantTab::SetDefaultValues()
 }
 void PropellantTab::UpdateSettings()
 {
+    /*
     m_unitsBRCoef->SetUnits(m_GlobalSettings->m_BurnRateUnits);
     m_unitsDensity->SetUnits(m_GlobalSettings->m_DensityUnits);
     m_unitsCStar->SetUnits(m_GlobalSettings->m_VelocityUnits);
+    */
 }

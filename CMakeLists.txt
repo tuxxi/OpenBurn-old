@@ -10,14 +10,13 @@ set(CMAKE_AUTOMOC ON)
 
 if (NOT MSVC)
 # Turn on all warnings for debug mode (NOT MSVC)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -fsanitize=address")
 endif(NOT MSVC)
 #
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release
-RelWithDebInfo MinSizeRel."
+      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
@@ -27,7 +26,7 @@ endif(MSVC)
 
 # Set some Apple MacOS Specific settings
 if (APPLE)
-set(GUI_TYPE MACOSX_BUNDLE)
+	set(GUI_TYPE MACOSX_BUNDLE)
 endif (APPLE)
 
 
@@ -47,6 +46,7 @@ get_target_property(QtPrintSupport_location Qt5::PrintSupport LOCATION)
 set (PROJECT_SRCS 
         src/thirdparty/qcustomplot/qcustomplot.cpp
         src/thirdparty/qcustomplot/qcustomplot.h
+
         src/ui/dialogs/exportdialog.cpp
         src/ui/dialogs/exportdialog.hpp
         src/ui/dialogs/globalsettingsdialog.cpp
@@ -98,7 +98,8 @@ set (PROJECT_SRCS
         src/settings.hpp
         src/units.hpp
         src/util.cpp
-        src/util.hpp src/application.cpp src/application.hpp)
+        src/util.hpp 
+		src/application.cpp src/application.hpp)
 
 add_executable(OpenBurn ${GUI_TYPE} ${PROJECT_SRCS} )
 

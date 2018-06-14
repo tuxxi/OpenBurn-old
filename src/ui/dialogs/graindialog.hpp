@@ -15,15 +15,13 @@
 #include "graindesigntypes.hpp"
 #include "src/ui/graphics/graingraphicsitem.hpp"
 
+class OpenBurnApplication;
 class GrainDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit GrainDialog(PropellantList* propellants,
-        OpenBurnGrain* seedValues = nullptr, 
-        OpenBurnSettings* settings = nullptr,
-        const GrainVector& grains = GrainVector(),
+    explicit GrainDialog(OpenBurnApplication& app,
         QWidget* parent = nullptr
         );
     ~GrainDialog() = default;
@@ -53,6 +51,9 @@ private:
 
     void UpdateDesignControls(GrainType type);
     void SetGrainValues();
+
+    OpenBurnApplication& m_app;
+
     QGridLayout* m_layControls;
     QGroupBox* m_gbFrame;
 
@@ -73,12 +74,5 @@ private:
 
 	QToolButton *m_btntModifyPropellant;
 
-    OpenBurnGrain* m_seedGrain;
-	GrainVector m_grainsToEdit;
-	//because the grains are pointers and we explicitly modify their values via the dialog, 
-	//we store a copy of the original grains for the undo action later on
-	GrainVector m_OriginalGrains;
-    PropellantList* m_Propellants;
-    OpenBurnSettings* m_GlobalSettings;
     bool m_isNewGrainWindow;
 };

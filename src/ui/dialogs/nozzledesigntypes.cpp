@@ -3,14 +3,13 @@
 #include "nozzledesigntypes.hpp"
 #include "src/util.hpp"
 
-OpenBurnDesignNozzle::OpenBurnDesignNozzle(QWidget* parent, OpenBurnNozzle* nozz, OpenBurnSettings* settings)
-    : QWidget(parent),
-      m_nozzleSeed(nozz),
-      m_GlobalSettings(settings)
+/*
+BaseNozzleDesign::BaseNozzleDesign(QGridLayout* layout, 
+    OpenBurnNozzle* seed,
+    OpenBurnSettings* settings)
+    
 {
     SetupUI();
-    SeedValues();
-
     //new function pointer syntax does not work for overloaded signals or slots >.<
     connect(m_sbThroatDia, SIGNAL(valueChanged(double)),
             this, SIGNAL(DesignUpdated()));
@@ -123,3 +122,4 @@ double ConicalNozzleDesign::GetDivergentHalfAngle()
         OpenBurnUnits::AngleUnits_T::degrees,
         m_sbHalfAngle->value());
 }
+*/

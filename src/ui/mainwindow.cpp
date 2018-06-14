@@ -7,7 +7,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ImplicitIntegerAndEnumConversion"
 MainWindow::MainWindow(OpenBurnApplication& app, QWidget *parent)
-    : m_app(app), QMainWindow(parent)
+    : QMainWindow(parent), m_app(app)
 {
     SetupUI();
 }
@@ -85,15 +85,14 @@ void MainWindow::SetupUI()
     m_MenuHelp = new QMenu(tr("Help"), m_MenuBar);
     m_MenuBar->addAction(m_MenuHelp->menuAction());
 
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setSizePolicy(sizePolicy);
+    setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     
     m_TabWidget = new QTabWidget(this);
     connect(m_TabWidget, &QTabWidget::currentChanged,
             this, &MainWindow::OnTabChanged);
 
-    //m_DesignTab =
-    //m_SimTab =
+    m_DesignTab = new DesignTab(m_app, this);
+    //m_SimTab = new SimulationTab()
     //m_PropellantTab =
 
     m_TabWidget->addTab(m_DesignTab, tr("Design"));
@@ -156,7 +155,7 @@ void MainWindow::OnMenuSaveAs()
 {
     QFile file = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
             tr("OpenBurn File (*.obm)"));
-    if (!m_app.SaveNewFile(file))
+    if (!m_app.SaveFile(file))
     {
         QMessageBox::critical(this,
                               tr("Could not save file!"),

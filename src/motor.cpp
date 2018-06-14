@@ -316,15 +316,16 @@ void OpenBurnMotor::CalcAvgPropellant()
 	m_AvgPropellant.SetBasicParams(a, n, cstar, rho, gmma);
 	m_AvgPropellant.SetPropellantName(debugName);
 }
-void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database)
+void OpenBurnMotor::ReadJSON(const QJsonObject& object)
 {
-    PropellantList propellants;
+    std::vector<OpenBurnPropellant> propellants;
     QJsonArray propellantArray = object["propellants"].toArray();
     for (auto i : propellantArray)
     {
         QJsonObject propellantObject = i.toObject();
         OpenBurnPropellant prop;
         prop.ReadJSON(propellantObject);
+        /*
         auto newPropellant = std::find(database->begin(), database->end(), prop);
         if (newPropellant == database->end()) //didn't find it, lets check to see if it's a duplicate
         {
@@ -340,6 +341,7 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
             }
         }
         propellants.push_back(prop);
+        */
     }
     QJsonArray grainArray = object["grains"].toArray(); 
     for(auto grain : grainArray)
@@ -385,12 +387,12 @@ void OpenBurnMotor::ReadJSON(const QJsonObject& object, PropellantList* database
 void OpenBurnMotor::WriteJSON(QJsonObject &object)
 {
     QJsonArray grainArray;
-    PropellantList propellants;
+    std::vector<OpenBurnPropellant> propellants;
     for(const auto& grain : m_Grains)
     {
-        QJsonObject object;
-        grain->WriteJSON(object);
-        grainArray.append(object);
+        QJsonObject obj;
+        grain->WriteJSON(obj);
+        grainArray.append(obj);
 
         if (propellants.empty()) //no propellants yet
         {
